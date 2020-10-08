@@ -3,7 +3,7 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <router-link class="" to="/">
       <b-navbar-brand>
-        <h1 class="ml-3">Kampong Spirit</h1>
+        <h1 id="brand" class="ml-3">Kampong Spirit</h1>
       </b-navbar-brand>
     </router-link>
 

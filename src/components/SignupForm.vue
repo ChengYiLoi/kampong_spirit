@@ -1,5 +1,5 @@
 <template>
-  <b-form class="login-form text-left p-4">
+  <b-form @submit.stop.prevent="onSubmit()" class="login-form text-left p-4">
     <h1>Sign up</h1>
     <b-row class="mt-4">
       <b-col>
@@ -71,7 +71,9 @@
       <b-form-invalid-feedback id="pnumber-feedback" v-if="!$v.form.email.email"
         >Email must be valid</b-form-invalid-feedback
       >
-      <b-form-invalid-feedback id="pnumber-feedback" v-if="!$v.form.email.required"
+      <b-form-invalid-feedback
+        id="pnumber-feedback"
+        v-if="!$v.form.email.required"
         >Email is required</b-form-invalid-feedback
       >
     </b-form-group>
@@ -96,7 +98,6 @@
         id="passsword-feedback"
         >Password cannot exceed 12 characters</b-form-invalid-feedback
       >
-    
     </b-form-group>
 
     <b-form-group label="Confirm Password:" label-for="cpassword" class="mb-3">
@@ -105,45 +106,29 @@
         type="password"
         placeholder="Enter your password"
         autocomplete="off"
-         v-model="$v.form.cpassword.$model"
+        v-model="$v.form.cpassword.$model"
         :state="validateState('cpassword')"
         aria-describedby="cpassword-feedback"
       ></b-form-input>
-       <b-form-invalid-feedback
+      <b-form-invalid-feedback
         v-if="!$v.form.password.required"
         id="cpasssword-feedback"
         >Confirm password is required</b-form-invalid-feedback
       >
-       <b-form-invalid-feedback
+      <b-form-invalid-feedback
         v-if="!$v.form.cpassword.sameAsPassword"
         id="cpasssword-feedback"
         >Password and confirm password is not the same</b-form-invalid-feedback
       >
     </b-form-group>
 
-    <router-link to="/main">
-      <button id="login-button" class="mt-4">
-        Sign Up
-      </button></router-link
-    >
+    <button id="login-button" class="mt-4">
+      Sign Up
+    </button>
+    <p  class="mt-4 text-center text-link" v-on:click="switchForm()">
+      Back to Login
+    </p>
   </b-form>
-  <!-- <div>
-    <b-form @submit.stop.prevent="onSubmit">
-      <b-form-group id="example-input-group-1" label="Name" label-for="example-input-1">
-        <b-form-input
-          id="example-input-1"
-          name="example-input-1"
-          v-model="$v.form.name.$model"
-          :state="validateState('name')"
-          aria-describedby="input-1-live-feedback"
-        ></b-form-input>
-
-        <b-form-invalid-feedback
-          id="input-1-live-feedback"
-        >This is a required field and must be at least 3 characters.</b-form-invalid-feedback>
-      </b-form-group>
-    </b-form>
-  </div> -->
 </template>
 <script>
 import { validationMixin } from "vuelidate";
@@ -154,7 +139,7 @@ import {
   numeric,
   email,
   maxLength,
-  sameAs
+  sameAs,
 } from "vuelidate/lib/validators";
 export default {
   mixins: [validationMixin],
@@ -197,32 +182,24 @@ export default {
         required,
         minLength: minLength(6),
         maxLength: maxLength(12),
-        sameAsPassword: sameAs('password')
+        sameAsPassword: sameAs("password"),
       },
     },
   },
   methods: {
+      switchForm(){
+          this.$emit('switchForm', false);
+      },
     validateState(name) {
-     
       const { $dirty, $error } = this.$v.form[name];
       return $dirty ? !$error : null;
-    },
-    resetForm() {
-      this.form = {
-        name: null,
-        food: null,
-      };
-
-      this.$nextTick(() => {
-        this.$v.$reset();
-      });
     },
     onSubmit() {
       this.$v.form.$touch();
       if (this.$v.form.$anyError) {
         return;
       }
-
+      this.$router.push({name: 'Main'});
       alert("Form submitted!");
     },
   },

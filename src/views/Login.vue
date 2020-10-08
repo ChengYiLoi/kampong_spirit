@@ -9,10 +9,10 @@
       <b-row class="p-3">
         <b-col md="5" align-self="center">
           <div v-if="isSignup">
-            <signupForm></signupForm>
+            <signupForm v-on:switchForm="switchForm($event)"></signupForm>
           </div>
           <div v-else>
-            <loginForm></loginForm>
+            <loginForm :isSignup="isSignup" v-on:switchForm="switchForm($event)"></loginForm> <!-- v-on fires when user clicks on sign up -->
           </div>
         </b-col>
         <b-col md="" class="text-right">
@@ -33,9 +33,14 @@ export default {
   },
   data() {
     return {
-      isSignup: true,
+      isSignup: false,
     };
   },
+  methods:{
+    switchForm(event){
+      this.isSignup = event;
+    }
+  }
 };
 </script>
 <style lang="scss">

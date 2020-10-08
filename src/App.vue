@@ -24,12 +24,19 @@ export default {
   text-align: center;
   color: #2c3e50;
   scroll-behavior: smooth;
+
   button{
     &:focus{
       outline: unset;
     }
+   
     
   }
+   #brand{
+      font-weight: bold;
+      color: #D2FDFF;
+      font-style: italic;
+    }
 }
 
 

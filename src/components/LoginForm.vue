@@ -9,7 +9,19 @@
         id="email"
         type="email"
         placeholder="you@example.com"
+        autocomplete="off"
+        v-model="$v.form.email.$model"
+        :state="validateState('email')"
+        aria-describedby="email-feedback"
       ></b-form-input>
+      <b-form-invalid-feedback
+        id="email-feedback"
+        v-if="!$v.form.email.required"
+        >Email is required</b-form-invalid-feedback
+      >
+      <b-form-invalid-feedback id="email-feedback" v-if="!$v.form.email.email"
+        >Email is invalid</b-form-invalid-feedback
+      >
     </b-form-group>
 
     <b-form-group label="Password:" label-for="password" class="my-4">
@@ -17,7 +29,14 @@
         id="password"
         type="password"
         placeholder="Enter your password"
+        autocomplete="off"
+        v-model="$v.form.password.$model"
+        :state="validateState('password')"
+        aria-describedby="password-feedback"
       ></b-form-input>
+      <b-form-invalid-feedback id="password-feedback"
+        >Password is required</b-form-invalid-feedback
+      >
     </b-form-group>
     <b-form-checkbox value="remember" class="my-3"
       >Keep me logged In</b-form-checkbox
@@ -28,12 +47,56 @@
       </button></router-link
     >
     <p class="mt-4 text-center">
-      Don't have an acoount? <a id="sign-up">Sign up</a>
+      Don't have an acoount? <span v-on:click="switchForm()" class="text-link">Sign up</span>
     </p>
   </b-form>
 </template>
+<script>
+import { validationMixin } from "vuelidate";
+import { required, email } from "vuelidate/lib/validators";
+export default {
+  mixins: [validationMixin],
+   props: ['isSignup'],
+  data() {
+    return {
+      form: {
+        email: null,
+        password: null,
+      },
+    };
+  },
+  validations: {
+    form: {
+      email: {
+        required,
+        email,
+      },
+      password: {
+        required,
+      },
+    },
+  },
+  methods: {
+    switchForm(){
+      this.$emit('switchForm', true); // emits to the parent component to show the sigup form 
+    },
+    validateState(name) {
+      const { $dirty, $error } = this.$v.form[name];
+      return $dirty ? !$error : null;
+    },
+    onSubmit() {
+      this.$v.form.$touch();
+      if (this.$v.form.$anyError) {
+        return;
+      }
+      this.$router.push({ name: "Main" });
+      alert("Form submitted!");
+    },
+  },
+};
+</script>
 <style lang="scss">
-  .login-form {
+.login-form {
   background-color: white;
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
@@ -64,9 +127,10 @@
 
     color: whitesmoke;
   }
-  #sign-up{
-    color: #824EA0;
+  .text-link {
+    color: #824ea0;
     font-weight: 900;
+    cursor: pointer;
   }
 }
 </style>
