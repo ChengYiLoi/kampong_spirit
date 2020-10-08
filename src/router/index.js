@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Landing from '../views/Landing.vue';
-// import Main from '../views/Main.vue';
 
 
 Vue.use(VueRouter);
@@ -24,7 +23,8 @@ const routes = [
   // {
   //   path: "/main",
   //   name: "Main",
-  //   component: Main
+  //   component: () =>
+  //   import("../views/Main.vue")
   // }
 ];
 

@@ -9,8 +9,10 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
 import VueSmoothScroll from 'vue2-smooth-scroll'
 
+
 Vue.use(BootstrapVue);
 Vue.use(VueSmoothScroll);
+
 
 Vue.use(VueGoogleMaps,{
   load:{

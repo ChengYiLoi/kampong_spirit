@@ -4,6 +4,7 @@
     <jumbotron></jumbotron>
     <features></features>
     <mainFooter></mainFooter>
+    <slider></slider>
   </div>
 </template>
 
@@ -12,12 +13,14 @@ import jumbotron from "../components/Jumbotron";
 import features from "../components/Features";
 import mainFooter from "../components/Footer";
 import navbar from "../components/Nav";
+import slider from '../components/Slider'
 export default {
   components: {
     jumbotron,
     features,
     mainFooter,
     navbar,
+    slider
   },
   data() {
     return {
