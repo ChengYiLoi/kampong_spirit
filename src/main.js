@@ -8,11 +8,12 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
 import VueSmoothScroll from 'vue2-smooth-scroll'
+import Vuelidate from 'vuelidate'
 
 
 Vue.use(BootstrapVue);
 Vue.use(VueSmoothScroll);
-
+Vue.use(Vuelidate)
 
 Vue.use(VueGoogleMaps,{
   load:{
