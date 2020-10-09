@@ -1,27 +1,51 @@
 <template>
-  <div id="dashbar" class="p-3">
-    <b-row class="mb-5">
-      <b-col><h1 id="brand">Kampong Spirit</h1></b-col>
-    </b-row>
-    <dashOption
-      class="isSelected"
-      :dashProps="dashOptions.map"
-      v-on:updateSelection="updateSelection($event)"
-    ></dashOption>
-    <dashOption
-      :dashProps="dashOptions.marketplace"
-      v-on:updateSelection="updateSelection($event)"
-    ></dashOption>
-    <dashOption
-      :dashProps="dashOptions.settings"
-      v-on:updateSelection="updateSelection($event)"
-    ></dashOption>
+  <b-container id="sidebar">
+    <b-row>
+      <span id="menu" class="d-inline mx-auto pt-2" v-b-toggle.sidebar-backdrop><b-img  :src="require(`../assets/menu.svg`)"></b-img></span>
+      <b-sidebar
+        id="sidebar-backdrop"
+        :backdrop-variant="variant"
+        backdrop
+        shadow
+      >
+        <b-container>
+          <b-row>
+            <b-col>
+              <p id="brand" class="pt-2">Kampong Spirit</p>
+            </b-col>
+          </b-row>
 
-    <dashOption
-      :dashProps="dashOptions.logout"
-      v-on:updateSelection="updateSelection($event)"
-    ></dashOption>
-  </div>
+          <b-row>
+            <b-col cols="12">
+              <dashOption
+                class="isSelected"
+                :dashProps="dashOptions.map"
+                v-on:updateSelection="updateSelection($event)"
+              ></dashOption>
+            </b-col>
+            <b-col cols="12">
+              <dashOption
+                :dashProps="dashOptions.marketplace"
+                v-on:updateSelection="updateSelection($event)"
+              ></dashOption>
+            </b-col>
+            <b-col cols="12">
+              <dashOption
+                :dashProps="dashOptions.settings"
+                v-on:updateSelection="updateSelection($event)"
+              ></dashOption>
+            </b-col>
+            <b-col cols="12">
+              <dashOption
+                :dashProps="dashOptions.logout"
+                v-on:updateSelection="updateSelection($event)"
+              ></dashOption>
+            </b-col>
+          </b-row>
+        </b-container>
+      </b-sidebar>
+    </b-row>
+  </b-container>
 </template>
 <script>
 import dashOption from "../components/DashOption";
@@ -55,7 +79,7 @@ export default {
           url: "logout.svg",
           selectName: "logout",
           selected: false,
-          isLogout: true
+          isLogout: true,
         },
       },
     };
@@ -75,9 +99,26 @@ export default {
 };
 </script>
 <style lang="scss">
-#dashbar {
+#sidebar{
   height: 100vh;
   background-color: #6cc49a;
-  border-radius: 0px 20px 0px 0px;
+  #menu{
+  &:focus{
+    outline: none;
+  }
+}
+}
+
+#sidebar-backdrop {
+  background-color: #6cc49a !important;
+}
+  #brand {
+    font-size: 1.6rem;
+  }
+
+@media only screen and (max-width: 1025px) {
+  #dashbar #brand {
+    font-size: 1.4rem;
+  }
 }
 </style>

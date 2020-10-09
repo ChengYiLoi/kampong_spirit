@@ -19,7 +19,6 @@ export default {
     const rand = Math.floor(Math.random() * this.quotes.length);
 
     this.num = rand;
-    console.log(this.num);
   },
   mounted() {
     const t1 = gsap.timeline({ defaults: { ease: "power1.out" } });
@@ -101,4 +100,19 @@ export default {
   height: 100%;
   transform: translateY(100%);
 }
+
+@media only screen and (max-width: 426px) {
+  #intro  #intro-text  .hide{
+    font-size: 1.8rem;
+    padding: 0px 1%;
+  }
+}
+
+@media only screen and (max-width: 321px) {
+  #intro  #intro-text  .hide{
+    
+    padding: 0px 4%;
+  }
+}
+
 </style>

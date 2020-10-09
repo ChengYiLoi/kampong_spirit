@@ -1,6 +1,6 @@
 <template>
   <b-form @submit.stop.prevent="onSubmit()" class="login-form text-left p-3">
-    <h3>Sign up</h3>
+    <h2 class="text-lg-left text-center">Sign up</h2>
     <b-row class="mt-4">
       <b-col>
         <b-form-group label="First Name" label-for="fname">

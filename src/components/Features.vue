@@ -61,6 +61,4 @@ export default {
   font-size: 3.0rem;
   text-align: center;
 }
-
-
 </style>

@@ -1,13 +1,13 @@
 <template>
-  <b-container fluid id="login">
-    <b-row class="navbar nav-deco pt-2 navbar-dark">
+<div>
+  <b-row class="navbar nav-deco pt-2 navbar-dark">
       <b-col>
         <router-link class="brand" to="/"><h1>Kampong Spirit</h1></router-link>
       </b-col>
     </b-row>
-    <b-container fluid>
-      <b-row class="p-3 h-100">
-        <b-col lg="5" align-self="center">
+    
+      <b-row id="login" class=" p-4" align-v="center">
+        <b-col lg="5" >
           <div v-if="isSignup">
             <signupForm v-on:switchForm="switchForm($event)"></signupForm>
           </div>
@@ -19,16 +19,18 @@
             <!-- v-on fires when user clicks on sign up -->
           </div>
         </b-col>
-        <b-col class="text-right d-none d-lg-block h-100">
+        <b-col class="text-right d-none d-lg-block">
           <b-img
             fluid
             :src="require('../assets/earth.svg')"
-            class=""
+          
           ></b-img>
         </b-col>
       </b-row>
-    </b-container>
-  </b-container>
+
+</div>
+  
+
 </template>
 
 <script>
@@ -69,7 +71,12 @@ $text-white: whitesmoke;
 #login {
   background-color: #f1f3f6;
   height: 100vh;
-  overflow: hidden;
+}
+
+@media only screen and (max-width: 426px) {
+  #login{
+    overflow: visible;
+  }
 }
 
 @media only screen and (max-width: 376px) {

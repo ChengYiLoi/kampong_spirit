@@ -1,7 +1,7 @@
 <template>
 <b-container fluid id="main" class="p-0 m-0">
    <b-row align-v="stretch">
-      <b-col cols="2">
+      <b-col cols="1">
         <dashbar></dashbar>
       </b-col>
       <b-col>

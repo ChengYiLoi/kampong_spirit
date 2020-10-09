@@ -1,7 +1,7 @@
 <template>
-  <b-row class="my-5">
-    <b-col cols="2"></b-col>
-    <b-col class="pr-0">
+  <b-row >
+    <b-col ></b-col>
+    <b-col md='12' class="pr-0 my-3">
       <b-row
         align-v="center"
         v-bind:class="{
@@ -12,10 +12,10 @@
         v-on:click="updateSelection()"
       >
         <b-col cols="3" class="p-0">
-          <b-img fluid :src="require(`../assets/${dashProps.url}`)"></b-img>
+          <b-img fluid :src="require(`../assets/${dashProps.url}`)" class="dash-option-img"></b-img>
         </b-col>
-        <b-col class="p-0">
-          <p class="d-inline mx-auto dash-text">{{ dashProps.text }}</p>
+        <b-col class="p-0" >
+          <p class=" mx-auto dash-text">{{ dashProps.text }}</p>
         </b-col>
       </b-row>
     </b-col>
@@ -41,7 +41,8 @@ export default {
 
   .dash-text {
     font-weight: bold;
-    font-size: 1.3rem;
+    font-size: 1.0rem;
+    display: inline;
   }
 }
 .selected {
@@ -50,5 +51,24 @@ export default {
 }
 .logout {
   background-color: #7854f7;
+}
+
+@media only screen and (max-width: 1025px) {
+  .dash-option  .dash-text{
+    font-size: 0.7rem;
+    color: pink;
+  }
+  .dash-option-img{
+    
+  }
+}
+
+@media only screen and (max-width: 769px) {
+  .dash-option  .dash-text{
+    font-size: 0.7rem;
+  }
+  .dash-option-img{
+    
+  }
 }
 </style>

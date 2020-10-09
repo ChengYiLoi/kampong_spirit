@@ -1,11 +1,10 @@
 <template>
-  <b-form class="login-form text-left p-3">
+  <b-form @submit.stop.prevent="onSubmit()" class="login-form text-left p-5">
     <h2 class="text-lg-left text-center">Log In</h2>
-  
-      <button id="google" class="mt-4 d-block w-100 mx-auto px-3">
-        <span><img src="../assets/google.svg"/></span> Sign in with Google
-      </button>
-   
+
+    <button id="google" class="mt-4 d-block w-100 mx-auto px-3">
+      <span><img src="../assets/google.svg"/></span> Sign in with Google
+    </button>
 
     <b-form-group label="Email Address:" label-for="email" class="my-4">
       <b-form-input
@@ -44,11 +43,10 @@
     <b-form-checkbox value="remember" class="my-3"
       >Keep me logged In</b-form-checkbox
     >
-    <router-link to="/main">
+    
       <button id="login-button" class="mt-4">
         Log In
-      </button></router-link
-    >
+      </button>
     <p class="mt-4 text-center">
       Don't have an acoount?
       <span v-on:click="switchForm()" class="text-link">Sign up</span>
@@ -140,15 +138,14 @@ export default {
 }
 
 @media only screen and (max-width: 376px) {
-  .login-form{
+  .login-form {
     font-size: 0.7rem;
-    #login-button{
+    #login-button {
       font-size: 0.9rem;
     }
-    p{
+    p {
       font-size: 0.6rem;
     }
   }
-
 }
 </style>
