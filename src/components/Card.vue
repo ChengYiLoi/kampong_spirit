@@ -1,5 +1,5 @@
 <template>
-  <b-card v-bind:title="cardObject.title" class="h-100 w-100 card-info">
+  <b-card v-bind:title="cardObject.title" class="card-info h-100">
     <b-row>
       <b-col cols="">
         <b-img

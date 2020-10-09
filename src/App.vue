@@ -33,10 +33,17 @@ export default {
     
   }
    #brand{
+     font-size: 2.0rem;
       font-weight: bold;
       color: #D2FDFF;
       font-style: italic;
     }
+}
+@media only screen and (max-width: 426px) {
+   #app  #brand{
+    font-size: 1.5rem;
+  }
+ 
 }
 
 

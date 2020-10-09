@@ -1,21 +1,16 @@
 <template>
   <b-container id="features" fluid class="pt-3">
     <h3 id="title" class="pb-4">Features</h3>
-    <b-container fluid class="">
-      <b-row class="justify-content-center">
-        <b-col v-for="cardObject in cardObjects" :key="cardObject.name" md="3">
-          <!-- for loop that creates a card component based on the length of the cardObjects array -->
-          <card :cardObject="cardObject"></card>
-        </b-col>
-          <b-col cols="12" align-self="end">
-          <b-container class="text-center mt-4">
-            <a id="arrow" href="#navbar" v-smooth-scroll>
-              <i class="fas fa-chevron-up fa-5x"></i
-            ></a>
-          </b-container>
-        </b-col>
-      </b-row>
-    </b-container>
+    <b-row class="justify-content-center px-md-5 px-0">
+      <b-col v-for="cardObject in cardObjects" :key="cardObject.name" lg="4" class="w-100 my-xl-0 my-3">
+        <!-- for loop that creates a card component based on the length of the cardObjects array -->
+        <card :cardObject="cardObject"></card>
+      </b-col>
+   
+    </b-row>
+      <a id="arrow" href="#navbar" v-smooth-scroll>
+            <i class="fas fa-chevron-up fa-5x"></i
+          ></a>
   </b-container>
 </template>
 
@@ -51,7 +46,6 @@ export default {
             "Trade or just donate with other users",
           ],
         },
-    
       ],
     };
   },
@@ -59,18 +53,14 @@ export default {
 </script>
 
 <style lang="scss">
-
 #features {
-  background-color: #ACACAC;
+  background-color: #acacac;
 }
 #title {
   color: whitesmoke;
-  font-size: 52px;
+  font-size: 3.0rem;
+  text-align: center;
 }
 
-@media screen and (min-width: 768px) {
-  #features {
-    height: 85vh;
-  }
-}
+
 </style>

@@ -1,12 +1,13 @@
 <template>
   <div>
-    <b-jumbotron class="text-left mb-0 pb-2">
-      <b-row class="pb-5">
-        <b-col cols="12">
+    <b-jumbotron class="text-center text-md-left mb-0 pb-2">
+      <b-row>
+        <b-col class="px-1">
           <h1 class="display-4">Reducing waste has never been easier</h1>
-
         </b-col>
-        <b-col cols="4">
+      </b-row>
+      <b-row class="pb-5">
+        <b-col>
           <b-button-group vertical>
             <router-link to="/login">
               <button variant="info" class="my-2 jumbo-button">
@@ -38,7 +39,7 @@ export default {
 <style lang="scss">
 $hover-blue: #5bb7de;
 .jumbo-button {
-  min-width: 350px;
+  min-width: 250px;
   font-size: 1.75rem;
   border-radius: 10px;
   border: unset;
@@ -57,10 +58,10 @@ $hover-blue: #5bb7de;
   background-color: #6cc49a !important;
   border-radius: unset !important;
   color: white;
-  height: 92vh;
+  height: 100vh;
   background-image: url(../assets/jumbo_640.gif);
   background-repeat: no-repeat;
-  background-position: 98% 50%;
+  background-position: 100%;
   background-size: 50% 100%;
 }
 
@@ -71,5 +72,20 @@ $hover-blue: #5bb7de;
   &:hover {
     color: $hover-blue;
   }
+}
+
+@media only screen and (max-width: 1025px) {
+  .col > .display-4{
+    font-size: 3.0rem;
+  }
+}
+@media only screen and (max-width: 426px) {
+ .jumbotron{
+   background-image: unset;
+   .col > .display-4{
+    text-align: center;
+    font-size: 2.0rem;
+  }
+ }
 }
 </style>

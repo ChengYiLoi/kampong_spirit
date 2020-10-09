@@ -26,6 +26,7 @@ export default {
     t1.to(".text", { y: "0%", duration: 1, stagger: 0.25 });
     t1.to("#slider", { y: "-100%", duration: 2, delay: 1 });
     t1.to("#intro", { y: "-100%", duration: 0.5 }, "-=1.65");
+    t1.fromTo('#intro', {opacity: 1}, {opacity : 0, duration: 0.1})
   },
   data() {
     return {

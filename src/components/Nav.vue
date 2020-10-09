@@ -1,18 +1,17 @@
 <template>
   <b-navbar id="navbar" toggleable="md" type="dark" class="nav-deco p-3">
-    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-    <router-link class="" to="/">
-      <b-navbar-brand>
-        <h1 id="brand" class="ml-3">Kampong Spirit</h1>
+    <router-link to="/">
+      <b-navbar-brand id="brand">
+        Kampong Spirit
       </b-navbar-brand>
     </router-link>
-
+    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav class="ml-auto text-left">
-        <b-nav-item class=""
+        <b-nav-item 
           ><router-link class="link" to="/">About Us</router-link></b-nav-item
         >
-        <b-nav-item class=""
+        <b-nav-item 
           ><router-link class="link" to="/login"
             >Log in or Sign Up</router-link
           ></b-nav-item
@@ -42,6 +41,17 @@ export default {
     &:hover {
       text-decoration: none;
     }
+  }
+}
+
+@media only screen and (max-width: 426px) {
+   .router-link-active > #brand{
+    font-size: 1.5rem;
+  }
+  .nav-link > .link{
+    color: whitesmoke;
+    background-color: unset;
+    font-size: 1.0rem;
   }
 }
 </style>
