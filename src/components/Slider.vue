@@ -1,20 +1,11 @@
 <template>
   <div id="intro">
     <div id="intro-text">
-      <h1 class="hide">
-        <span class="text">No challenge poses</span>
+      <h1 class="hide" v-for="(text, index) in quotes[num].texts" :key="index">
+        <span class="text">{{ text }}</span>
       </h1>
       <h1 class="hide">
-        <span class="text">a greater threat</span>
-      </h1>
-      <h1 class="hide">
-        <span class="text">to future generations</span>
-      </h1>
-      <h1 class="hide">
-        <span class="text">than climate change.</span>
-      </h1>
-      <h1 class="hide">
-        <span id="quote-name" class="text">~ Obama ~</span>
+        <span class="text">{{ quotes[num].name }}</span>
       </h1>
     </div>
     <div id="slider"></div>
@@ -24,14 +15,50 @@
 <script>
 import { gsap } from "gsap";
 export default {
+  created() {
+    const rand = Math.floor(Math.random() * this.quotes.length);
+
+    this.num = rand;
+    console.log(this.num);
+  },
   mounted() {
     const t1 = gsap.timeline({ defaults: { ease: "power1.out" } });
     t1.to(".text", { y: "0%", duration: 1, stagger: 0.25 });
-    t1.to('#slider', {y:"-100%", duration: 2, delay: 1});
-    t1.to('#intro', {y: "-100%", duration: 0.5}, "-=1.65");
+    t1.to("#slider", { y: "-100%", duration: 2, delay: 1 });
+    t1.to("#intro", { y: "-100%", duration: 0.5 }, "-=1.65");
   },
   data() {
-    return {};
+    return {
+      num: null,
+      quotes: [
+        {
+          name: "~ Obama ~",
+          texts: [
+            "No challenge poses",
+            "a greater threat",
+            "to future generations",
+            "than climate change.",
+          ],
+        },
+        {
+          name: "~ Greta Thunberg ~",
+          texts: [
+            "The climate crisis",
+            "has already been solved.",
+            "We already have the facts and solutions.",
+            "All we have to do is wake up and change.",
+          ],
+        },
+        {
+          name: "~ Pope Francis ~",
+          texts: [
+            "God gave us the earth",
+            "to till and to keep in",
+            "a balanced and respectful way.",
+          ],
+        },
+      ],
+    };
   },
 };
 </script>
@@ -57,8 +84,8 @@ export default {
         transform: translateY(100%);
         display: inline-block;
       }
-      #quote-name{
-          font-size: 2rem;
+      #quote-name {
+        font-size: 2rem;
       }
     }
   }

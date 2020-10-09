@@ -1,6 +1,6 @@
 <template>
-  <b-form @submit.stop.prevent="onSubmit()" class="login-form text-left p-4">
-    <h1>Sign up</h1>
+  <b-form @submit.stop.prevent="onSubmit()" class="login-form text-left p-3">
+    <h3>Sign up</h3>
     <b-row class="mt-4">
       <b-col>
         <b-form-group label="First Name" label-for="fname">
@@ -122,7 +122,7 @@
       >
     </b-form-group>
 
-    <button id="login-button" class="mt-4">
+    <button id="login-button" class="mt-2">
       Sign Up
     </button>
     <p  class="mt-4 text-center text-link" v-on:click="switchForm()">

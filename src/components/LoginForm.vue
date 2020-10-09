@@ -1,9 +1,12 @@
 <template>
-  <b-form class="login-form text-left p-4">
-    <h1>Log In</h1>
-    <button id="google" class="mt-4 d-block mx-auto">
-      <span><img src="../assets/google.svg"/></span> Sign in with Google
-    </button>
+  <b-form class="login-form text-left p-3">
+    <h2 class="text-lg-left text-center">Log In</h2>
+  
+      <button id="google" class="mt-4 d-block w-100 mx-auto px-3">
+        <span><img src="../assets/google.svg"/></span> Sign in with Google
+      </button>
+   
+
     <b-form-group label="Email Address:" label-for="email" class="my-4">
       <b-form-input
         id="email"
@@ -47,7 +50,8 @@
       </button></router-link
     >
     <p class="mt-4 text-center">
-      Don't have an acoount? <span v-on:click="switchForm()" class="text-link">Sign up</span>
+      Don't have an acoount?
+      <span v-on:click="switchForm()" class="text-link">Sign up</span>
     </p>
   </b-form>
 </template>
@@ -56,7 +60,7 @@ import { validationMixin } from "vuelidate";
 import { required, email } from "vuelidate/lib/validators";
 export default {
   mixins: [validationMixin],
-   props: ['isSignup'],
+  props: ["isSignup"],
   data() {
     return {
       form: {
@@ -77,8 +81,8 @@ export default {
     },
   },
   methods: {
-    switchForm(){
-      this.$emit('switchForm', true); // emits to the parent component to show the sigup form 
+    switchForm() {
+      this.$emit("switchForm", true); // emits to the parent component to show the sigup form
     },
     validateState(name) {
       const { $dirty, $error } = this.$v.form[name];
@@ -100,6 +104,7 @@ export default {
   background-color: white;
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
+  font-size: 0.9rem;
 
   #google {
     background-color: #f1f3f6;
@@ -123,7 +128,7 @@ export default {
   #login-button {
     background-color: #f37656;
     border-radius: 30px 0px 30px 30px;
-    font-size: 32px;
+    font-size: 1.2rem;
 
     color: whitesmoke;
   }
@@ -132,5 +137,18 @@ export default {
     font-weight: 900;
     cursor: pointer;
   }
+}
+
+@media only screen and (max-width: 376px) {
+  .login-form{
+    font-size: 0.7rem;
+    #login-button{
+      font-size: 0.9rem;
+    }
+    p{
+      font-size: 0.6rem;
+    }
+  }
+
 }
 </style>
