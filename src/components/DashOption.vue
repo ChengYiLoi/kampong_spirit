@@ -58,17 +58,13 @@ export default {
     font-size: 0.7rem;
     color: pink;
   }
-  .dash-option-img{
-    
-  }
+ 
 }
 
 @media only screen and (max-width: 769px) {
   .dash-option  .dash-text{
     font-size: 0.7rem;
   }
-  .dash-option-img{
-    
-  }
+ 
 }
 </style>

@@ -9,6 +9,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
 import VueSmoothScroll from 'vue2-smooth-scroll'
 import Vuelidate from 'vuelidate'
+import {store} from './store/store'
 
 
 Vue.use(BootstrapVue);
@@ -25,6 +26,7 @@ Vue.config.productionTip = false;
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount("#app");
 

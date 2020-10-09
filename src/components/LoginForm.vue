@@ -61,10 +61,7 @@ export default {
   props: ["isSignup"],
   data() {
     return {
-      form: {
-        email: null,
-        password: null,
-      },
+    
     };
   },
   validations: {
@@ -91,10 +88,16 @@ export default {
       if (this.$v.form.$anyError) {
         return;
       }
+      this.$store.state.form.isLogin = true;
       this.$router.push({ name: "Main" });
       alert("Form submitted!");
     },
   },
+  computed:{
+    form(){
+      return this.$store.state.form;
+    }
+  }
 };
 </script>
 <style lang="scss">

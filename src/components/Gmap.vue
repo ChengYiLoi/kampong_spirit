@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1>Maps</h1>
+    <h1>Green Map</h1>
     <gmap-map :center="{ lat: 1.406688, lng: 104.029381 }" :zoom="16" id="map">
       <gmap-info-window
         :options="infoWindowOptions"
@@ -191,6 +191,5 @@ export default {
 <style lang="scss">
 #map {
   height: 50vh;
-  width: 80%;
 }
 </style>
