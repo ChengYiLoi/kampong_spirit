@@ -8,7 +8,7 @@ export const store = new Vuex.Store({
     form: {
       email: null,
       password: null,
-      isLogin: false,
+      isLogin: true,
     },
     dashOptions: {
       map: {
@@ -43,7 +43,66 @@ export const store = new Vuex.Store({
         isLogout: true,
       },
     },
+    items: [],
   },
+  getters: {},
+  mutations: {}, // functions fired from mutations can be tracked in the Vue.js devtools chrome plugin
 });
 
 export default store;
+
+
+// simulate data [
+//   {
+//     id: 34,
+//     name: "gameboy",
+//     image: "https://picsum.photos/id/239/800/300",
+//     category: "technology",
+//     state: "used",
+//     description: "good condition",
+//     createDate: "2020-10-22",
+//     deliveryType: "Postage",
+//     location: "yishun",
+//     status: "Open",
+//     listedBy: "foodpls@gmail.com",
+//   },
+//   {
+//     id: 35,
+//     name: "water bottle",
+//     image: "NA",
+//     category: "essentials",
+//     state: "new",
+//     description: "good",
+//     createDate: "2020-10-29",
+//     deliveryType: "Meet up",
+//     location: "africa",
+//     status: "Donated",
+//     listedBy: "trump@gmail.com",
+//   },
+//   {
+//     id: 36,
+//     name: "dog meat",
+//     image: "https://picsum.photos/id/238/800/300",
+//     category: "essentials",
+//     state: "new",
+//     description: "good",
+//     createDate: "2020-10-29",
+//     deliveryType: "Meet up",
+//     location: "china",
+//     status: "Donated",
+//     listedBy: "trump@gmail.com",
+//   },
+//   {
+//     id: 37,
+//     name: "mc nuggets",
+//     image: "NA",
+//     category: "essentials",
+//     state: "new",
+//     description: "good",
+//     createDate: "2020-10-29",
+//     deliveryType: "Meet up",
+//     location: "china",
+//     status: "Donated",
+//     listedBy: "trump@gmail.com",
+//   },
+// ],

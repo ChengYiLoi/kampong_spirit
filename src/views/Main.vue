@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid id="main" class="p-0 m-0">
+  <b-container fluid id="main" class="pt-3 m-0">
     <b-row align-v="stretch">
       <b-col cols="1">
         <dashbar v-on:updateSelection="updateView($event)"></dashbar>
@@ -7,6 +7,7 @@
       <b-col>
         <gmap v-if="views.map"></gmap>
         <events v-else-if="views.events"></events>
+        <marketplace v-else-if="views.marketplace"></marketplace>
       </b-col>
     </b-row>
   </b-container>
@@ -15,11 +16,13 @@
 import dashbar from "../components/Dashbar.vue";
 import gmap from "../components/Gmap.vue";
 import events from "../components/Events.vue";
+import marketplace from '../components/Marketplace.vue'
 export default {
   components: {
     gmap,
     dashbar,
     events,
+    marketplace
   },
   data() {
     return {

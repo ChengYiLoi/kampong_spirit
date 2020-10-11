@@ -29,26 +29,24 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
+  // mode: "history",
+  base: "",
+  // base: process.env.BASE_URL,
   routes,
 });
 
 router.beforeEach((to, from, next) => {
-  if(to.meta.requiresAuth){
-    if (!store.state.form.isLogin){
-      alert('user is not authorised');
-      next({name: "Landing"});
-    }
-    else{
-      alert('user is authorised');
+  if (to.meta.requiresAuth) {
+    if (!store.state.form.isLogin) {
+      alert("user is not authorised");
+      next({ name: "Landing" });
+    } else {
+      alert("user is authorised");
       next();
-    } 
+    }
   }
-  
+
   next();
- 
-  
 });
 
 export default router;

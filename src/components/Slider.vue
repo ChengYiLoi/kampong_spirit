@@ -5,7 +5,7 @@
         <span class="text">{{ text }}</span>
       </h1>
       <h1 class="hide">
-        <span class="text">{{ quotes[num].name }}</span>
+        <span class="text">~ {{ quotes[num].name }} ~</span>
       </h1>
     </div>
     <div id="slider"></div>
@@ -23,8 +23,8 @@ export default {
   mounted() {
     const t1 = gsap.timeline({ defaults: { ease: "power1.out" } });
     t1.to(".text", { y: "0%", duration: 1, stagger: 0.25 });
-    t1.to("#slider", { y: "-100%", duration: 2, delay: 1 });
-    t1.to("#intro", { y: "-100%", duration: 0.5 }, "-=1.65");
+    t1.to("#slider", { y: "-100%", duration: 3, delay: 0.5 });
+    t1.to("#intro", { y: "-100%", duration: 0.6 }, "-=2.35");
     t1.fromTo('#intro', {opacity: 1}, {opacity : 0, duration: 0.1})
   },
   data() {
@@ -32,7 +32,7 @@ export default {
       num: null,
       quotes: [
         {
-          name: "~ Obama ~",
+          name: "Obama",
           texts: [
             "No challenge poses",
             "a greater threat",
@@ -41,7 +41,7 @@ export default {
           ],
         },
         {
-          name: "~ Greta Thunberg ~",
+          name: "Greta Thunberg",
           texts: [
             "The climate crisis",
             "has already been solved.",
@@ -50,13 +50,23 @@ export default {
           ],
         },
         {
-          name: "~ Pope Francis ~",
+          name: "Pope Francis",
           texts: [
             "God gave us the earth",
             "to till and to keep in",
             "a balanced and respectful way.",
           ],
         },
+        {
+          name: "Guy McPherson",
+          texts:[
+            "If you really think that the",
+            "environment is less important than the economy,",
+            "try holding your breath while you",
+            "count your money."
+          ]
+
+        }
       ],
     };
   },

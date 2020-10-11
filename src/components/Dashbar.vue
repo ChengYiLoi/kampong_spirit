@@ -45,7 +45,7 @@ export default {
   methods: {
     updateSelection(type) {
       Object.keys(this.dashOptions).forEach((key) => {
-        console.log(key);
+      
         if (this.dashOptions[key].selectName == type) {
           this.dashOptions[key].selected = true;
         } else {

@@ -36,6 +36,7 @@ export default {
 </script>
 <style lang="scss">
 .dash-option {
+  cursor: pointer;
   color: #f5f5f5;
   border-radius: 20px 0px 0px 20px;
 
