@@ -1,17 +1,17 @@
 <template>
     <div>
-        <h1>markeetplace</h1>
-        <b-row>
-            <b-col> </b-col>
-            <b-col>
-                <p>my items</p>
-            </b-col>
-            <b-col>
-                <button v-on:click="getData()">Get data</button>
-            </b-col>
-        </b-row>
+        <div id="banner">
+            <h1 class="d-inline pt-4">Market Place</h1>
+            <b-row>
+                <b-col> </b-col>
+                <b-col>
+                    <button v-on:click="getData()">Get data</button>
+                </b-col>
+                <b-col> </b-col>
+            </b-row>
+        </div>
 
-        <b-row id="items" class="p-2">
+        <b-row class="m-0 main">
             <b-col>
                 <b-card-group columns>
                     <itemcard
@@ -37,7 +37,7 @@ export default {
         getData() {
             var request = new XMLHttpRequest();
             var url = `getItems.php`;
-            var comp = this;
+            var comp = this; //reference to this component because in the onreadystatechange can have only one this which is referencing the request
             request.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     alert("success");
@@ -59,7 +59,6 @@ export default {
 };
 </script>
 <style lang="scss">
-#items {
-    background-color: #f1f3f6;
-}
+
+
 </style>

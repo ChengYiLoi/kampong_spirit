@@ -37,7 +37,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    if (!store.state.form.isLogin) {
+    if (!store.state.loginForm.form.isLogin) {
       alert("user is not authorised");
       next({ name: "Landing" });
     } else {

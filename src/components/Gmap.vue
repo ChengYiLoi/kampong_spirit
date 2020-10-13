@@ -1,7 +1,10 @@
 <template>
     <div id="green-map">
-        <h1>Green Map</h1>
-        <gmap-map
+        <div id="banner">
+            <h1 class="d-inline pt-4">Green Map</h1>
+        </div>
+        <div class="main">
+                    <gmap-map
             :center="{ lat: 1.406688, lng: 104.029381 }"
             :zoom="16"
             id="map"
@@ -58,6 +61,8 @@
         <br />
         <button v-on:click="getData()">Get Data</button>
     </div>
+        </div>
+
 </template>
 
 <script>

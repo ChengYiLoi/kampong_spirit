@@ -145,14 +145,7 @@ export default {
   mixins: [validationMixin],
   data() {
     return {
-      form: {
-        fname: null,
-        lname: null,
-        pnumber: null,
-        email: null,
-        password: null,
-        cpassword: null,
-      },
+     
     };
   },
   validations: {
@@ -203,6 +196,11 @@ export default {
       alert("Form submitted!");
     },
   },
+  computed:{
+    form(){
+      return this.$store.state.signupForm;
+    }
+  }
 };
 </script>
 <style lang="scss"></style>
