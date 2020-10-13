@@ -11,7 +11,7 @@
         class="w-100 m-0 p-3 dash-option"
         v-on:click="updateSelection()"
       >
-        <b-col cols="3" class="p-0">
+        <b-col cols="2" class="p-0">
           <b-img fluid :src="require(`../assets/${dashProps.url}`)" class="dash-option-img"></b-img>
         </b-col>
         <b-col class="p-0" >
@@ -57,7 +57,6 @@ export default {
 @media only screen and (max-width: 1025px) {
   .dash-option  .dash-text{
     font-size: 0.7rem;
-    color: pink;
   }
  
 }

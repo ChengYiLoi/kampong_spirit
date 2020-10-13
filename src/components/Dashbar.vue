@@ -1,7 +1,7 @@
 <template>
   <b-container id="sidebar">
     <b-row>
-      <span id="menu" class="d-inline mx-auto pt-4" v-b-toggle.sidebar-backdrop
+      <span id="menu" class="pt-4" v-b-toggle.sidebar-backdrop
         ><b-img :src="require(`../assets/menu.svg`)"></b-img
       ></span>
       <b-sidebar
@@ -28,6 +28,7 @@
           </b-row>
         </b-container>
       </b-sidebar>
+      
     </b-row>
   </b-container>
 </template>
@@ -64,8 +65,11 @@ export default {
 </script>
 <style lang="scss">
 #sidebar {
-  height: 100vh;
+  height: 100%;
+  background-color: #6cc49a;
   #menu {
+    position: fixed;
+    left: 2vw;
     &:focus {
       outline: none;
     }

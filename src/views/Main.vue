@@ -1,7 +1,7 @@
 <template>
-  <b-container fluid id="main" class="pt-3 m-0">
+  <b-container fluid id="main" class="m-0">
     <b-row align-v="stretch">
-      <b-col cols="1">
+      <b-col cols="1" class="p-0">
         <dashbar v-on:updateSelection="updateView($event)"></dashbar>
       </b-col>
       <b-col>
