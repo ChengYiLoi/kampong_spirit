@@ -7,7 +7,7 @@
     >
         <b-row>
             <b-col>
-                <b-img fluid :src="require('../assets/server/' + `${imgUrl}`)">
+                <b-img fluid :src="'./uploads/' + `${imgUrl}`">
                 </b-img>
             </b-col>
         </b-row>
@@ -37,7 +37,7 @@
         >
             <b-img
                 fluid
-                :src="require('../assets/server/' + `${imgUrl}`)"
+                :src="'./uploads/' + `${imgUrl}`"
             ></b-img>
             <div class="modal-info p-3">
                 <p class="mt-2">Description: {{ item.description }}</p>
