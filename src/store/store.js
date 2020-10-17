@@ -101,6 +101,7 @@ export const store = new Vuex.Store({
         listedBy: "wad2project@gmail.com",
       },
     ],
+    isMarketItems: true
   },
   getters: {},
   mutations: {}, // functions fired from mutations can be tracked in the Vue.js devtools chrome plugin

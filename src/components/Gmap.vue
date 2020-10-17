@@ -1,5 +1,5 @@
 <template>
-    <div id="green-map">
+    <div id="full-height">
         <div id="banner">
             <h1 class="d-inline pt-4">Green Map</h1>
         </div>
@@ -197,9 +197,7 @@ export default {
 </script>
 
 <style lang="scss">
-#green-map {
-    height: 100vh;
-}
+
 #map {
     height: 50vh;
 }
