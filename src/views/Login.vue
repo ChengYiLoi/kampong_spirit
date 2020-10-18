@@ -1,5 +1,6 @@
 <template>
 <div>
+
   <b-row class="navbar nav-deco pt-2 navbar-dark">
       <b-col>
         <router-link class="brand" to="/"><h1>Kampong Spirit</h1></router-link>
@@ -49,6 +50,7 @@ export default {
   methods: {
     switchForm(event) {
       this.isSignup = event;
+      
     },
   },
 };

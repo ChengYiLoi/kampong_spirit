@@ -47,24 +47,26 @@ export default {
     updateSelection(type) {
       this.isSideBarOpen = false;
       if (type == "logout") {
-        this.$store.state.loginForm = {
-          form: {
-            email: null,
-            password: null,
-            isLogin: false,
-          },
+        this.$store.state.loginForm.form = {
+          email: null,
+          password: null,
+          isLogin: false,
         };
+
         this.$router.push({ name: "Landing" });
         alert("Log out successful");
+        localStorage.removeItem("name");
+        alert('session removed');
+      } else {
+        Object.keys(this.dashOptions).forEach((key) => {
+          if (this.dashOptions[key].selectName == type) {
+            this.dashOptions[key].selected = true;
+          } else {
+            this.dashOptions[key].selected = false;
+          }
+        });
+        this.$emit("updateSelection", type);
       }
-      Object.keys(this.dashOptions).forEach((key) => {
-        if (this.dashOptions[key].selectName == type) {
-          this.dashOptions[key].selected = true;
-        } else {
-          this.dashOptions[key].selected = false;
-        }
-      });
-      this.$emit("updateSelection", type);
     },
   },
   computed: {

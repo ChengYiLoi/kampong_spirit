@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Landing from "../views/Landing.vue";
+
 import store from "../store/store.js";
 
 Vue.use(VueRouter);
@@ -9,11 +9,12 @@ const routes = [
   {
     path: "/",
     name: "Landing",
-    component: Landing,
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Landing.vue"),
   },
   {
     path: "/login",
-    name: "login",
+    name: "Login",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
@@ -24,7 +25,20 @@ const routes = [
     path: "/main",
     name: "Main",
     component: () => import("../views/Main.vue"),
-    meta: { requiresAuth: true }, // Allows vue to know that this route is protected
+    beforeEnter: (to, from, next) => {
+      if(localStorage.getItem('name') !== null){
+        alert('session exist');
+        next();
+      }
+      else if (!store.state.loginForm.form.isLogin) {
+        alert("user is not authorised and session does not exist");
+
+        next({ name: "Landing" });
+      } else {
+        alert("user is authorised");
+        next();
+      }
+    },
   },
 ];
 
@@ -35,18 +49,6 @@ const router = new VueRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    if (!store.state.loginForm.form.isLogin) {
-      alert("user is not authorised");
-      next({ name: "Landing" });
-    } else {
-      alert("user is authorised");
-      next();
-    }
-  }
 
-  next();
-});
 
 export default router;

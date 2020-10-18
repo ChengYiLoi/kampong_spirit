@@ -12,9 +12,12 @@ import Vuelidate from 'vuelidate'
 import {store} from './store/store'
 
 
+
+
 Vue.use(BootstrapVue);
 Vue.use(VueSmoothScroll);
 Vue.use(Vuelidate)
+
 
 Vue.use(VueGoogleMaps,{
   load:{

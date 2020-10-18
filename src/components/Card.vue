@@ -32,8 +32,10 @@ export default {
 .card-info {
   transition: transform 0.3s linear;
   color: #1D295A;
+
   &:hover {
     transform: scale(1.05);
+   
   }
 
 }

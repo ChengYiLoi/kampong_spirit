@@ -3,7 +3,7 @@
     <div id="banner">
       <b-row align-v="center">
         <b-col>
-          <button v-on:click="getData()">Get data</button>
+          <button v-on:click="getItems()">Get data</button>
         </b-col>
         <b-col cols="8">
           <h1 class="d-inline">
@@ -11,7 +11,7 @@
           </h1>
         </b-col>
         <b-col>
-          <b-button id="user-items" v-on:click="displayMyItems()">
+          <b-button v-on:click="displayMyItems()">
             {{
               this.$store.state.isMarketItems
                 ? "My Items"
@@ -27,41 +27,47 @@
         <b-card-group columns>
           <itemcard
             v-for="item in items"
-            :key="item.id"
+            :key="item.iID"
             :item="item"
           ></itemcard>
         </b-card-group>
       </b-col>
     </b-row>
+
     <b-row v-else>
       <b-col>
-        <h1>my items</h1>
+        <useritems></useritems>
       </b-col>
     </b-row>
   </div>
 </template>
 <script>
 import itemcard from "../components/ItemCard";
+import useritems from "../components/UserItems";
+import getData from '../data';
 export default {
   components: {
     itemcard,
+    useritems
   },
   data() {
     return {};
   },
   methods: {
-    getData() {
-      var request = new XMLHttpRequest();
-      var url = `getItems.php`;
-      var comp = this; //reference to this component because in the onreadystatechange can have only one this which is referencing the request
-      request.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          alert("success");
-          comp.renderItems(this.responseText);
-        }
-      };
-      request.open("POST", url, true);
-      request.send();
+    getItems() {
+      let url = `getItems.php`;
+      getData(url, this.renderItems);
+      // var request = new XMLHttpRequest();
+      // var url = `getItems.php`;
+      // var comp = this; //reference to this component because in the onreadystatechange can have only one this which is referencing the request
+      // request.onreadystatechange = function() {
+      //   if (this.readyState == 4 && this.status == 200) {
+      //     alert("success");
+      //     comp.renderItems(this.responseText);
+      //   }
+      // };
+      // request.open("POST", url, true);
+      // request.send();
     },
     renderItems(data) {
       return (this.$store.state.items = JSON.parse(data));
@@ -81,7 +87,5 @@ export default {
 };
 </script>
 <style lang="scss">
-#user-items {
-  background-color: #6cc49a;
-}
+
 </style>

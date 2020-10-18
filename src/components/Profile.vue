@@ -1,5 +1,5 @@
 <template>
-  <div id="profile">
+  <div id="full-height">
     <div id="banner">
       <h1 class="d-inline pt-4">Profile</h1>
     </div>
@@ -94,9 +94,7 @@ export default {
 };
 </script>
 <style lang="scss">
-#profile {
-  height: 100vh;
-}
+
 .user-info {
   background-color: #f1f3f6 !important;
   border-radius: 1rem;
