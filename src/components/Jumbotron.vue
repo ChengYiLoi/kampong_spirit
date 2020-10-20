@@ -9,12 +9,6 @@
       <b-row class="pb-5">
         <b-col>
           <b-button-group vertical>
-            <router-link to="/login">
-              <button variant="info" class="my-2 jumbo-button">
-                Discover now
-              </button>
-            </router-link>
-
             <a
               href="#features"
               class="my-2 jumbo-button text-center"

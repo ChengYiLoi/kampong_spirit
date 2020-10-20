@@ -5,11 +5,22 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
+    userInfo: {
+      isLogin: false,
+      accType: "",
+      email: "",
+      fname: "",
+      greenPoints: "",
+      lname: "",
+      mobileNo: "",
+      password: "",
+      profilePic: "NA"
+
+    },
     loginForm: {
       form: {
         email: null,
         password: null,
-        isLogin: false,
       },
     },
 
@@ -24,7 +35,7 @@ export const store = new Vuex.Store({
         text: "Green Map",
         url: "mapIcon.svg",
         selectName: "map",
-        selected: true,
+        selected: false,
       },
       events: {
         text: "Events",
@@ -54,21 +65,25 @@ export const store = new Vuex.Store({
       profile: false,
     },
     items: [],
-    isMarketItems: true,
-    userItems: [
-      {
-        iID: "36",
-        name: "Razor Gaming Mouse",
-        image: "01NlLQzm8PSNlDYAGHYFL8D-1..1575422627.jpg",
-        category: "electronics",
-        state: "used",
-        description: "No longer want to game. Do not want it to go to waste",
-        createDate: "2020-10-10",
-        deliveryType: "Meet Up",
-        location: "Ang Mo Kio avenue 10, Singapore",
-        status: "Open",
-        listedBy: "wad2project@gmail.com",
-      },
+    isDisplayMarketItems: true,
+
+    userItems: [],
+    itemCategoryDropdown: [
+      { value: null, text: "Please select a category" },
+      { value: "electronics", text: "Electronics" },
+      { value: "technology", text: "Technology" },
+      { value: "Books and Stationary", text: "Books and Stationary" },
+      { value: "Assistive Device", text: "Assistive Device" },
+      { value: "Beauty Accessories", text: "Beauty Accessories" },
+      { value: "essentials", text: "Essentials" },
+    ],
+    itemConditionRadio: [
+      { value: "new", text: "New" },
+      { value: "used", text: "Used" },
+    ],
+    deliveryTypeRadio: [
+      { value: "Meet Up", text: "Meet Up" },
+      { value: "Postage", text: "Postage" },
     ],
   },
   getters: {},
@@ -77,7 +92,6 @@ export const store = new Vuex.Store({
 
 export default store;
 
-// simulate data [
 // {
 //   iID: "34",
 //   name: "gameboy",
@@ -89,7 +103,8 @@ export default store;
 //   deliveryType: "Postage",
 //   location: "yishun",
 //   status: "Open",
-//   listedBy: "wad2project@gmail.com"
+//   listedBy: "wad2project@gmail.com",
+//   fname: "john"
 // },
 // {
 //   iID: "35",
@@ -102,7 +117,8 @@ export default store;
 //   deliveryType: "Meet Up",
 //   location: "africa",
 //   status: "Donated",
-//   listedBy: "wad2project@gmail.com"
+//   listedBy: "wad2project@gmail.com",
+//   fname: "jake"
 // },
 // {
 //   iID: "36",
@@ -115,7 +131,8 @@ export default store;
 //   deliveryType: "Meet Up",
 //   location: "Ang Mo Kio avenue 10, Singapore",
 //   status: "Open",
-//   listedBy: "wad2project@gmail.com"
+//   listedBy: "wad2project@gmail.com",
+//   fname: "jill"
 // },
 // {
 //   iID: "37",
@@ -128,5 +145,6 @@ export default store;
 //   deliveryType: "Mee Up",
 //   location: "Dakota crescent Singapore",
 //   status: "Open",
-//   listedBy: "wad2project@gmail.com"
+//   listedBy: "wad2project@gmail.com",
+//   fname: "james"
 // },

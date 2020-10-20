@@ -1,5 +1,9 @@
 <template>
-  <b-row >
+<div>
+  <div v-if="!isLogin && (dashProps.text == 'Logout' || dashProps.text == 'Profile')">
+
+  </div>
+   <b-row v-else>
     <b-col ></b-col>
     <b-col md='12' class="pr-0 my-3">
       <b-row
@@ -20,6 +24,10 @@
       </b-row>
     </b-col>
   </b-row>
+  
+ 
+</div>
+ 
 </template>
 <script>
 export default {
@@ -32,6 +40,11 @@ export default {
       this.$emit("updateSelection", this.dashProps.selectName);
     },
   },
+  computed:{
+    isLogin(){
+      return this.$store.state.userInfo.isLogin;
+    }
+  }
 };
 </script>
 <style lang="scss">

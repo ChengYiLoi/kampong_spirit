@@ -30,13 +30,15 @@ export default {
           description: [
             "Discover any waste reduction events such as free buffet or giveaways",
           ],
+          dashOption: 'map'
         },
         {
-          title: "Join or Create Community Clean-up Events",
+          title: "Join Clean-up Events",
           img: "team.svg",
           description: [
             "A well organised clean event provides the opportunity for participants to bond together all while do something meaningful for the community and the environment",
           ],
+          dashOption: 'events'
         },
         {
           title: "Sharing is Caring",
@@ -45,6 +47,7 @@ export default {
             "Want to donate unwanted items to charities but are too lazy to make the travel?",
             "Trade or just donate with other users",
           ],
+          dashOption: 'marketplace'
         },
       ],
     };
@@ -55,6 +58,7 @@ export default {
 <style lang="scss">
 #features {
   background-color: #acacac;
+  height: 100vh;
 }
 #title {
   color: whitesmoke;

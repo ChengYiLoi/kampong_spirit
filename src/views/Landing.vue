@@ -3,7 +3,7 @@
     <navbar></navbar>
     <jumbotron></jumbotron>
     <features></features>
-    <mainFooter></mainFooter>
+
     <slider></slider>
   </div>
 </template>
@@ -11,14 +11,17 @@
 <script>
 import jumbotron from "../components/Jumbotron";
 import features from "../components/Features";
-import mainFooter from "../components/Footer";
+
 import navbar from "../components/Nav";
 import slider from '../components/Slider'
 export default {
+  mounted(){
+     this.checkStorage();
+  },
   components: {
     jumbotron,
     features,
-    mainFooter,
+
     navbar,
     slider
   },
@@ -27,6 +30,15 @@ export default {
       name: "",
     };
   },
+  methods:{
+    checkStorage() {
+      if (localStorage.getItem("userStorage")) {
+        let userSession = JSON.parse(localStorage.getItem("userStorage"));
+         sessionStorage.setItem('userSession', JSON.stringify(userSession));
+        this.$store.state["userInfo"] = userSession;
+      }
+    },
+  }
 };
 </script>
 <style lang="scss">

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
-import store from "../store/store.js";
+// import store from "../store/store.js";
 
 Vue.use(VueRouter);
 
@@ -25,21 +25,12 @@ const routes = [
     path: "/main",
     name: "Main",
     component: () => import("../views/Main.vue"),
-    beforeEnter: (to, from, next) => {
-      if(localStorage.getItem('name') !== null){
-        alert('session exist');
-        next();
-      }
-      else if (!store.state.loginForm.form.isLogin) {
-        alert("user is not authorised and session does not exist");
-
-        next({ name: "Landing" });
-      } else {
-        alert("user is authorised");
-        next();
-      }
-    },
   },
+  {
+    path: "/chat",
+    name: "Chat",
+    component: () => import("../views/Chat.vue")
+  }
 ];
 
 const router = new VueRouter({
@@ -52,3 +43,24 @@ const router = new VueRouter({
 
 
 export default router;
+
+// beforeEnter: (to, from, next) => {
+//   if(localStorage.getItem('userInfo') !== null){
+//     alert('session exist');
+//     let session = localStorage.getItem('userInfo');
+//     session = JSON.parse(session);
+
+//     store.state.loginForm.form.email = session.email;
+//     store.state.loginForm.form.password = session.password;
+//     next();
+
+//   }
+//   else if (!store.state.loginForm.form.isLogin) {
+//     alert("user is not authorised and session does not exist");
+
+//     next({ name: "Landing" });
+//   } else {
+//     alert("user is authorised");
+//     next();
+//   }
+// }

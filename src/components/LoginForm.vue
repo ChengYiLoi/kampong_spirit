@@ -40,7 +40,7 @@
         >Password is required</b-form-invalid-feedback
       >
     </b-form-group>
-    <b-form-checkbox value="remember" class="my-3"
+    <b-form-checkbox value="remember" class="my-3" v-model="keepLogged"
       >Keep me logged In</b-form-checkbox
     >
 
@@ -57,12 +57,14 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required, email } from "vuelidate/lib/validators";
-import getData from "../data";
+import getData from "../getData";
 export default {
   mixins: [validationMixin],
   props: ["isSignup"],
   data() {
-    return {};
+    return {
+      keepLogged: false,
+    };
   },
   validations: {
     form: {
@@ -96,22 +98,35 @@ export default {
     },
     authLogin(dataObj) {
       let data = JSON.parse(dataObj);
+      console.log(data);
       if (data[0] != null) {
+        data = data[0];
+        let sessionObj = data;
+        sessionObj["isLogin"] = true;
         alert("auth login");
-
-        localStorage.setItem("name", "bob");
         alert("session created");
-        this.$store.state.loginForm.form.isLogin = true;
-
+        sessionStorage.setItem("userSession", JSON.stringify(sessionObj));
+        this.$store.state.userInfo = sessionObj;
+        // this.$store.state.userInfo["isLogin"] = true;
+        // this.$store.state.userInfo["accType"] = data["acctype"];
+        // this.$store.state.userInfo["email"] = data["email"];
+        // this.$store.state.userInfo["fname"] = data["fname"];
+        // this.$store.state.userInfo["greenPoints"] = data["greenpoints"];
+        // this.$store.state.userInfo["lname"] = data["lname"];
+        // this.$store.state.userInfo["mobileNo"] = data["mobileno"];
+        // this.$store.state.userInfo["password"] = data["password"];
+        // this.$store.state.userInfo["profilePic"] = data["profilepic"];
+        console.log(this.$store.state.userInfo);
+        if (this.keepLogged) {
+          localStorage.setItem("userStorage", JSON.stringify(sessionObj));
+          alert("local storage created");
+        }
         this.$router.push({ name: "Main" });
       } else {
-        alert('Login info incorrect');
-        document.getElementById("email").value = "";
-        document.getElementById("password").value = "";
+        alert("Login info incorrect");
+        document.getElementById("email").value = null;
+        document.getElementById("password").value = null;
       }
-    },
-    checkSession() {
-      alert(this.$session.exists("112"));
     },
   },
   computed: {
