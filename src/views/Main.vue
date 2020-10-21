@@ -24,7 +24,10 @@ import events from "../components/Events.vue";
 import marketplace from "../components/Marketplace.vue";
 import profile from "../components/Profile.vue";
 export default {
-  
+  mounted(){
+    alert('main page mounted');
+    this.checkSessionOrLocalStorage();
+  },
   components: {
     gmap,
  
@@ -36,7 +39,19 @@ export default {
     return {};
   },
   methods: {
-    
+    checkSessionOrLocalStorage(){
+      let user
+      if(localStorage.getItem('userStorage') != null){
+        alert('User did not logout');
+        user = localStorage.getItem('userStorage');
+        this.$store.state.userInfo = user;
+      }
+      else if(sessionStorage.getItem('userStorage') != null){
+        alert('session found');
+        user = sessionStorage.getItem('userSession');
+        this.$store.state.userInfo = user;
+      }
+    }
   },
 };
 </script>

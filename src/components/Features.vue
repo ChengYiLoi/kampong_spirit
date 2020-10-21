@@ -61,8 +61,9 @@ export default {
   height: 100vh;
 }
 #title {
-  color: whitesmoke;
+  color: #F1F3F6;
   font-size: 3.0rem;
   text-align: center;
+  font-weight: bolder;
 }
 </style>

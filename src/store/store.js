@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
+    isSignup: false,
     userInfo: {
       isLogin: false,
       accType: "",
@@ -14,8 +15,7 @@ export const store = new Vuex.Store({
       lname: "",
       mobileNo: "",
       password: "",
-      profilePic: "NA"
-
+      profilePic: "NA",
     },
     loginForm: {
       form: {
@@ -23,7 +23,16 @@ export const store = new Vuex.Store({
         password: null,
       },
     },
-
+    signupForm: {
+      form: {
+        fname: null,
+        lname: null,
+        pnumber: null,
+        email: null,
+        password: null,
+        cpassword: null,
+      },
+    },
     dashOptions: {
       profile: {
         text: "Profile",
@@ -47,7 +56,7 @@ export const store = new Vuex.Store({
         text: "Marketplace",
         url: "scale.svg",
         selectName: "marketplace",
-        selected: false,
+        selected: true,
       },
 
       logout: {
@@ -58,16 +67,50 @@ export const store = new Vuex.Store({
         isLogout: true,
       },
     },
-    views: {
-      map: true,
-      events: false,
-      marketplace: false,
-      profile: false,
-    },
+    // views: {
+    //   map: true,
+    //   events: false,
+    //   marketplace: false,
+    //   profile: false,
+    // },
     items: [],
     isDisplayMarketItems: true,
 
     userItems: [],
+    events: [
+      {
+        eventID: "123",
+        title: "Clean up",
+        type: "clean up",
+        startDateTime: "2020-08-08 08:06:16",
+        endDateTime: "2020-10-10 07:10:10",
+        location: "yishun park playground",
+        postalCode: "125697",
+        description: "Cleaning up event at nowhere",
+        weatherInfo: "Sunny day",
+        greenPoints: "10",
+        numberOfParticipants: "10",
+        createdBy: "wad2project@gmail.com",
+        maxcapacity: "20",
+        status: "Open",
+      },
+      {
+        eventID: "666",
+        title: "Clean up",
+        type: "clean up",
+        startDateTime: "2021-08-08 08:06:16",
+        endDateTime: "2021-10-10 07:10:10",
+        location: "playground",
+        postalCode: "666",
+        description: "Cleaning up event",
+        weatherInfo: "Rainy day",
+        greenPoints: "1",
+        numberOfParticipants: "10",
+        createdBy: "wad2project@gmail.com",
+        maxcapacity: "20",
+        status: "Open",
+      },
+    ],
     itemCategoryDropdown: [
       { value: null, text: "Please select a category" },
       { value: "electronics", text: "Electronics" },
@@ -76,6 +119,7 @@ export const store = new Vuex.Store({
       { value: "Assistive Device", text: "Assistive Device" },
       { value: "Beauty Accessories", text: "Beauty Accessories" },
       { value: "essentials", text: "Essentials" },
+      { value: "Others", text: "Others" },
     ],
     itemConditionRadio: [
       { value: "new", text: "New" },

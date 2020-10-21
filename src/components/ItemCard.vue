@@ -6,7 +6,7 @@
   >
     <b-row>
       <b-col>
-        <b-img fluid :src="'./images/' + `${imgUrl}`"> </b-img>
+        <b-img class="w-50" fluid :src="'./images/' + `${imgUrl}`"> </b-img>
       </b-col>
     </b-row>
     <hr />
@@ -26,7 +26,11 @@
     </b-container>
 
     <b-modal :id="`${item.name}`" centered :title="`${item.name}`" hide-footer>
-      <b-img fluid :src="'./images/' + `${imgUrl}`"></b-img>
+      <b-img
+        fluid
+        class="d-block mx-auto w-50"
+        :src="'./images/' + `${imgUrl}`"
+      ></b-img>
       <div class="modal-info p-3">
         <p class="mt-2">Category: {{ item.category }}</p>
         <p>Condition: {{ item.state }}</p>
@@ -44,14 +48,11 @@
               ><b-button class=" w-100" variant="danger">Close</b-button></b-col
             >
             <b-col class="pl-1"
-              ><b-button class="w-100" variant="success"
-                ><a
-                  class="button-link"
-                  :href="
-                    `chat.html?sender=${email}&receiver=${item.listedBy}&iID=${item.iID}`
-                  "
-                  >Chat with Donor</a
-                ></b-button
+              ><b-button
+                @click="displayChat('CWD')"
+                class="w-100"
+                variant="success"
+                >Chat With Donor</b-button
               ></b-col
             >
           </b-row>
@@ -98,16 +99,14 @@
             ></b-col
           >
         </b-row>
-        <b-row>
+        <b-row class="py-1">
           <b-col cols="12">
-            <b-button variant="success" class="w-100">
-              <a
-                class="button-link"
-                :href="
-                  `chatlobby.html?user=${item['listedBy']}&iID=${item['iID']}`
-                "
-                >View Chat</a
-              >
+            <b-button
+              variant="success"
+              class="w-100"
+              @click="displayChat('VC')"
+            >
+              View Chat
             </b-button>
           </b-col>
         </b-row>
@@ -189,7 +188,7 @@
 </template>
 <script>
 import postData from "../postData";
-import getData from '../getData';
+var axios = require("axios");
 export default {
   props: ["item"],
   data() {
@@ -204,6 +203,31 @@ export default {
     };
   },
   methods: {
+    displayChat(type) {
+      if (!this.validateLogin()) {
+        alert("user has not logged in");
+        this.$router.push({ name: "Login" });
+      } else {
+        if (type == "CWD") {
+          window.location.replace(
+            `chat.html?receiver=${this.item.listedBy}&iID=${this.item.iID}&sender=${this.currentUserEmail}`,
+          );
+        } else {
+          window.location.replace(
+            `itemchatlobby.html?user=${this.item["listedBy"]}&iID=${this.item["iID"]}`,
+          );
+        }
+      }
+    },
+    validateLogin() {
+      let isLogged = false;
+      if (localStorage.getItem("userStorage") != null) {
+        isLogged = true;
+      } else if (sessionStorage.getItem("userSession") != null) {
+        isLogged = true;
+      }
+      return isLogged;
+    },
     updateItemInfo(iID) {
       let picName = "";
       let email = this.$store.state.userInfo["email"];
@@ -234,34 +258,7 @@ export default {
         this.getUserItems();
       }
     },
-    getItems() {
-      let url = `getItems.php`;
-      url = encodeURI(url);
-      postData(url, this.renderItems);
-    },
-    getUserItems() {
-      alert("get user items");
-      let userSession;
-      if (localStorage.getItem("userStorage")) {
-        userSession = JSON.parse(localStorage.getItem("userStorage"));
-      } else {
-        userSession = JSON.parse(sessionStorage.getItem("userSession"));
-      }
 
-      let email = userSession["email"];
-      let url = `getUserItems.php?useremail=${email}`;
-      alert(`get user items email is ${email}`);
-      getData(url, this.renderUserItems);
-    },
-    renderUserItems(data) {
-      console.log(JSON.parse(data));
-      this.$store.state.userItems = JSON.parse(data);
-    },
-
-    renderItems(data) {
-      console.log(JSON.parse(data));
-      this.$store.state.items = JSON.parse(data);
-    },
     showModal(item) {
       // show or hide the modal, if the item is donated, it will not show
       if (item.status != "Donated") {
@@ -277,13 +274,25 @@ export default {
       // deletes the item
       let email = this.$store.state.userInfo["email"];
       let url = `deleteitem.php?iID=${iID}&email=${email}`;
-      if (!this.isDisplayMarketItems) {
-        alert("display market place is false");
-        postData(url, this.getUserItems());
-      } else {
-        alert("display market place is true");
-        postData(url, this.getItems());
-      }
+      url = encodeURI(url);
+      axios.post(url).then(() => {
+        if (!this.isDisplayMarketItems) {
+          alert("display market place is false");
+          url = `getUserItems.php?useremail=${email}`;
+          url = encodeURI(url);
+          axios.post(url).then((result) => {
+            this.$store.state.userItems = result.data;
+          });
+        } else {
+          alert("display market place is true");
+          url = `getItems.php`;
+          axios.post(url).then((result) => {
+            this.$store.state.items = result.data;
+          });
+          
+        }
+      });
+
       this.$bvModal.hide(`${this.item.name}`);
     },
   },
@@ -329,17 +338,12 @@ export default {
     deliveryTypeRadio() {
       return this.$store.state.deliveryTypeRadio;
     },
-    userEmail() {
-      let email;
-      let userInfo;
-      if (localStorage.getItem("userStorage")) {
-        userInfo = JSON.parse(localStorage.getItem("userStorage"));
-        email = userInfo.email;
-      } else {
-        userInfo = JSON.parse(sessionStorage.getItem("userSession"));
-        email = userInfo.email;
+    currentUserEmail() {
+      if (sessionStorage.getItem("userSession") != null) {
+        let user = JSON.parse(sessionStorage.getItem("userSession"));
+        return user["email"];
       }
-      return email;
+      return "";
     },
   },
 };

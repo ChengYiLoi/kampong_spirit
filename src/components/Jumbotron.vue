@@ -3,7 +3,9 @@
     <b-jumbotron class="text-center text-md-left mb-0 pb-2">
       <b-row>
         <b-col class="px-1">
-          <h1 class="display-4">Reducing waste has never been easier</h1>
+          <h1 class="display-4">
+            Reducing waste has never been easier
+          </h1>
         </b-col>
       </b-row>
       <b-row class="pb-5">
@@ -14,12 +16,11 @@
               class="my-2 jumbo-button text-center"
               v-smooth-scroll
             >
-              View Features
+              <strong>Features</strong>
             </a>
           </b-button-group>
         </b-col>
       </b-row>
-     
     </b-jumbotron>
   </div>
 </template>
@@ -69,17 +70,17 @@ $hover-blue: #5bb7de;
 }
 
 @media only screen and (max-width: 1025px) {
-  .col > .display-4{
-    font-size: 3.0rem;
+  .col > .display-4 {
+    font-size: 3rem;
   }
 }
 @media only screen and (max-width: 426px) {
- .jumbotron{
-   background-image: unset;
-   .col > .display-4{
-    text-align: center;
-    font-size: 2.0rem;
+  .jumbotron {
+    background-image: unset;
+    .col > .display-4 {
+      text-align: center;
+      font-size: 2rem;
+    }
   }
- }
 }
 </style>

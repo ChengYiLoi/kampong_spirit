@@ -125,12 +125,13 @@
     <button id="login-button" class="mt-2">
       Sign Up
     </button>
-    <p  class="mt-4 text-center text-link" v-on:click="switchForm()">
+    <p class="mt-4 text-center text-link" v-on:click="switchForm()">
       Back to Login
     </p>
   </b-form>
 </template>
 <script>
+const axios = require("axios");
 import { validationMixin } from "vuelidate";
 import {
   required,
@@ -144,9 +145,7 @@ import {
 export default {
   mixins: [validationMixin],
   data() {
-    return {
-     
-    };
+    return {};
   },
   validations: {
     form: {
@@ -180,9 +179,9 @@ export default {
     },
   },
   methods: {
-      switchForm(){
-          this.$emit('switchForm', false);
-      },
+    switchForm() {
+      this.$store.state.isSignup = !this.$store.state.isSignup;
+    },
     validateState(name) {
       const { $dirty, $error } = this.$v.form[name];
       return $dirty ? !$error : null;
@@ -191,16 +190,22 @@ export default {
       this.$v.form.$touch();
       if (this.$v.form.$anyError) {
         return;
+      } else {
+        let userInputs = this.$v.form.$model;
+
+        let url = `registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
+        axios.post(url).then(() => {
+          alert("Form submitted");
+          this.$router.push({ name: "Main" });
+        });
       }
-      this.$router.push({name: 'Main'});
-      alert("Form submitted!");
     },
   },
-  computed:{
-    form(){
-      return this.$store.state.signupForm;
-    }
-  }
+  computed: {
+    form() {
+      return this.$store.state.signupForm.form;
+    },
+  },
 };
 </script>
 <style lang="scss"></style>

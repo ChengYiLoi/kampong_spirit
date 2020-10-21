@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     switchForm() {
-      this.$emit("switchForm", true); // emits to the parent component to show the sigup form
+      this.$store.state.isSignup = !this.$store.state.isSignup;
     },
     validateState(name) {
       const { $dirty, $error } = this.$v.form[name];

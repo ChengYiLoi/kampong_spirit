@@ -1,37 +1,24 @@
 <template>
-<div>
-
-  <b-row class="navbar nav-deco pt-2 navbar-dark">
+  <div>
+    <b-row class="navbar nav-deco pt-2 navbar-dark">
       <b-col>
         <router-link class="brand" to="/"><h1>Kampong Spirit</h1></router-link>
       </b-col>
     </b-row>
-    
-      <b-row id="login" class=" p-4" align-v="center">
-        <b-col lg="5" >
-          <div v-if="isSignup">
-            <signupForm v-on:switchForm="switchForm($event)"></signupForm>
-          </div>
-          <div v-else>
-            <loginForm
-              :isSignup="isSignup"
-              v-on:switchForm="switchForm($event)"
-            ></loginForm>
-            <!-- v-on fires when user clicks on sign up -->
-          </div>
-        </b-col>
-        <b-col class="text-right d-none d-lg-block">
-          <b-img
-            fluid
-            :src="require('../assets/earth.svg')"
-          
-          ></b-img>
-        </b-col>
-      </b-row>
 
-</div>
-  
-
+    <b-row id="login" class=" p-4" align-v="center">
+      <b-col lg="5">
+        <div >
+          <signupForm v-if="isSignup"></signupForm>
+            <loginForm v-else></loginForm>
+        </div>
+       
+      </b-col>
+      <b-col class="text-right d-none d-lg-block">
+        <b-img fluid :src="require('../assets/earth.svg')"></b-img>
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <script>
@@ -43,15 +30,15 @@ export default {
     signupForm,
   },
   data() {
-    return {
-      isSignup: false,
-    };
-  },
-  methods: {
-    switchForm(event) {
-      this.isSignup = event;
+    return{
       
-    },
+    }
+  },
+
+  computed: {
+    isSignup(){
+      return this.$store.state.isSignup;
+    }
   },
 };
 </script>
@@ -76,7 +63,7 @@ $text-white: whitesmoke;
 }
 
 @media only screen and (max-width: 426px) {
-  #login{
+  #login {
     overflow: visible;
   }
 }

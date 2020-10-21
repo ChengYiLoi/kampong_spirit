@@ -16,7 +16,8 @@ import {store} from './store/store'
 
 Vue.use(BootstrapVue);
 Vue.use(VueSmoothScroll);
-Vue.use(Vuelidate)
+Vue.use(Vuelidate);
+
 
 
 Vue.use(VueGoogleMaps,{

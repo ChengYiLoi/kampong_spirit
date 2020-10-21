@@ -17,7 +17,10 @@
       <b-container>
         <b-row>
           <b-col>
-            <p id="brand" class="pt-2">Kampong Spirit</p>
+            <router-link to="Landing">
+                <p id="brand" class="pt-2">Kampong Spirit</p>
+            </router-link>
+          
           </b-col>
         </b-row>
 
@@ -53,6 +56,22 @@ export default {
           email: null,
           password: null,
         };
+        this.$store.state["userInfo"] = {
+          isLogin: false,
+          accType: "",
+          email: "",
+          fname: "",
+          greenPoints: "",
+          lname: "",
+          mobileNo: "",
+          password: "",
+          profilePic: "NA",
+        };
+        this.$store.state.dashOptions.profile["selected"] = false;
+        this.$store.state.dashOptions.map["selected"] = false;
+        this.$store.state.dashOptions.events["selected"] = false;
+        this.$store.state.dashOptions.marketplace["selected"] = false;
+        this.$store.state.dashOptions.logout["selected"] = false;
 
         this.$router.push({ name: "Landing" });
         alert("Log out successful");
@@ -80,11 +99,7 @@ export default {
 </script>
 <style lang="scss">
 #sidebar {
- 
-
   #menu {
-    
-  
     &:focus {
       outline: none;
     }

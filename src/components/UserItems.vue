@@ -72,7 +72,7 @@
           </b-form-radio-group>
         </b-form-group>
         <b-form-group
-          v-if="selectedDeliveryType == 'meetUp'"
+          v-if="selectedDeliveryType == 'Meet Up'"
           label="Location:"
           label-for="location"
         >
@@ -85,14 +85,14 @@
 </template>
 <script>
 import itemcard from "./ItemCard";
-import getData from '../getData';
+// import getData from "../getData";
+var axios = require("axios");
 export default {
   components: {
     itemcard,
   },
-   
+
   data() {
-   
     return {
       itemPicture: null,
       itemName: null,
@@ -101,24 +101,48 @@ export default {
       itemDescription: null,
       selectedDeliveryType: null,
       location: null,
-      userEmail: 'dekubhna@gmail.com'
     };
   },
   methods: {
     onSubmit() {
+      var fd = new FormData();
+
+      fd.append("itemPicture", this.itemPicture);
       if (this.itemPicture == null) {
         this.itemPicture = { name: "noimage.png" };
       }
+      let itemPictureName = this.itemPicture["name"];
+      var extension = itemPictureName
+        .substring(itemPictureName.lastIndexOf(".") + 1)
+        .toLowerCase();
 
-      let url = `addItems.php?pictureName=${this.itemPicture['name']}&itemName=${this.itemName}&selectedCategory=${this.selectedCategory}&selectedCondition=${this.selectedCondition}&itemDescription=${this.itemDescription}&selectedDeliveryType=${this.selectedDeliveryType}&location=${this.location}&userEmail=${this.userEmail}`;
-      url = encodeURI(url);
-      getData(url, this.itemAdded);
-
-      
+      if (
+        extension == "gif" ||
+        extension == "png" ||
+        extension == "bmp" ||
+        extension == "jpeg" ||
+        extension == "jpg" ||
+        extension == "jpg" ||
+        extension == "svg"
+      ) {
+        let url = `addItems.php?pictureName=${itemPictureName}&itemName=${this.itemName}&selectedCategory=${this.selectedCategory}&selectedCondition=${this.selectedCondition}&itemDescription=${this.itemDescription}&selectedDeliveryType=${this.selectedDeliveryType}&location=${this.location}&userEmail=${this.userEmail}`;
+        url = encodeURI(url);
+        axios.post(url).then(() => {
+          url = `addimage.php?`;
+          axios.post(url, fd).then(() => {
+            url = `getUserItems.php?useremail=${this.userEmail}`;
+            axios.get(url).then((result) => {
+              alert("User items have been updated");
+              console.log(result);
+              this.$store.state.userItems = result.data;
+            });
+          });
+        });
+      } else {
+        alert("Photo only allows file types of GIF, PNG, JPG, JPEG and BMP.");
+      }
+      // getData(url, this.itemAdded);
     },
-    itemAdded(){
-      alert('item added to db');
-    }
   },
   computed: {
     userItems() {
@@ -132,6 +156,10 @@ export default {
     },
     deliveryTypeRadio() {
       return this.$store.state.deliveryTypeRadio;
+    },
+    userEmail() {
+      let user = JSON.parse(sessionStorage.getItem("userSession"));
+      return user["email"];
     },
   },
 };
