@@ -2,7 +2,11 @@
   <b-form @submit.stop.prevent="onSubmit()" class="login-form text-left p-5">
     <h2 class="text-lg-left text-center">Log In</h2>
 
-    <button id="google" class="mt-4 d-block w-100 mx-auto px-3">
+    <button
+      @click="handleSignIn"
+      id="google"
+      class="mt-4 d-block w-100 mx-auto px-3"
+    >
       <span><img src="../assets/google.svg"/></span> Sign in with Google
     </button>
 
@@ -58,6 +62,7 @@
 import { validationMixin } from "vuelidate";
 import { required, email } from "vuelidate/lib/validators";
 import getData from "../getData";
+var axios = require("axios");
 export default {
   mixins: [validationMixin],
   props: ["isSignup"],
@@ -78,6 +83,45 @@ export default {
     },
   },
   methods: {
+    createSession(userInfo) {
+      userInfo.isLogin = true;
+      sessionStorage.setItem("userSession", JSON.stringify(userInfo));
+      this.$store.state.userInfo = userInfo;
+      if (this.keepLogged) {
+        localStorage.setItem("userStorage", JSON.stringify(userInfo));
+        alert("local storage created");
+      }
+    },
+    handleSignIn() {
+      this.$gAuth.signIn().then((user) => {
+        console.log("user", user);
+        let email;
+
+        for (var props in user) {
+          let substring = props.substring(1);
+          if (substring == "t") {
+            email = user[props].getEmail();
+          }
+        }
+        let data;
+        let idtoken = user.wc["login_hint"];
+        let url = `validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+        axios.get(url).then((result) => {
+          alert("check with DB was done");
+          console.log(result.data);
+          if (result.data.length == 1) {
+            alert("User is authorised");
+
+            data = result.data[0];
+            this.$store.state.dashOptions.marketplace.selected = true;
+            this.createSession(data);
+            this.$router.push({ name: "Main" });
+          } else {
+            alert("user has not signed up");
+          }
+        });
+      });
+    },
     switchForm() {
       this.$store.state.isSignup = !this.$store.state.isSignup;
     },
@@ -102,25 +146,11 @@ export default {
       if (data[0] != null) {
         data = data[0];
         let sessionObj = data;
-        sessionObj["isLogin"] = true;
+
         alert("auth login");
         alert("session created");
-        sessionStorage.setItem("userSession", JSON.stringify(sessionObj));
-        this.$store.state.userInfo = sessionObj;
-        // this.$store.state.userInfo["isLogin"] = true;
-        // this.$store.state.userInfo["accType"] = data["acctype"];
-        // this.$store.state.userInfo["email"] = data["email"];
-        // this.$store.state.userInfo["fname"] = data["fname"];
-        // this.$store.state.userInfo["greenPoints"] = data["greenpoints"];
-        // this.$store.state.userInfo["lname"] = data["lname"];
-        // this.$store.state.userInfo["mobileNo"] = data["mobileno"];
-        // this.$store.state.userInfo["password"] = data["password"];
-        // this.$store.state.userInfo["profilePic"] = data["profilepic"];
-        console.log(this.$store.state.userInfo);
-        if (this.keepLogged) {
-          localStorage.setItem("userStorage", JSON.stringify(sessionObj));
-          alert("local storage created");
-        }
+        this.createSession(sessionObj);
+        this.$store.state.dashOptions.marketplace.selected = true;
         this.$router.push({ name: "Main" });
       } else {
         alert("Login info incorrect");

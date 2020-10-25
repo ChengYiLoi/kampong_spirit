@@ -18,7 +18,7 @@
             </b-col>
           </b-row>
         </b-col>
-        
+
         <b-col md="3" class="p-0">
           <b-row align-v="center" id="market-buttons" class="">
             <b-col cols="6" class="px-0">
@@ -145,8 +145,10 @@ export default {
         let userSession = JSON.parse(sessionStorage.getItem("userSession"));
         console.log("user session is");
         this.$store.state["userInfo"] = userSession;
+        this.getItems();
+      } else {
+        this.getItems();
       }
-      this.getItems();
     },
     toggleMarketPlace() {
       alert("updated market place items");
@@ -175,13 +177,11 @@ export default {
 };
 </script>
 <style lang="scss">
-
-
-@media only screen and (max-width: 426px){
-  #feature-title{
+@media only screen and (max-width: 426px) {
+  #feature-title {
     display: none;
   }
-  #market-buttons{
+  #market-buttons {
     padding-bottom: 1rem;
   }
 }

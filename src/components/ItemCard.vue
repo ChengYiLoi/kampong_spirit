@@ -229,6 +229,7 @@ export default {
       return isLogged;
     },
     updateItemInfo(iID) {
+
       let picName = "";
       let email = this.$store.state.userInfo["email"];
       if (this.itemPicture != null) {
@@ -267,6 +268,12 @@ export default {
     },
     editItem(item) {
       //displays the modal of the edit item form
+      this.itemName = item.name;
+      this.selectedCategory = item.category;
+      this.selectedCondition = item.state;
+      this.itemDescription = item.description;
+      this.selectedDeliveryType = item.deliveryType;
+      this.location = item.location;
       this.$bvModal.hide(`${item.name}`);
       this.$bvModal.show(`${item.name}-edit`);
     },
@@ -387,7 +394,8 @@ $white: rgb(245, 245, 245);
     }
   }
   .modal-info {
-    background-color: #f1f3f6;
+    background-color: #eeeff1;
+    border-radius: 5px;
   }
 }
 </style>

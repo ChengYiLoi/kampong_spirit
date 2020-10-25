@@ -32,6 +32,12 @@ export default {
     renderFeature() {
       let selectedName = this.cardObject.dashOption;
       alert(`Selected is ${selectedName}`);
+
+      this.$store.state.dashOptions.profile.selected = false;
+      this.$store.state.dashOptions.map.selected = false;
+      this.$store.state.dashOptions.events.selected = false;
+      this.$store.state.dashOptions.marketplace.selected = false;
+
       this.$store.state.dashOptions[selectedName].selected = true;
       if (selectedName == "marketplace") {
         this.getItems();

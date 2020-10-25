@@ -77,7 +77,7 @@ export default {
         alert("Log out successful");
         localStorage.removeItem("userStorage");
         sessionStorage.removeItem("userSession");
-        alert("storage removed");
+        alert("storage (if keep logged was selected) and session removed");
       } else {
         Object.keys(this.dashOptions).forEach((key) => {
           if (this.dashOptions[key].selectName == type) {

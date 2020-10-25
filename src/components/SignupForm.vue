@@ -1,6 +1,13 @@
 <template>
   <b-form @submit.stop.prevent="onSubmit()" class="login-form text-left p-3">
     <h2 class="text-lg-left text-center">Sign up</h2>
+    <button
+      @click="handleSignup"
+      id="google"
+      class="mt-4 d-block w-100 mx-auto px-3"
+    >
+      <span><img src="../assets/google.svg"/></span> Sign Up with Google
+    </button>
     <b-row class="mt-4">
       <b-col>
         <b-form-group label="First Name" label-for="fname">
@@ -179,6 +186,34 @@ export default {
     },
   },
   methods: {
+    handleSignup() {
+      this.$gAuth.signIn().then((user) => {
+        console.log("user", user);
+        let email;
+        let fname;
+        let lname;
+        for (var props in user) {
+          let substring = props.substring(1);
+          if (substring == "t") {
+            email = user[props].getEmail();
+            fname = user[props].getGivenName();
+            lname = user[props].getFamilyName();
+            console.log(email);
+            console.log(fname);
+            console.log(lname);
+          }
+        }
+
+        let idtoken = user.wc["login_hint"];
+        let url = `signupgmail.php?lname=${lname}&fname=${fname}&email=${email}&idtoken=${idtoken}`;
+        axios.post(url).then((result) => {
+          if (result.data.length == 1) {
+            alert("Sign up successful");
+            this.$router.push({ name: "Main" });
+          }
+        });
+      });
+    },
     switchForm() {
       this.$store.state.isSignup = !this.$store.state.isSignup;
     },
