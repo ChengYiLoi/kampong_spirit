@@ -8,7 +8,7 @@ export const store = new Vuex.Store({
     isSignup: false,
     userInfo: {
       isLogin: false,
-      acctype: "User",
+      acctype: "",
       email: "",
       fname: "",
       greenpoints: "",
@@ -100,6 +100,23 @@ export const store = new Vuex.Store({
     //   { value: "", text: "" },
     //   { value: "", text: "" },
     // ],
+    chartData: [
+     
+    ],
+    monthNames: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
   },
   getters: {},
   mutations: {}, // functions fired from mutations can be tracked in the Vue.js devtools chrome plugin

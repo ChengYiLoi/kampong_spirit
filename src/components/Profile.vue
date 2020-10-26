@@ -60,7 +60,7 @@
             </h2>
           </b-col>
         </b-row>
-        <b-row align-v="center">
+        <b-row v-if="hiddenPass != ''" align-v="center">
           <b-col cols="10">
             <h2 class="py-2">
               <strong>Password: </strong>
@@ -117,13 +117,14 @@
         <b-row align-v="center">
           <b-col cols="10">
             <h2 class="py-2">
-              <strong>Mobile Number: </strong> <span>{{ mobileNo }}</span>
+              <strong>Mobile Number: </strong>
+              <span>{{ mobileNo != "0" ? mobileNo : "" }}</span>
             </h2>
           </b-col>
           <b-col>
-            <b-button class="w-100" v-b-modal="'phonenum'" variant="success"
-              >Change Phone Number</b-button
-            >
+            <b-button class="w-100" v-b-modal="'phonenum'" variant="success">{{
+              mobileNo != "0" ? "Change Phone Number" : "Add Phone Number"
+            }}</b-button>
           </b-col>
           <b-modal
             id="phonenum"
@@ -146,6 +147,9 @@
           <strong>Green Points: </strong>
           <span>{{ gPoints }}</span>
         </h2>
+      </b-container>
+      <b-container fluid class="user-info p-3 mt-2">
+        <GChart type="ColumnChart" :data="chartData" :options="chartOptions" />
       </b-container>
       <div class=" py-2 mt-4">
         <b-row class="px-5">
@@ -177,9 +181,13 @@
 import postData from "../postData";
 import getData from "../getData";
 import dashbar from "../components/Dashbar";
+import { GChart } from "vue-google-charts";
+var axios = require("axios");
+var currentYear = new Date().getFullYear();
 export default {
   components: {
     dashbar,
+    GChart,
   },
   mounted() {
     this.checkSession();
@@ -193,9 +201,14 @@ export default {
       newpassword: "",
       confirmpassword: "",
       oldpassword: "",
+
+      chartOptions: {
+        title: `Number of Events Joined for ${currentYear}`,
+      },
     };
   },
   methods: {
+     
     updateInfo() {
       console.log(this.newpassword);
 
@@ -231,11 +244,58 @@ export default {
       } else if (localStorage.getItem("userStorage")) {
         user = JSON.parse(localStorage.getItem("userStorage"));
       }
+      this.getUserChartData();
       console.log(user);
       this.$store.state.userInfo = user;
     },
+    getUserChartData() {
+      let monthsWithEvents = {
+        January: "",
+        February: "",
+        March: "",
+        April: "",
+        May: "",
+        June: "",
+        July: "",
+        August: "",
+        September: "",
+        October: "",
+        November: "",
+        December: "",
+      };
+      let chartData = [["Month", "# of Events Joined"]];
+      let currentYear = new Date().getFullYear();
+      let url = `get_countevent.php?email=${this.email}&year=${currentYear}`;
+      axios.get(url).then((result) => {
+        result.data.forEach((event) => {
+          let date = event.endDatetime;
+          let dateArray = date.split(/\D+/);
+          let month = dateArray[1];
+          month = this.$store.state.monthNames[--month];
+          console.log(month);
+
+          if (monthsWithEvents[month] === "") {
+            alert("found matching month");
+            monthsWithEvents[month] = [month, 1];
+          } else {
+            monthsWithEvents[month] = [month, monthsWithEvents[month][1] + 1];
+          }
+          console.log(Array.isArray(monthsWithEvents[month]));
+        });
+        for (var month in monthsWithEvents) {
+          if (Array.isArray(monthsWithEvents[month])) {
+            chartData.push(monthsWithEvents[month]);
+          }
+        }
+        this.$store.state.chartData = chartData;
+      });
+    },
   },
   computed: {
+   
+    chartData() {
+      return this.$store.state.chartData;
+    },
     hiddenPass() {
       let pass;
       if (!this.isVisible) {

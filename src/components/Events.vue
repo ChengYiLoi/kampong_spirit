@@ -63,6 +63,9 @@
             <strong>Maximum Number of Participants:</strong>
             {{ eventInfo.maxcapacity }}
           </p>
+          <p><strong>Event Status:</strong>
+          {{eventInfo.status}}
+          </p>
           <b-container>
             <b-row>
               <b-col v-if="!checkIfUserJoined">
@@ -445,7 +448,10 @@ export default {
 
       this.selectedParticipants.forEach((participantEmail) => {
         let url = `update_greenpoints.php?eventID=${this.eventInfo["eventID"]}&email=${participantEmail}`;
-        axios.post(url);
+        axios.post(url).then(()=>{
+          url = `mark_completed.php?eventID=${this.eventInfo['eventID']}`;
+          axios.get(url);
+        });
       });
       alert("Green points distributed");
     },

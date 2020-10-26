@@ -11,6 +11,7 @@ import VueSmoothScroll from 'vue2-smooth-scroll'
 import Vuelidate from 'vuelidate'
 import {store} from './store/store'
 import GAuth from 'vue-google-oauth2'
+import VueGoogleCharts from 'vue-google-charts'
 
 const gauthOption = {
   clientId: '1007004476848-d0uvavdcrbrsrtciu7pc49keb2jlolhn.apps.googleusercontent.com',
@@ -24,6 +25,7 @@ Vue.use(GAuth, gauthOption);
 Vue.use(BootstrapVue);
 Vue.use(VueSmoothScroll);
 Vue.use(Vuelidate);
+Vue.use(VueGoogleCharts);
 
 
 
