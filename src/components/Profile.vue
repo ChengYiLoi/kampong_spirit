@@ -308,6 +308,10 @@ export default {
     };
   },
   methods: {
+<<<<<<< HEAD
+=======
+     
+>>>>>>> 9744198217f38e6b80b74a6d838c4cac68746839
     updateInfo() {
       console.log(this.newpassword);
 

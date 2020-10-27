@@ -9,7 +9,11 @@
           <h1>{{ isDisplayUserEvents ? "My Events" : "Events" }}</h1>
         </b-col>
         <b-col cols="2">
+<<<<<<< HEAD
           <b-button @click="displayCreateEventForm" v-if="isAdmin"
+=======
+          <b-button v-b-modal="'create-event-form'" v-if="isAdmin"
+>>>>>>> 9744198217f38e6b80b74a6d838c4cac68746839
             ><strong>Create Event</strong></b-button
           >
           <b-button @click="displayUserEvents" v-else
@@ -63,9 +67,14 @@
             <strong>Maximum Number of Participants:</strong>
             {{ eventInfo.maxcapacity }}
           </p>
+<<<<<<< HEAD
           <p>
             <strong>Event Status:</strong>
             {{ eventInfo.status }}
+=======
+          <p><strong>Event Status:</strong>
+          {{eventInfo.status}}
+>>>>>>> 9744198217f38e6b80b74a6d838c4cac68746839
           </p>
           <b-container>
             <b-row>
