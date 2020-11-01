@@ -201,7 +201,7 @@
           </b-modal>
         </b-row>
 
-        <b-row class="pt-2">
+        <b-row class="pt-2 mt-5">
           <b-col class="text-center">
             <b-button v-b-modal="'view-rewards'" variant="info"
               >View Rewards</b-button
@@ -512,7 +512,7 @@ export default {
 }
 @media only screen and (max-width: 426px) {
   .responsive-text {
-    font-size: 1rem;
+    font-size: 0.7rem;
   }
   .responsive-button-text {
     font-size: 0.7rem;

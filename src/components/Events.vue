@@ -8,11 +8,11 @@
         <b-col id="feature-title">
           <h1>{{ isDisplayUserEvents ? "My Events" : "Events" }}</h1>
         </b-col>
-        <b-col cols="2">
+        <b-col md="2">
           <b-button @click="displayCreateEventForm" v-if="isAdmin"
             ><strong>Create Event</strong></b-button
           >
-          <b-button @click="displayUserEvents" v-else
+          <b-button class="w-100 mb-1" @click="displayUserEvents" v-else
             ><strong>{{
               isDisplayUserEvents ? "View All Events" : "My Events"
             }}</strong></b-button
