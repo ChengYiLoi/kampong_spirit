@@ -125,12 +125,12 @@ export default {
         extension == "jpg" ||
         extension == "svg"
       ) {
-        let url = `addItems.php?pictureName=${itemPictureName}&itemName=${this.itemName}&selectedCategory=${this.selectedCategory}&selectedCondition=${this.selectedCondition}&itemDescription=${this.itemDescription}&selectedDeliveryType=${this.selectedDeliveryType}&location=${this.location}&userEmail=${this.userEmail}`;
+        let url = `./database/addItems.php?pictureName=${itemPictureName}&itemName=${this.itemName}&selectedCategory=${this.selectedCategory}&selectedCondition=${this.selectedCondition}&itemDescription=${this.itemDescription}&selectedDeliveryType=${this.selectedDeliveryType}&location=${this.location}&userEmail=${this.userEmail}`;
         url = encodeURI(url);
         axios.post(url).then(() => {
-          url = `addimage.php?`;
+          url = `./database/addimage.php?`;
           axios.post(url, fd).then(() => {
-            url = `getUserItems.php?useremail=${this.userEmail}`;
+            url = `./database/getUserItems.php?useremail=${this.userEmail}`;
             axios.get(url).then((result) => {
               alert("User items have been updated");
               console.log(result);

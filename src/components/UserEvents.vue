@@ -91,12 +91,15 @@ export default {
       let email = this.getUserEmail;
       console.log(eventID);
       console.log(email);
-      let url = `withdraw.php?eventID=${eventID}&email=${email}`;
+      let url = `./database/withdraw.php?eventID=${eventID}&email=${email}`;
+      url = encodeURI(url);
       axios.post(url).then(() => {
         alert("User has withdrawed");
-        url = `withdraw_joincount.php?eventID=${eventID}`;
+        url = `./database/withdraw_joincount.php?eventID=${eventID}`;
+        url = encodeURI(url);
         axios.post(url).then(() => {
-          url = `getUserEvents.php?email=${email}`;
+          url = `./database/getUserEvents.php?email=${email}`;
+          url = encodeURI(url);
           axios.get(url).then((result) => {
             alert("User events has been updated");
             this.$store.state.userEvents = result.data;

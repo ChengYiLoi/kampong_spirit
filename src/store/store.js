@@ -8,13 +8,13 @@ export const store = new Vuex.Store({
     isSignup: false,
     userInfo: {
       isLogin: true,
-      acctype: "Admin",
-      email: "wad2project@gmail.com",
-      fname: "Kampong",
-      greenpoints: "50",
-      lname: "Admin",
-      mobileno: "98765748",
-      password: "123456789",
+      acctype: "User",
+      email: "",
+      fname: "",
+      greenpoints: "",
+      lname: "",
+      mobileno: "",
+      password: "",
       profilepic: "NA",
     },
     loginForm: {
@@ -77,7 +77,66 @@ export const store = new Vuex.Store({
     isDisplayMarketItems: true,
     userItems: [],
     userEvents: [],
+    userRewards:[
+
+    ],
     events: [],
+    markers:[
+      {
+        type: "food",
+        icon: "chicken.svg",
+        lat: 1.406688,
+        lng: 104.03,
+        clickable: true,
+        draggable: false,
+      },
+      {
+        type: "refill",
+        icon: "water.svg",
+        lat: 1.406688,
+        lng: 104.033,
+        clickable: true,
+        draggable: false,
+      },
+      {
+        type: "giveAway",
+        icon: "giveaway.svg",
+        lat: 1.406688,
+        lng: 104.035,
+        clickable: true,
+        draggable: false,
+      },
+    ],
+    refill: [
+      {
+        type: "refill",
+        icon: "water.svg",
+        lat: 1.406688,
+        lng: 104.033,
+        clickable: true,
+        draggable: false,
+      },
+    ],
+    food: [
+      {
+        type: "food",
+        icon: "chicken.svg",
+        lat: 1.406688,
+        lng: 104.03,
+        clickable: true,
+        draggable: false,
+      },
+    ],
+    giveAway: [
+      {
+        type: "giveAway",
+        icon: "giveaway.svg",
+        lat: 1.406688,
+        lng: 104.035,
+        clickable: true,
+        draggable: false,
+      },
+    ],
     itemCategoryDropdown: [
       { value: null, text: "Please select a category" },
       { value: "Electronics", text: "Electronics" },

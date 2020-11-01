@@ -32,7 +32,8 @@ Vue.use(VueGoogleCharts);
 Vue.use(VueGoogleMaps,{
   load:{
     key: "",
-  }
+  },
+  
 });
 
 Vue.config.productionTip = false;

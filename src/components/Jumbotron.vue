@@ -74,6 +74,11 @@ $hover-blue: #5bb7de;
     font-size: 3rem;
   }
 }
+@media only screen and (max-width: 768px){
+  .jumbotron{
+    background-image: unset;
+  }
+}
 @media only screen and (max-width: 426px) {
   .jumbotron {
     background-image: unset;

@@ -205,7 +205,8 @@ export default {
         }
 
         let idtoken = user.wc["login_hint"];
-        let url = `signupgmail.php?lname=${lname}&fname=${fname}&email=${email}&idtoken=${idtoken}`;
+        let url = `./database/signupgmail.php?lname=${lname}&fname=${fname}&email=${email}&idtoken=${idtoken}`;
+        url = encodeURI(url);
         axios.post(url).then((result) => {
           if (result.data.length == 1) {
             alert("Sign up successful");
@@ -228,7 +229,8 @@ export default {
       } else {
         let userInputs = this.$v.form.$model;
 
-        let url = `registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
+        let url = `./database/registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
+        url = encodeURI(url);
         axios.post(url).then(() => {
           alert("Form submitted");
           this.$router.push({ name: "Main" });

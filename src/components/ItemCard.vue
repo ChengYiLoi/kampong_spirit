@@ -12,14 +12,14 @@
     <hr />
     <b-container fluid class="item-info">
       <b-row class="p-2 text-left">
-        <b-col cols="12">Status: {{ item.status }}</b-col>
+        <b-col cols="12" class="item-info-text">Status: {{ item.status }}</b-col>
 
-        <b-col cols="12" v-if="isDisplayMarketItems">
+        <b-col cols="12" v-if="isDisplayMarketItems" class="item-info-text">
           Listed by: {{ item.fname }}
         </b-col>
       </b-row>
       <b-row>
-        <b-col class="text-right">
+        <b-col class="text-right item-info-text">
           Condition: <strong>{{ item.state }} </strong></b-col
         >
       </b-row>
@@ -258,17 +258,42 @@ export default {
       }
 
       if (!this.isErrors) {
+        let url;
         if (this.itemPicture != null) {
           picName = this.itemPicture.name;
+          let fd = new FormData();
+          fd.append("itemPicture", this.itemPicture);
+          url = `./database/addimage.php?`;
+          url = encodeURI(url);
+          let itemPictureName = this.itemPicture["name"];
+          let extension = itemPictureName
+            .substring(itemPictureName.lastIndexOf(".") + 1)
+            .toLowerCase();
+
+          if (
+            extension == "gif" ||
+            extension == "png" ||
+            extension == "bmp" ||
+            extension == "jpeg" ||
+            extension == "jpg" ||
+            extension == "jpg" ||
+            extension == "svg"
+          ) {
+            axios.post(url, fd).then(() => {
+              alert("image has been uploaded");
+            });
+          }
         }
 
-        let url = `processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
+        url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
+        url = encodeURI(url);
         axios.post(url).then(() => {
           if (this.$store.state.isDisplayMarketItems) {
-            url = `getItems.php`;
+            url = `./database/getItems.php`;
           } else {
-            url = `getUserItems.php?useremail=${email}`;
+            url = `./database/getUserItems.php?useremail=${email}`;
           }
+          url = encodeURI(url);
           axios.get(url).then((result) => {
             if (this.$store.state.isDisplayMarketItems) {
               this.$store.state.items = result.data;
@@ -285,8 +310,8 @@ export default {
     updateItemStatus(type, iID) {
       //updates whether it is reserved or open
       let email = this.$store.state.userInfo["email"];
-      let url = `updatechatitemstatus.php?newstatus=${type}&email=${email}&iID=${iID}`;
-
+      let url = `./database/updatechatitemstatus.php?newstatus=${type}&email=${email}&iID=${iID}`;
+      url = encodeURI(url);
       postData(url, this.itemStatusCallback);
       // this.$bvModal.hide(`${this.item.name}`);
     },
@@ -318,19 +343,19 @@ export default {
     deleteItem(iID) {
       // deletes the item
       let email = this.$store.state.userInfo["email"];
-      let url = `deleteitem.php?iID=${iID}&email=${email}`;
+      let url = `./database/deleteitem.php?iID=${iID}&email=${email}`;
       url = encodeURI(url);
       axios.post(url).then(() => {
         if (!this.isDisplayMarketItems) {
           alert("display market place is false");
-          url = `getUserItems.php?useremail=${email}`;
+          url = `./database/getUserItems.php?useremail=${email}`;
           url = encodeURI(url);
           axios.post(url).then((result) => {
             this.$store.state.userItems = result.data;
           });
         } else {
           alert("display market place is true");
-          url = `getItems.php`;
+          url = `./database/getItems.php`;
           axios.post(url).then((result) => {
             this.$store.state.items = result.data;
           });
@@ -433,6 +458,11 @@ $white: rgb(245, 245, 245);
   .modal-info {
     background-color: #eeeff1;
     border-radius: 5px;
+  }
+}
+@media only screen and (max-width: 769px) {
+  .item-info-text{
+    font-size: 1.0rem;
   }
 }
 </style>

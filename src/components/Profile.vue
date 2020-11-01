@@ -177,25 +177,41 @@
             id="gPointsReward"
             centered
             title="Green Points Rewards"
-            ok-title="Confirm"
+            hide-footer
           >
             <b-container>
               <b-button
+                :disabled="gPoints < 50 ? true : false"
                 v-b-modal="'aCouponCode'"
                 class="w-100"
                 variant="primary"
-               
+                @click="deductPoints(50, '10OOFF', 'Amazon $10 off')"
                 >Generate Amazon coupon code (50 Green Points)</b-button
               >
             </b-container>
+
             <b-modal
-              id="aCouponCode"
+              id="coupon-deducted"
               ok-only
               ok-title="close"
               ok-variant="danger"
             >
-              <p class="w-100">Wait long long</p>
+              <p class="w-100">Green points have been successfully deducted</p>
             </b-modal>
+          </b-modal>
+        </b-row>
+
+        <b-row class="pt-2">
+          <b-col class="text-center">
+            <b-button v-b-modal="'view-rewards'" variant="info"
+              >View Rewards</b-button
+            >
+          </b-col>
+          <b-modal id="view-rewards" ok-only ok-title="close">
+            <b-row v-for="reward in userRewards" :key="reward['rewardcode']">
+              <b-col>{{ reward["rewardname"] }}</b-col>
+              <b-col>{{ reward["rewardcode"] }}</b-col>
+            </b-row>
           </b-modal>
         </b-row>
       </b-container>
@@ -213,18 +229,20 @@
             ></b-progress>
           </b-col>
         </b-row> -->
-        <h3 class="text-center responsive-text"><strong>Achivements</strong></h3>
+        <h3 class="text-center responsive-text">
+          <strong>Achivements</strong>
+        </h3>
         <b-row>
           <b-col class="" id="tooltip-bronze">
             <b-tooltip target="tooltip-bronze" triggers="hover">
               {{
-                gPoints >= 20
-                  ? "Achievement for participating in 20 events"
-                  : "Unlocks when you have participated in 20 events"
+                eventCount >= 20
+                  ? "Achievement for participating 20 events"
+                  : "Unlocks when you have participated 20 events"
               }}
             </b-tooltip>
             <b-img
-              v-if="gPoints >= 20"
+              v-if="eventCount >= 20"
               fluid
               :src="require('../assets/bronzeMedalUnlocked.svg')"
             ></b-img>
@@ -237,13 +255,13 @@
           <b-col id="tooltip-silver">
             <b-tooltip target="tooltip-silver" triggers="hover">
               {{
-                gPoints >= 50
-                  ? "Achievement for participating in 50 events"
-                  : "Unlocks when you have participated in 50 events"
+                eventCount >= 50
+                  ? "Achievement for participating 50 events"
+                  : "Unlocks when you have participated 50 events"
               }}
             </b-tooltip>
             <b-img
-              v-if="gPoints >= 50"
+              v-if="eventCount >= 50"
               fluid
               :src="require('../assets/silverMedalUnlocked.svg')"
             ></b-img>
@@ -256,9 +274,9 @@
           <b-col id="tooltip-gold">
             <b-tooltip target="tooltip-gold" triggers="hover">
               {{
-                gPoints == 100
-                  ? "Achievement for participating in 1000 events"
-                  : "Unlocks when you have participated in 1000 events"
+                eventCount == 100
+                  ? "Achievement for participating 1000 events"
+                  : "Unlocks when you have participated 1000 events"
               }}
             </b-tooltip>
             <b-img
@@ -308,23 +326,54 @@ export default {
     };
   },
   methods: {
-<<<<<<< HEAD
-=======
-     
->>>>>>> 9744198217f38e6b80b74a6d838c4cac68746839
+    // getUserRewards() {
+    //   let url = `userrewards.php?email=${this.email}`;
+    //   axios.get(url).then((result) => {
+    //     this.$store.state.getUserRewards = result.data;
+    //   });
+    // },
+    getUserData() {
+      alert('getting user data');
+
+      let url = `./database/updatedprofile.php?email=${this.email}`;
+      axios.get(url).then((result) => {
+        let data = result.data[0];
+        data.isLogin = true;
+        console.log('User data is');
+        console.log(result.data);
+        sessionStorage.setItem("userSession", JSON.stringify(data));
+        this.$store.state.userInfo = data;
+      });
+    },
+    deductPoints(points, rCode, rDescription) {
+      let url = `./database/deductpoints.php?email=${this.email}&greenpoints=${points}&rewardname=${rDescription}&rewardcode=${rCode}`;
+      url = encodeURI(url);
+      axios.post(url).then(() => {
+        this.$bvModal.show("coupon-deducted");
+        url = `./database/updatedprofile.php?email=${this.email}`;
+        url = encodeURI(url);
+        axios.get(url).then((result) => {
+          let data = result.data[0];
+          data.isLogin = true;
+          sessionStorage.setItem("userSession", JSON.stringify(data));
+          this.$store.state.userInfo = data;
+        });
+      });
+    },
     updateInfo() {
       console.log(this.newpassword);
 
       alert("about to send data");
-      let url = `editprofile.php?fname=${this.newfname}&lname=${this.newlname}&email=${this.email}&mobileno=${this.newmobileno}&password=${this.newpassword}`;
+      let url = `./database/editprofile.php?fname=${this.newfname}&lname=${this.newlname}&email=${this.email}&mobileno=${this.newmobileno}&password=${this.newpassword}`;
       url = encodeURI(url);
       postData(url, this.updateUsernameCallBack);
     },
     updateUsernameCallBack() {
       alert("call back success");
-      let url = `updatedprofile.php?email=${this.email}`;
+      let url = `./database/updatedprofile.php?email=${this.email}`;
       getData(url, this.getUpdatedProfileInfo);
     },
+
     getUpdatedProfileInfo(dataObj) {
       alert("user profile update call back");
       let data = JSON.parse(dataObj);
@@ -347,9 +396,11 @@ export default {
       } else if (localStorage.getItem("userStorage")) {
         user = JSON.parse(localStorage.getItem("userStorage"));
       }
-      this.getUserChartData();
+
       console.log(user);
       this.$store.state.userInfo = user;
+      this.getUserData();
+      this.getUserChartData();
     },
     getUserChartData() {
       let monthsWithEvents = {
@@ -368,7 +419,8 @@ export default {
       };
       let chartData = [["Month", "# of Events Joined"]];
       let currentYear = new Date().getFullYear();
-      let url = `get_countevent.php?email=${this.email}&year=${currentYear}`;
+      let url = `./database/get_countevent.php?email=${this.email}&year=${currentYear}`;
+      url = encodeURI(url);
       axios.get(url).then((result) => {
         result.data.forEach((event) => {
           let date = event.endDatetime;
@@ -390,13 +442,14 @@ export default {
             chartData.push(monthsWithEvents[month]);
           }
         }
+        console.log(chartData);
         this.$store.state.chartData = chartData;
       });
     },
   },
   computed: {
     isChartData() {
-      return this.$store.state.chartData.length == 1;
+      return this.$store.state.chartData.length > 1;
     },
     chartData() {
       return this.$store.state.chartData;
@@ -434,6 +487,12 @@ export default {
     },
     gPoints() {
       return this.$store.state.userInfo.greenpoints;
+    },
+    userRewards() {
+      return this.$store.state.userRewards;
+    },
+    eventCount() {
+      return this.$store.state.userInfo.numofevents;
     },
   },
 };

@@ -45,7 +45,7 @@ export default {
       this.$router.push({ name: "Main" });
     },
     getItems() {
-      let url = `getItems.php`;
+      let url = `./database/getItems.php`;
       url = encodeURI(url);
       postData(url, this.renderItems);
     },

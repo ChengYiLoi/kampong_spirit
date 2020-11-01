@@ -1,40 +1,36 @@
 <template>
   <div id="full-height">
-    <div id="banner">
-      <b-row align-v="center" class="px-2">
-        <b-col md="9">
-          <b-row align-v="center">
-            <b-col md="2">
-              <dashbar></dashbar>
-            </b-col>
-            <b-col id="feature-title">
-              <h1 class="d-inline">
-                {{
-                  this.$store.state.isDisplayMarketItems
-                    ? "Market Place"
-                    : "My Items"
-                }}
-              </h1>
-            </b-col>
-          </b-row>
+    <div id="banner" >
+      <b-row align-v="center" class="w-100 mx-0">
+        <b-col md="3">
+          <dashbar></dashbar>
+        </b-col>
+        <b-col id="feature-title" class="px-0">
+          <h1 class="d-inline">
+            {{
+              this.$store.state.isDisplayMarketItems
+                ? "Market Place"
+                : "My Items"
+            }}
+          </h1>
         </b-col>
 
-        <b-col md="3" class="p-0">
-          <b-row align-v="center" id="market-buttons" class="">
+        <b-col md="3">
+          <b-row align-v="center" id="market-buttons">
             <b-col cols="6" class="px-0">
               <b-button
-                class="px-2 "
+              class="p-2"
                 v-on:click="displayMyItems()"
                 v-if="displayMarketItems"
               >
                 <strong>My Items</strong>
               </b-button>
               <b-button v-on:click="toggleMarketPlace()" v-else>
-                <strong>Back to Market Place</strong>
+                <strong>Market Place</strong>
               </b-button>
             </b-col>
             <b-col cols="6" class="px-0">
-              <b-button @click="displayUserChat">
+              <b-button @click="displayUserChat" class="p-2" >
                 <strong>My Chat</strong>
               </b-button>
             </b-col>
@@ -83,7 +79,7 @@ export default {
   },
   methods: {
     getItems() {
-      let url = `getItems.php`;
+      let url = `./database/getItems.php`;
       url = encodeURI(url);
       postData(url, this.renderItems);
     },
@@ -97,7 +93,7 @@ export default {
       }
 
       let email = userSession["email"];
-      let url = `getUserItems.php?useremail=${email}`;
+      let url = `./database/getUserItems.php?useremail=${email}`;
       alert(`get user items email is ${email}`);
       getData(url, this.renderUserItems);
     },
@@ -177,6 +173,7 @@ export default {
 };
 </script>
 <style lang="scss">
+
 @media only screen and (max-width: 426px) {
   #feature-title {
     display: none;
@@ -185,4 +182,5 @@ export default {
     padding-bottom: 1rem;
   }
 }
+
 </style>

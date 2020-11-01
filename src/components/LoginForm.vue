@@ -1,11 +1,11 @@
 <template>
-  <div class="login-form p-5">
+  <div class="login-form p-3">
     <h2 class="text-lg-left text-center">Log In</h2>
 
     <button
       @click="handleSignIn"
       id="google"
-      class="mt-4 d-block w-100 mx-auto px-3"
+      class="mt-4 d-block w-100 mx-auto"
     >
       <span><img src="../assets/google.svg"/></span> Sign in with Google
     </button>
@@ -84,7 +84,16 @@ export default {
     },
   },
   methods: {
+    getUserRewards(email) {
+      let url = `./database/userrewards.php?email=${email}`;
+      url = encodeURI(url);
+      axios.get(url).then((result) => {
+        this.$store.state.userRewards = result.data;
+      });
+    },
     createSession(userInfo) {
+      console.log(userInfo);
+      this.getUserRewards(userInfo["email"]);
       userInfo.isLogin = true;
       sessionStorage.setItem("userSession", JSON.stringify(userInfo));
       this.$store.state.userInfo = userInfo;
@@ -106,7 +115,8 @@ export default {
         }
         let data;
         let idtoken = user.wc["login_hint"];
-        let url = `validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+        let url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+        url = encodeURI(url);
         axios.get(url).then((result) => {
           alert("check with DB was done");
           console.log(result.data);
@@ -133,7 +143,7 @@ export default {
     onSubmit() {
       let email = document.getElementById("email").value;
       let password = document.getElementById("password").value;
-      let url = `validate.php?email=${email}&password=${password}`;
+      let url = `./database/validate.php?email=${email}&password=${password}`;
       url = encodeURI(url);
       this.$v.form.$touch();
       if (this.$v.form.$anyError) {

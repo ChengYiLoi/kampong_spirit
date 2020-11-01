@@ -5,15 +5,11 @@
         <b-col md="2">
           <dashbar></dashbar>
         </b-col>
-        <b-col>
+        <b-col id="feature-title">
           <h1>{{ isDisplayUserEvents ? "My Events" : "Events" }}</h1>
         </b-col>
         <b-col cols="2">
-<<<<<<< HEAD
           <b-button @click="displayCreateEventForm" v-if="isAdmin"
-=======
-          <b-button v-b-modal="'create-event-form'" v-if="isAdmin"
->>>>>>> 9744198217f38e6b80b74a6d838c4cac68746839
             ><strong>Create Event</strong></b-button
           >
           <b-button @click="displayUserEvents" v-else
@@ -67,14 +63,9 @@
             <strong>Maximum Number of Participants:</strong>
             {{ eventInfo.maxcapacity }}
           </p>
-<<<<<<< HEAD
           <p>
             <strong>Event Status:</strong>
             {{ eventInfo.status }}
-=======
-          <p><strong>Event Status:</strong>
-          {{eventInfo.status}}
->>>>>>> 9744198217f38e6b80b74a6d838c4cac68746839
           </p>
           <b-container>
             <b-row>
@@ -521,16 +512,20 @@ export default {
       console.log(`selected partcipants are ${this.selectedParticipants}`);
 
       this.selectedParticipants.forEach((participantEmail) => {
-        let url = `update_greenpoints.php?eventID=${this.eventInfo["eventID"]}&email=${participantEmail}`;
+        let url = `./database/update_greenpoints.php?eventID=${this.eventInfo["eventID"]}&email=${participantEmail}`;
+        url = encodeURI(url);
+        
         axios.post(url).then(() => {
-          url = `mark_completed.php?eventID=${this.eventInfo["eventID"]}`;
+          url = `./database/mark_completed.php?eventID=${this.eventInfo["eventID"]}`;
+          url = encodeURI(url);
           axios.get(url);
         });
       });
       alert("Green points distributed");
     },
     getAllParticipants() {
-      let url = `join.php?eventID=${this.eventInfo["eventID"]}`;
+      let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
+      url = encodeURI(url);
       axios.get(url).then((result) => {
         alert("Event participants retrieved");
         console.log(result.data);
@@ -565,7 +560,8 @@ export default {
           (isNaN(parseStartDate) && isNaN(parseEndDate)) ||
           parseStartDate < parseEndDate
         ) {
-          let url = `update_event.php?eventID=${this.eventInfo["eventID"]}&title=${this.eventTitle}&type=${this.eventType}&startDatetime=${this.sDateTime}&endDatetime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}`;
+          let url = `./database/update_event.php?eventID=${this.eventInfo["eventID"]}&title=${this.eventTitle}&type=${this.eventType}&startDatetime=${this.sDateTime}&endDatetime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}`;
+          url = encodeURI(url);
           axios.post(url).then(() => {
             alert("event has been updated");
             this.$bvModal.hide("edit-event-form");
@@ -587,21 +583,25 @@ export default {
       }
     },
     cancelEvent() {
-      let url = `join.php?eventID=${this.eventInfo["eventID"]}`;
+      let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
+      url = encodeURI(url);
       axios.get(url).then((result) => {
         alert("Event participants retrieved");
         console.log(result.data);
         this.eventParticipants = result.data;
-        url = `cancelled_event.php?eventID=${this.eventInfo["eventID"]}`;
+        url = `./database/cancelled_event.php?eventID=${this.eventInfo["eventID"]}`;
+        url = encodeURI(url);
         axios.post(url).then(() => {
           console.log(this.eventParticipants);
           let participants = this.eventParticipants;
           for (var participant in participants) {
             console.log(`email is ${participant["email"]}`);
             let email = participants[participant]["email"];
-            url = `update_cancel.php?email=${email}&eventID=${this.eventInfo["eventID"]}`;
+            url = `./database/update_cancel.php?email=${email}&eventID=${this.eventInfo["eventID"]}`;
+            url = encodeURI(url);
             axios.get(url);
-            url = `cancelled_emailsend.php?email=${email}&title=${this.eventTitle}`;
+            url = `./database/cancelled_emailsend.php?email=${email}&title=${this.eventTitle}`;
+            url = encodeURI(url);
             axios.get(url);
           }
 
@@ -647,7 +647,7 @@ export default {
         let parseStartDate = Date.parse(this.sDateTime);
         let parseEndDate = Date.parse(this.eDateTime);
         if (parseEndDate > parseStartDate) {
-          let url = `create_event.php?title=${this.eventTitle}&type=${this.eventType}&startDateTime=${this.sDateTime}&endDateTime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}`;
+          let url = `./database/create_event.php?title=${this.eventTitle}&type=${this.eventType}&startDateTime=${this.sDateTime}&endDateTime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}`;
           url = encodeURI(url);
           axios.post(url).then(() => {
             alert("event has been created");
@@ -661,11 +661,13 @@ export default {
       }
     },
     getAllEvents() {
-      let url = `getAllEvents.php?email=${this.getUserEmail}`;
+      let url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
+      url = encodeURI(url);
       axios.get(url).then((result) => {
         alert("Retrieved all events");
         this.$store.state.events = result.data;
-        url = `getUserEvents.php?email=${this.getUserEmail}`;
+        url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
+        url = encodeURI(url);
         axios.get(url).then((result) => {
           alert("Retrieved user events");
           alert(`User email is ${this.getUserEmail}`);
@@ -684,10 +686,12 @@ export default {
       let location = this.eventInfo["location"];
       let postalCode = this.eventInfo["postalCode"];
       let pointsEarn = this.eventInfo["pointsEarn"];
-      let url = `send_email.php?email=${email}&eventID=${eventID}&title=${title}&type=${type}&startDatetime=${startDateTime}&endDatetime=${endDateTime}&location=${location}&postalCode=${postalCode}&pointsEarn=${pointsEarn}`;
+      let url = `./database/send_email.php?email=${email}&eventID=${eventID}&title=${title}&type=${type}&startDatetime=${startDateTime}&endDatetime=${endDateTime}&location=${location}&postalCode=${postalCode}&pointsEarn=${pointsEarn}`;
+      url = encodeURI(url);
       axios.get(url).then(() => {
         alert("email has been sent");
-        url = `insert_join.php?eventID=${eventID}&email=${email}`;
+        url = `./database/insert_join.php?eventID=${eventID}&email=${email}`;
+        url = encodeURI(url);
         axios.get(url).then(() => {
           alert("join events has been updated");
         });
@@ -710,7 +714,8 @@ export default {
     },
     displayUserEvents() {
       if (!this.isDisplayUserEvents) {
-        let url = `getUserEvents.php?email=${this.getUserEmail}`;
+        let url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
+        url = encodeURI(url);
         axios.get(url).then((result) => {
           alert("Retrieved user events");
           alert(`User email is ${this.getUserEmail}`);
