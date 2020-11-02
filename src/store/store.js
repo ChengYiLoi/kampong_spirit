@@ -89,6 +89,7 @@ export const store = new Vuex.Store({
         lng: 104.03,
         clickable: true,
         draggable: false,
+       
       },
       {
         type: "refill",
@@ -97,6 +98,7 @@ export const store = new Vuex.Store({
         lng: 104.033,
         clickable: true,
         draggable: false,
+        
       },
       {
         type: "giveAway",
@@ -105,6 +107,7 @@ export const store = new Vuex.Store({
         lng: 104.035,
         clickable: true,
         draggable: false,
+        
       },
     ],
     refill: [

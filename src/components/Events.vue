@@ -8,11 +8,11 @@
         <b-col id="feature-title">
           <h1>{{ isDisplayUserEvents ? "My Events" : "Events" }}</h1>
         </b-col>
-        <b-col md="2">
+        <b-col md="2" class="responsive-col">
           <b-button @click="displayCreateEventForm" v-if="isAdmin"
             ><strong>Create Event</strong></b-button
           >
-          <b-button class="w-100 mb-1" @click="displayUserEvents" v-else
+          <b-button variant="info" class="responsive-event-button" @click="displayUserEvents" v-else
             ><strong>{{
               isDisplayUserEvents ? "View All Events" : "My Events"
             }}</strong></b-button
@@ -27,7 +27,7 @@
         outlined
         hover
         striped
-        dark
+        head-variant="light"
         selectable
         select-mode="single"
         :fields="isAdmin ? '' : fields['user']"
@@ -67,27 +67,29 @@
             <strong>Event Status:</strong>
             {{ eventInfo.status }}
           </p>
-          <b-container>
-            <b-row>
-              <b-col v-if="!checkIfUserJoined">
-                <b-button v-if="isProcessing">
-                  <b-spinner></b-spinner>
-                </b-button>
-                <b-button variant="success" @click="emailConfirmation">
-                  Join Event
-                </b-button>
-              </b-col>
-              <b-col :cols="checkIfUserJoined ? '12' : ''">
-                <b-button
-                  class="w-100"
+         
+          <template>
+            <b-row class="pb-2">
+              <b-col class="pr-0"
+                ><b-button
+                  class=" w-100"
                   variant="danger"
                   @click="$bvModal.hide('event-modal-user')"
-                >
-                  {{ checkIfUserJoined ? "User has Already Joined" : "Close" }}
-                </b-button>
-              </b-col>
+                  >{{
+                    checkIfUserJoined ? "Already Joined Event" : "Close"
+                  }}</b-button
+                ></b-col
+              >
+              <b-col class="pl-1" v-if="!checkIfUserJoined"
+                ><b-button
+                  class="w-100"
+                  variant="success"
+                  @click="emailConfirmation"
+                  >Create</b-button
+                ></b-col
+              >
             </b-row>
-          </b-container>
+          </template>
         </div>
       </b-modal>
       <b-modal
@@ -514,7 +516,7 @@ export default {
       this.selectedParticipants.forEach((participantEmail) => {
         let url = `./database/update_greenpoints.php?eventID=${this.eventInfo["eventID"]}&email=${participantEmail}`;
         url = encodeURI(url);
-        
+
         axios.post(url).then(() => {
           url = `./database/mark_completed.php?eventID=${this.eventInfo["eventID"]}`;
           url = encodeURI(url);
@@ -778,5 +780,13 @@ export default {
 .event-info {
   background-color: #aaccaa;
   border-radius: 5px;
+}
+@media only screen and (max-width: 768px){
+  .responsive-event-button{
+    width: 100%;
+  }
+  .responsive-col{
+    padding: 0px;
+  }
 }
 </style>

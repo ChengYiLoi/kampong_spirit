@@ -8,9 +8,9 @@
 var axios = require("axios");
 export default {
   mounted() {
-    alert("App mounted");
-    setInterval(() => this.get_messages(), 10000);
-  },
+  //   alert("App mounted");
+  //   setInterval(() => this.get_messages(), 10000);
+   },
 
   data() {
     return {};

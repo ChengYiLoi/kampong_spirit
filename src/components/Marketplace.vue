@@ -19,18 +19,19 @@
           <b-row align-v="center" id="market-buttons">
             <b-col cols="6" class="px-0">
               <b-button
-              class="p-2"
+              class="p-2  responsive-market-button"
+              variant="info"
                 v-on:click="displayMyItems()"
                 v-if="displayMarketItems"
               >
                 <strong>My Items</strong>
               </b-button>
-              <b-button v-on:click="toggleMarketPlace()" v-else>
+              <b-button v-on:click="toggleMarketPlace()" class="responsive-market-button" v-else>
                 <strong>Market Place</strong>
               </b-button>
             </b-col>
             <b-col cols="6" class="px-0">
-              <b-button @click="displayUserChat" class="p-2" >
+              <b-button @click="displayUserChat" class="p-2  responsive-market-button" variant="warning" >
                 <strong>My Chat</strong>
               </b-button>
             </b-col>
@@ -174,12 +175,16 @@ export default {
 </script>
 <style lang="scss">
 
-@media only screen and (max-width: 426px) {
+@media only screen and (max-width: 768px) {
   #feature-title {
     display: none;
   }
-  #market-buttons {
-    padding-bottom: 1rem;
+  // #market-buttons {
+  //   padding-bottom: 1rem;
+  // }
+  .responsive-market-button{
+    width: 100%;
+    border-radius: unset;
   }
 }
 

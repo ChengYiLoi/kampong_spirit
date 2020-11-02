@@ -13,10 +13,11 @@
     </div>
     <div class="main">
       <gmap-map
-        :center="{ lat: 1.406688, lng: 104.029381 }"
+        :center="currentPos"
         :zoom="16"
         id="map"
-        @click="setMarker"
+        
+        class="m-1"
       >
         <gmap-info-window
           :options="infoWindowOptions"
@@ -26,12 +27,15 @@
         >
           <div>
             <h2>{{ activeMarker.type }}</h2>
+            <b-button variant="info">Get Directions</b-button>
           </div>
         </gmap-info-window>
         <gmap-marker
+        
           v-for="marker in markers"
+          
           :key="marker.type"
-          :position="{ lat: marker.lat, lng: marker.lng }"
+          :position="filter[marker['type']] ? { lat: marker.lat, lng: marker.lng } : null"
           :clickable="marker.clickable"
           :draggable="marker.draggable"
           @click="setActiveMarker(marker)"
@@ -43,207 +47,227 @@
         >
         </gmap-marker>
       </gmap-map>
-      <p>{{ filter }}</p>
-      <b-row>
-        <b-col></b-col>
-        <b-col cols="4">
-          <b-container>
-            <b-row>
-              <b-col align-self="center">
-                <b-button
-                  :disabled="!isSelectedMarker"
-                  variant="info"
-                  v-b-modal="'create-event-form'"
-                  >Create Event</b-button
-                >
-              </b-col>
-              <b-col>
-                <b-row>
-                  <b-col>
-                    <h4 class="text-left"><u>Filter Events</u></h4>
-                  </b-col>
-                </b-row>
-                <b-row>
-                  <b-col class="text-left">
-                    <b-form-checkbox
-                      size="lg"
-                      v-model="filter['giveAway']"
-                      switch
-                      @click="updateFilter('giveAway')"
-                    >
-                      Give Away
-                    </b-form-checkbox>
-                  </b-col>
-                </b-row>
-                <b-row>
-                  <b-col class="text-left">
-                    <b-form-checkbox
-                      size="lg"
-                      v-model="filter['refill']"
-                      switch
-                      @click="updateFilter('giveAway')"
-                    >
-                      Buffet
-                    </b-form-checkbox>
-                  </b-col>
-                </b-row>
-                <b-row>
-                  <b-col class="text-left">
-                    <b-form-checkbox
-                      size="lg"
-                      v-model="filter['food']"
-                      switch
-                      @click="updateFilter('giveAway')"
-                    >
-                      Refill Station
-                    </b-form-checkbox>
-                  </b-col>
-                </b-row>
-              </b-col>
-            </b-row>
-          </b-container>
-          <b-modal
-            title="List New Event"
-            id="create-event-form"
-            centered
-            hide-footer
-          >
-            <b-row>
-              <b-col><p class="text-center">Marker Coordinates</p></b-col>
-            </b-row>
-            <b-row>
-              <b-col>
-                <b-form-group
-                  label="Latitude: "
-                  label-for="latitude"
-                  label-cols="2"
-                >
-                  <b-form-input
-                    id="latitude"
-                    disabled
-                    v-model="createForm['lat']"
-                  >
-                  </b-form-input>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col>
-                <b-form-group
-                  label="Longitude: "
-                  label-for="longitude"
-                  label-cols="2"
-                >
-                  <b-form-input
-                    id="longitude"
-                    disabled
-                    v-model="createForm['lng']"
-                  >
-                  </b-form-input>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-form-group
-              label="Location Description:"
-              label-cols="4"
-              label-for="descriptionInput"
-            >
-              <b-form-textarea
-                v-model="createForm['description']"
-                id="descriptionInput"
-                placeholder="Briefly describe your event"
-              >
-              </b-form-textarea>
-            </b-form-group>
-            <b-form-group label="Start Time: " label-for="sDateTime">
-              <b-form-input
-                v-model="createForm['sDateTime']"
-                type="datetime-local"
-                id="sDateTime"
-              ></b-form-input>
-            </b-form-group>
-            <b-form-group label="End Time: " label-for="eDateTime">
-              <b-form-input
-                v-model="createForm['eDateTime']"
-                type="datetime-local"
-                id="eDateTime"
-              ></b-form-input>
-            </b-form-group>
-            <b-form-group label="Event Type:" label-for="eType">
-              <b-form-radio v-model="createForm['eType']" value="Buffet"
-                >Buffet</b-form-radio
-              >
-              <b-form-radio v-model="createForm['eType']" value="Give Away"
-                >Give Away</b-form-radio
-              >
-            </b-form-group>
-            <b-form-group label="Telegram user ID" label-for="teleID">
-              <b-form-input id="teleID"></b-form-input>
-              <a href="https://t.me/Kampung_Spirit_bot">
-                <b-img fluid :src="require(`../assets/telegram.svg`)"></b-img
-              ></a>
-            </b-form-group>
-            <b-row v-if="createForm['eType'] == 'Buffet'">
-              <b-col>
-                <b-form-group>
-                  <b-form-radio
-                    name="isHalal"
-                    value="1"
-                    v-model="createForm['isHalal']"
-                    >Halal</b-form-radio
-                  >
-                  <b-form-radio
-                    value="0"
-                    name="isHalal"
-                    v-model="createForm['isHalal']"
-                    >Non-Halal</b-form-radio
-                  >
-                </b-form-group>
-              </b-col>
-              <b-col>
-                <b-form-group label="Cusine Type:" label-for="cType">
-                  <b-form-input
-                    id="cType"
-                    v-model="createForm['cType']"
-                  ></b-form-input>
-                </b-form-group>
-              </b-col>
-            </b-row>
 
-            <template>
-              <b-row class="pb-2">
-                <b-col class="pr-0"
-                  ><b-button class=" w-100" variant="danger"
-                    >Cancel</b-button
-                  ></b-col
-                >
-                <b-col class="pl-1"
-                  ><b-button
-                    class="w-100"
-                    variant="success"
-                    @click="createEvent"
-                    >Create</b-button
-                  ></b-col
-                >
+
+      <b-row class="m-2">
+        <b-col></b-col>
+        <b-col lg="6" class="filter p-2">
+          <b-row align-v="center">
+            <b-col>
+              <h4><u>Filter Events</u></h4>
+            </b-col>
+          </b-row>
+
+          <b-row class="p-2">
+            <b-col md="4" class="p-2">
+              <b-form-checkbox
+                size="lg"
+                v-model="filter['giveAway']"
+                switch
+                @click="updateFilter('giveAway')"
+              >
+                Give Away
+              </b-form-checkbox>
+            </b-col>
+            <b-col md="4" class="p-2">
+              <b-form-checkbox
+                size="lg"
+                 v-model="filter['food']"
+                switch
+                @click="updateFilter('food')"
+              >
+                Buffet
+              </b-form-checkbox>
+            </b-col>
+            <b-col md="4" class="p-2">
+              <b-form-checkbox
+                size="lg"
+                v-model="filter['refill']"
+              
+                switch
+                @click="updateFilter('refill')"
+              >
+                Refill Station
+              </b-form-checkbox>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col align-self="center">
+              <b-button variant="info" v-b-modal="'create-event-form'"
+                >Create Event</b-button
+              >
+            </b-col>
+            <b-modal
+              title="List New Event"
+              id="create-event-form"
+              centered
+              hide-footer
+            >
+              <b-row>
+                <b-col>
+                  <b-form-group
+                    label="Latitude: "
+                    label-for="latitude"
+                    label-cols="2"
+                    class="d-none"
+                  >
+                    <b-form-input
+                      id="latitude"
+                      disabled
+                      v-model="createForm['lat']"
+                    >
+                    </b-form-input>
+                  </b-form-group>
+                </b-col>
               </b-row>
-            </template>
-            <b-alert :show="isCreateErrors" class="w-100" variant="warning">
-              <ul>
-                <li v-if="createForm['description'] == ''">
-                  Event description cannot be empty
-                </li>
-                <li v-if="createForm['sDateTime'] == null">
-                  Start date time cannot be empty
-                </li>
-                <li v-if="createForm['eDateTime'] == null">
-                  End date time cannot be empty
-                </li>
-                <li v-if="createForm['eType'] == null">
-                  Event type cannot be empty
-                </li>
-              </ul>
-            </b-alert>
-          </b-modal>
+              <b-row>
+                <b-col>
+                  <b-form-group
+                    label="Longitude: "
+                    label-for="longitude"
+                    label-cols="2"
+                    class="d-none"
+                  >
+                    <b-form-input
+                      id="longitude"
+                      disabled
+                      v-model="createForm['lng']"
+                    >
+                    </b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <b-form-group
+                label="Postal Code: "
+                label-for="pCode"
+                label-cols="3"
+              >
+                <b-form-input
+                  v-model="createForm['pCode']"
+                  id="pCode"
+                ></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label="Location Description:"
+                label-cols="4"
+                label-for="descriptionInput"
+              >
+                <b-form-textarea
+                  v-model="createForm['description']"
+                  id="descriptionInput"
+                  placeholder="Briefly describe your event"
+                >
+                </b-form-textarea>
+              </b-form-group>
+              <b-form-group
+                label="Start Time: "
+                label-for="sDateTime"
+                label-cols="3"
+              >
+                <b-form-input
+                  v-model="createForm['sDateTime']"
+                  type="datetime-local"
+                  id="sDateTime"
+                ></b-form-input>
+              </b-form-group>
+              <b-form-group
+                label="End Time: "
+                label-for="eDateTime"
+                label-cols="3"
+              >
+                <b-form-input
+                  v-model="createForm['eDateTime']"
+                  type="datetime-local"
+                  id="eDateTime"
+                ></b-form-input>
+              </b-form-group>
+              <b-form-group label="Event Type:" label-for="eType">
+                <b-form-radio v-model="createForm['eType']" value="Buffet"
+                  >Buffet</b-form-radio
+                >
+                <b-form-radio v-model="createForm['eType']" value="Give Away"
+                  >Give Away</b-form-radio
+                >
+              </b-form-group>
+
+              <b-row v-if="createForm['eType'] == 'Buffet'">
+                <b-col>
+                  <b-form-group
+                    label="Cusine Type:"
+                    label-for="cType"
+                    label-cols="4"
+                  >
+                    <b-form-input
+                      id="cType"
+                      v-model="createForm['cType']"
+                    ></b-form-input>
+                  </b-form-group>
+                </b-col>
+                <b-col cols="4">
+                  <b-form-group>
+                    <b-form-radio
+                      name="isHalal"
+                      value="1"
+                      v-model="createForm['isHalal']"
+                      >Halal</b-form-radio
+                    >
+                    <b-form-radio
+                      value="0"
+                      name="isHalal"
+                      v-model="createForm['isHalal']"
+                      >Non-Halal</b-form-radio
+                    >
+                  </b-form-group>
+                </b-col>
+              </b-row>
+
+              <b-button class="d-inline w-100 mx-auto my-2" variant="info"
+                >Get Telegram ID</b-button
+              >
+
+              <b-form-group
+                label="Telegram user ID: "
+                label-for="teleID"
+                label-cols="4"
+              >
+                <b-form-input id="teleID"></b-form-input>
+              </b-form-group>
+
+              <template>
+                <b-row class="pb-2">
+                  <b-col class="pr-0"
+                    ><b-button class=" w-100" variant="danger" @click="$bvModal.hide('create-event-form')"
+                      >Cancel</b-button
+                    ></b-col
+                  >
+                  <b-col class="pl-1"
+                    ><b-button
+                      class="w-100"
+                      variant="success"
+                      @click="createEvent"
+                      >Create</b-button
+                    ></b-col
+                  >
+                </b-row>
+              </template>
+              <b-alert :show="isCreateErrors" class="w-100" variant="warning">
+                <ul>
+                  <li v-if="createForm['description'] == ''">
+                    Event description cannot be empty
+                  </li>
+                  <li v-if="createForm['sDateTime'] == null">
+                    Start date time cannot be empty
+                  </li>
+                  <li v-if="createForm['eDateTime'] == null">
+                    End date time cannot be empty
+                  </li>
+                  <li v-if="createForm['eType'] == null">
+                    Event type cannot be empty
+                  </li>
+                </ul>
+              </b-alert>
+            </b-modal>
+          </b-row>
         </b-col>
         <b-col></b-col>
       </b-row>
@@ -290,11 +314,16 @@
 import dashbar from "../components/Dashbar";
 var axios = require("axios");
 export default {
+  mounted() {
+    this.getCurrentLocation();
+    this.resetFields();
+  },
   components: {
     dashbar,
   },
   data() {
     return {
+      currentPos: { lat: 1.406688, lng: 104.029381 },
       filter: {
         giveAway: true,
         refill: true,
@@ -305,10 +334,11 @@ export default {
         lat: null,
         lng: null,
       },
-      isSelectedMarker: false,
+
       allLocations: {},
       isCreateErrors: false,
       createForm: {
+        pCode: null,
         description: "",
         sDateTime: null,
         eDateTime: null,
@@ -322,8 +352,8 @@ export default {
       iconScaleSize: { width: 30, height: 30, f: "px", b: "px" },
       infoWindowOptions: {
         pixelOffset: {
-          width: -15,
-          height: -90,
+          width: 0,
+          height: -35,
         },
       },
       activeMarker: {},
@@ -331,8 +361,36 @@ export default {
     };
   },
   methods: {
+    getCurrentLocation(){
+      navigator.geolocation.getCurrentPosition(
+        (position) =>{
+          var pos ={
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }
+         this.currentPos = pos;
+        }
+      )
+    },
+    resetFields() {
+      alert('fields reset');
+      this.createForm = {
+        pCode: null,
+        description: "",
+        sDateTime: null,
+        eDateTime: null,
+        eType: null,
+        isHalal: null,
+        cType: null,
+        lat: null,
+        lng: null,
+      };
+    },
     createEvent() {
       this.isCreateErrors = false;
+      if (this.createForm.pCode == "") {
+        this.isCreateErrors = true;
+      }
       if (this.createForm.description == "") {
         this.isCreateErrors = true;
       }
@@ -346,11 +404,26 @@ export default {
         this.isCreateErrors = true;
       }
       if (!this.isCreateErrors) {
-        let url = `./database/createmarkers.php?email=${this.email}&locDesc=${this.createForm["description"]}&startDatetime=${this.createForm["sDateTime"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}`;
-        axios.post(url).then(() => {
-          alert("marker added");
-          this.$bvModal.hide("create-event-form");
+        var data;
+        let key = "AIzaSyBum4Aau6RFj_MyiKFERdj5xKq812WJfVU";
+        let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${this.createForm["pCode"]}&key=${key}`;
+        axios.get(url).then((response) => {
+          if (response["status"] == 200) {
+            data = response.data.results[0];
+            this.createForm["lat"] = data.geometry.location.lat;
+            this.createForm["lng"] = data.geometry.location.lng;
+
+            //  url = `./database/createmarkers.php?email=${this.email}&locDesc=${this.createForm["description"]}&startDatetime=${this.createForm["sDateTime"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}`;
+            // axios.post(url).then(() => {
+            //   alert("marker added");
+            //   this.$bvModal.hide("create-event-form");
+            // });
+          }
         });
+
+        console.log(this.createForm["lat"]);
+        console.log(this.createForm["lng"]);
+        this.$bvModal.hide("create-event-form");
       } else {
         this.$bvModal.show("create-event-form");
       }
@@ -443,5 +516,9 @@ export default {
 }
 .filter-info {
   font-size: 32px;
+}
+.filter {
+  background-color: #eeeeee;
+  border-radius: 10px;
 }
 </style>
