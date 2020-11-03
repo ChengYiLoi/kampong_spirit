@@ -14,7 +14,8 @@ import GAuth from 'vue-google-oauth2'
 import VueGoogleCharts from 'vue-google-charts'
 
 const gauthOption = {
-  clientId: '1007004476848-d0uvavdcrbrsrtciu7pc49keb2jlolhn.apps.googleusercontent.com',
+  clientId: '1007004476848-joi8l4bpbddcqufbo7lvrngt8veh0qdc.apps.googleusercontent.com',
+
   scope: 'profile email',
   prompt: 'select_account'
 }

@@ -6,24 +6,49 @@
   >
     <b-row>
       <b-col>
-        <b-img class="w-50" fluid :src="'./images/' + `${imgUrl}`"> </b-img>
+        <b-img class="w-50" :src="'./images/' + `${imgUrl}`"> </b-img>
       </b-col>
     </b-row>
-    <hr />
-    <b-container fluid class="item-info">
-      <b-row class="p-2 text-left">
-        <b-col cols="12" class="item-info-text">Status: {{ item.status }}</b-col>
 
-        <b-col cols="12" v-if="isDisplayMarketItems" class="item-info-text">
-          Listed by: {{ item.fname }}
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col class="text-right item-info-text">
-          Condition: <strong>{{ item.state }} </strong></b-col
-        >
-      </b-row>
-    </b-container>
+    <b-row class=" text-left item-info m-0">
+      <b-col cols="6" class="item-info-text">
+        <b-row>
+          <b-col><strong>Status</strong></b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            {{ item.status }}
+          </b-col>
+        </b-row>
+      </b-col>
+      <b-col class="text-left item-info-text">
+        <b-row>
+          <b-col><strong>Condition</strong></b-col>
+        </b-row>
+        <b-row>
+          <b-col>{{ item.state }}</b-col>
+        </b-row>
+      </b-col>
+      <!-- <b-col cols="6" v-if="isDisplayMarketItems" class="item-info-text">
+        Listed by: {{ item.fname }}
+      </b-col> -->
+      <b-col cols="12"><br></b-col>
+      <b-col cols="12" class="text-right pb-2">
+        <b-row>
+          <b-col>
+            <p>
+              <strong> Listed By: </strong>
+              <span>
+                {{ item.fname }}{{ item.lname }}
+                <div id="profile-bg" class="d-inline">
+                  <b-img  id="item-profile" :src="'./images/' + `${item.profilepic}`"></b-img>
+                </div>
+              </span>
+            </p>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-row>
 
     <b-modal :id="`${item.name}`" centered :title="`${item.name}`" hide-footer>
       <b-img
@@ -43,16 +68,16 @@
       </div>
       <template v-if="!isUserItems">
         <div>
-          <b-row class="pb-2">
+          <b-row >
             <b-col class="pr-0"
-              ><b-button class=" w-100" variant="danger">Close</b-button></b-col
+              ><b-button class="w-100 item-options" variant="danger">Close</b-button></b-col
             >
-            <b-col class="pl-1"
-              ><b-button
+            <b-col class="pl-0"
+              ><b-button 
                 @click="displayChat('CWD')"
-                class="w-100"
+                class="w-100 item-options"
                 variant="success"
-                >Chat With Donor</b-button
+                >Chat</b-button
               ></b-col
             >
           </b-row>
@@ -86,7 +111,6 @@
         <b-row>
           <b-col class="pr-0"
             ><b-button
-              @click="deleteItem(`${item['iID']}`)"
               variant="danger"
               class="w-100"
               >Delete</b-button
@@ -111,6 +135,10 @@
           </b-col>
         </b-row>
       </template>
+    </b-modal>
+
+    <b-modal id="item-delete-confirmation" ok-title="Yes" ok-variant="success" cancel-variant="danger" @ok="deleteItem(`${item['iID']}`)">
+      <p>Are you Sure?</p>
     </b-modal>
 
     <b-modal :id="`${item.name}-edit`" centered title="Edit Item" hide-footer>
@@ -313,13 +341,23 @@ export default {
       let url = `./database/updatechatitemstatus.php?newstatus=${type}&email=${email}&iID=${iID}`;
       url = encodeURI(url);
       postData(url, this.itemStatusCallback);
-      // this.$bvModal.hide(`${this.item.name}`);
+      this.$bvModal.hide(`${this.item.name}`);
     },
     itemStatusCallback() {
+      let url;
       if (this.$store.state.isDisplayMarketItems) {
-        this.getItems();
+        // this.getItems();
+        url = `./database/getItems.php`;
+        axios.get(url).then((response) => {
+          this.$store.state.items = response.data;
+        });
       } else {
-        this.getUserItems();
+        let email = this.currentUserEmail;
+        url = `./database/getUserItems.php?useremail=${email}`;
+        axios.get(url).then((response) => {
+          this.$store.state.userItems = response.data;
+        });
+        // this.getUserItems();
       }
     },
 
@@ -419,6 +457,25 @@ export default {
 </script>
 <style lang="scss">
 $white: rgb(245, 245, 245);
+
+.item-options{
+  border-radius: 0px;
+}
+
+#profile-bg {
+  img{
+    width: 5%;
+  }
+}
+.card-title {
+  font-weight: bold;
+}
+.card-body {
+  padding: 0px !important;
+}
+.item-bg {
+  background-color: #f2f2f2;
+}
 .card-info {
   cursor: pointer;
   background-color: #f1f3f6;
@@ -436,7 +493,7 @@ $white: rgb(245, 245, 245);
   }
 
   .item-info {
-    background-color: #aaccaa;
+    background-color: #e7e6e6;
     border-radius: 5px;
   }
 }
@@ -461,8 +518,9 @@ $white: rgb(245, 245, 245);
   }
 }
 @media only screen and (max-width: 769px) {
-  .item-info-text{
-    font-size: 1.0rem;
+  .item-info-text {
+    font-size: 1rem;
   }
+  
 }
 </style>

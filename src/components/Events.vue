@@ -2,14 +2,14 @@
   <div id="full-height">
     <div id="banner">
       <b-row align-v="center" class="px-2">
-        <b-col md="2">
+        <b-col lg="2">
           <dashbar></dashbar>
         </b-col>
         <b-col id="feature-title">
           <h1>{{ isDisplayUserEvents ? "My Events" : "Events" }}</h1>
         </b-col>
-        <b-col md="2" class="responsive-col">
-          <b-button @click="displayCreateEventForm" v-if="isAdmin"
+        <b-col lg="2" class="responsive-col">
+          <b-button @click="displayCreateEventForm" v-if="isAdmin" variant="info" class="w-100"
             ><strong>Create Event</strong></b-button
           >
           <b-button variant="info" class="responsive-event-button" @click="displayUserEvents" v-else
@@ -23,11 +23,10 @@
     <userevents v-if="isDisplayUserEvents"></userevents>
     <div class="p-0" v-else>
       <b-table
-        bordered
-        outlined
+       table-variant="light"
+        head-variant="dark"
         hover
         striped
-        head-variant="light"
         selectable
         select-mode="single"
         :fields="isAdmin ? '' : fields['user']"
@@ -70,7 +69,7 @@
          
           <template>
             <b-row class="pb-2">
-              <b-col class="pr-0"
+              <b-col
                 ><b-button
                   class=" w-100"
                   variant="danger"
@@ -279,7 +278,7 @@
               </b-form-group>
             </b-col>
           </b-row>
-          <b-button variant="danger" v-b-modal="'confirm-cancel'" class="w-100"
+          <b-button variant="warning" v-b-modal="'confirm-cancel'" class="w-100"
             >Cancel Event</b-button
           >
         </b-form>
@@ -778,7 +777,7 @@ export default {
 </script>
 <style lang="scss">
 .event-info {
-  background-color: #aaccaa;
+  background-color: #e7e6e6;
   border-radius: 5px;
 }
 @media only screen and (max-width: 768px){

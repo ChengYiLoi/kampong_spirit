@@ -1,5 +1,5 @@
 <template>
-  <b-navbar id="navbar" toggleable="md" type="dark" class="nav-deco p-3">
+  <b-navbar id="navbar" toggleable="lg" type="dark" class="nav-deco p-3">
     <router-link to="/">
       <b-navbar-brand id="brand">
         <strong>Kampong Spirit</strong>
@@ -8,12 +8,12 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav class="ml-auto text-left">
-        <b-nav-item
-          ><router-link class="link" to="/"
+        <b-nav-item v-if="isAbout" class="my-1"
+          ><router-link class="link" to="/about"
             ><strong>About Us</strong></router-link
           ></b-nav-item
         >
-        <b-nav-item
+        <b-nav-item class="my-1"
           ><router-link class="link" to="/login"
             ><strong>Log in or Sign Up</strong>
           </router-link></b-nav-item
@@ -25,6 +25,7 @@
 
 <script>
 export default {
+   props:['isAbout'],
   data() {
     return {};
   },
@@ -46,7 +47,7 @@ export default {
   }
 }
 
-@media only screen and (max-width: 426px) {
+@media only screen and (max-width: 425px) {
   .router-link-active > #brand {
     font-size: 1.5rem;
   }

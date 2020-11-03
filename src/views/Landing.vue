@@ -1,6 +1,6 @@
 <template>
   <div>
-    <navbar></navbar>
+    <navbar :isAbout="true"></navbar>
     <jumbotron></jumbotron>
     <features></features>
 
@@ -15,6 +15,7 @@ import features from "../components/Features";
 import navbar from "../components/Nav";
 import slider from '../components/Slider'
 export default {
+ 
   mounted(){
      this.checkStorage();
   },

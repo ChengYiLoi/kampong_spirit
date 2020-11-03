@@ -7,8 +7,8 @@ export const store = new Vuex.Store({
   state: {
     isSignup: false,
     userInfo: {
-      isLogin: true,
-      acctype: "User",
+      isLogin: false,
+      acctype: "",
       email: "",
       fname: "",
       greenpoints: "",
@@ -77,11 +77,9 @@ export const store = new Vuex.Store({
     isDisplayMarketItems: true,
     userItems: [],
     userEvents: [],
-    userRewards:[
-
-    ],
+    userRewards: [],
     events: [],
-    markers:[
+    markers: [
       {
         type: "food",
         icon: "chicken.svg",
@@ -89,7 +87,6 @@ export const store = new Vuex.Store({
         lng: 104.03,
         clickable: true,
         draggable: false,
-       
       },
       {
         type: "refill",
@@ -98,7 +95,6 @@ export const store = new Vuex.Store({
         lng: 104.033,
         clickable: true,
         draggable: false,
-        
       },
       {
         type: "giveAway",
@@ -107,7 +103,6 @@ export const store = new Vuex.Store({
         lng: 104.035,
         clickable: true,
         draggable: false,
-        
       },
     ],
     refill: [
@@ -151,8 +146,8 @@ export const store = new Vuex.Store({
       { value: "Others", text: "Others" },
     ],
     itemConditionRadio: [
-      { value: "new", text: "New" },
-      { value: "used", text: "Used" },
+      { value: "New", text: "New" },
+      { value: "Used", text: "Used" },
     ],
     deliveryTypeRadio: [
       { value: "Meet Up", text: "Meet Up" },
@@ -162,9 +157,7 @@ export const store = new Vuex.Store({
     //   { value: "", text: "" },
     //   { value: "", text: "" },
     // ],
-    chartData: [
-     
-    ],
+    chartData: [],
     monthNames: [
       "January",
       "February",

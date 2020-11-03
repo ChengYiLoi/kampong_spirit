@@ -2,7 +2,7 @@
   <div id="full-height">
     <div id="banner">
       <b-row align-v="center" class="px-2">
-        <b-col md="2">
+        <b-col lg="2">
           <dashbar></dashbar>
         </b-col>
         <b-col id="feature-title">
@@ -12,13 +12,7 @@
       </b-row>
     </div>
     <div class="main">
-      <gmap-map
-        :center="currentPos"
-        :zoom="16"
-        id="map"
-        
-        class="m-1"
-      >
+      <gmap-map :center="currentPos" :zoom="16" id="map" class="m-1">
         <gmap-info-window
           :options="infoWindowOptions"
           :position="infoWindowPosition"
@@ -31,11 +25,11 @@
           </div>
         </gmap-info-window>
         <gmap-marker
-        
           v-for="marker in markers"
-          
           :key="marker.type"
-          :position="filter[marker['type']] ? { lat: marker.lat, lng: marker.lng } : null"
+          :position="
+            filter[marker['type']] ? { lat: marker.lat, lng: marker.lng } : null
+          "
           :clickable="marker.clickable"
           :draggable="marker.draggable"
           @click="setActiveMarker(marker)"
@@ -47,7 +41,6 @@
         >
         </gmap-marker>
       </gmap-map>
-
 
       <b-row class="m-2">
         <b-col></b-col>
@@ -72,7 +65,7 @@
             <b-col md="4" class="p-2">
               <b-form-checkbox
                 size="lg"
-                 v-model="filter['food']"
+                v-model="filter['food']"
                 switch
                 @click="updateFilter('food')"
               >
@@ -83,7 +76,6 @@
               <b-form-checkbox
                 size="lg"
                 v-model="filter['refill']"
-              
                 switch
                 @click="updateFilter('refill')"
               >
@@ -221,22 +213,37 @@
                 </b-col>
               </b-row>
 
-              <b-button class="d-inline w-100 mx-auto my-2" variant="info"
-                >Get Telegram ID</b-button
-              >
+              <b-row>
+                <b-col cols="10">
+                  <b-form-group
+                    label="Telegram user ID: "
+                    label-for="teleID"
+                    label-cols="5"
+                  >
+                    <b-form-input id="teleID"></b-form-input>
+                  </b-form-group>
+                </b-col>
+                <b-col>
+                  <span id="tooltip-tele">
+                    <b-img
+                      fluid
+                      :src="require(`../assets/telegram.svg`)"
+                    ></b-img>
+                  </span>
+                </b-col>
+              </b-row>
 
-              <b-form-group
-                label="Telegram user ID: "
-                label-for="teleID"
-                label-cols="4"
-              >
-                <b-form-input id="teleID"></b-form-input>
-              </b-form-group>
+              <b-tooltip target="tooltip-tele" triggers="hover" show>
+                Click this to get your Telegram user ID
+              </b-tooltip>
 
               <template>
                 <b-row class="pb-2">
                   <b-col class="pr-0"
-                    ><b-button class=" w-100" variant="danger" @click="$bvModal.hide('create-event-form')"
+                    ><b-button
+                      class=" w-100"
+                      variant="danger"
+                      @click="$bvModal.hide('create-event-form')"
                       >Cancel</b-button
                     ></b-col
                   >
@@ -316,7 +323,6 @@ var axios = require("axios");
 export default {
   mounted() {
     this.getCurrentLocation();
-    this.resetFields();
   },
   components: {
     dashbar,
@@ -361,19 +367,21 @@ export default {
     };
   },
   methods: {
-    getCurrentLocation(){
-      navigator.geolocation.getCurrentPosition(
-        (position) =>{
-          var pos ={
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          }
-         this.currentPos = pos;
-        }
-      )
+    getCurrentLocation() {
+      alert('getting current location');
+      navigator.geolocation.getCurrentPosition((position) => {
+        var pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        // this.createForm['lat'] = pos.lat;
+        // this.createForm['lng'] = pos.lng;
+        this.currentPos = pos;
+      });
+      this.resetFields();
     },
     resetFields() {
-      alert('fields reset');
+      alert("fields reset");
       this.createForm = {
         pCode: null,
         description: "",

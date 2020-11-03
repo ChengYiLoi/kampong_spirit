@@ -8,9 +8,9 @@
 var axios = require("axios");
 export default {
   mounted() {
-  //   alert("App mounted");
-  //   setInterval(() => this.get_messages(), 10000);
-   },
+    //   alert("App mounted");
+      // setInterval(() => this.get_messages(), 10000);
+  },
 
   data() {
     return {};
@@ -47,28 +47,43 @@ export default {
       });
     },
 
-    clear_message(message, from, update_id) {
+    clear_message(message, from, update_id){
+      var request = new XMLHttpRequest();
+      
+					console.log(from);
+					update_id++;
+					console.log(update_id);
+					var final_url = "https://api.telegram.org/bot1490325444:AAHcvXdS2ag2RXumvFQ8ssPWE0x5XhNvkq8/getUpdates?offset=" + update_id;
+					console.log(final_url);
+					request.open("POST", final_url, true);
+					request.send();
+					
+					if (message == "/start"){
+						this.introduction(from)
+					}
+					
+					else if (message == "/getuserid"){
+						   this.get_userid(from);
+					} else {
+							let userid = message.split(":");
+							if (userid == message || String(userid[0]).length <= 7 || isNaN(userid[0]) ){
+								this.no_userid(from)
+							} else{ 
+							this.user_know(from);
+							this.reply_messages(userid[1], userid[0], from);
+							this.format_messages (userid[0], from);	
+							}
+						}
+			},
+
+    no_userid(from) {
       var request = new XMLHttpRequest();
       console.log(from);
-      update_id++;
-      console.log(update_id);
       var final_url =
-        "https://api.telegram.org/bot1490325444:AAHcvXdS2ag2RXumvFQ8ssPWE0x5XhNvkq8/getUpdates?offset=" +
-        update_id;
+        "./database/reply_userid.php?from=" + from;
       console.log(final_url);
       request.open("POST", final_url, true);
       request.send();
-
-      if (message == "/start") {
-        this.introduction(from);
-      } else if (message == "/getuserid") {
-        this.get_userid(from);
-      } else {
-        let userid = message.split(":");
-        this.user_know(from);
-        this.reply_messages(userid[1], userid[0], from);
-        this.format_messages(userid[0], from);
-      }
     },
 
     user_know(from) {

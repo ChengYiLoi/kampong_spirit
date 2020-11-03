@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-jumbotron class="text-center text-md-left mb-0 pb-2">
+    <b-jumbotron class="text-center text-lg-left mb-0 pb-2">
       <b-row>
         <b-col class="px-1">
           <h1 class="display-4">

@@ -36,7 +36,7 @@ export default {
           title: "Join Clean-up Events",
           img: "team.svg",
           description: [
-            "A well organised clean event provides the opportunity for participants to bond together all while do something meaningful for the community and the environment",
+            "A well organised cleanup event provides the opportunity for participants to bond together all while do something meaningful for the community and the environment",
           ],
           dashOption: 'events'
         },
@@ -58,7 +58,7 @@ export default {
 <style lang="scss">
 #features {
   background-color: #acacac;
-  height: 100vh;
+  
 }
 #title {
   color: #F1F3F6;

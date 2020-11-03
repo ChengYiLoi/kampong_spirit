@@ -2,7 +2,7 @@
   <div id="full-height">
     <div id="banner">
       <b-row align-v="center">
-        <b-col md="2">
+        <b-col lg="2">
           <dashbar></dashbar>
         </b-col>
         <b-col id="feature-title">

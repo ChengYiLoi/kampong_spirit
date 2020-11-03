@@ -2,7 +2,7 @@
   <div id="full-height">
     <div id="banner" >
       <b-row align-v="center" class="w-100 mx-0">
-        <b-col md="3">
+        <b-col lg="3">
           <dashbar></dashbar>
         </b-col>
         <b-col id="feature-title" class="px-0">
@@ -15,7 +15,7 @@
           </h1>
         </b-col>
 
-        <b-col md="3">
+        <b-col lg="3">
           <b-row align-v="center" id="market-buttons">
             <b-col cols="6" class="px-0">
               <b-button
@@ -31,7 +31,7 @@
               </b-button>
             </b-col>
             <b-col cols="6" class="px-0">
-              <b-button @click="displayUserChat" class="p-2  responsive-market-button" variant="warning" >
+              <b-button @click="displayUserChat" class="p-2 button-border-left  responsive-market-button" variant="info" >
                 <strong>My Chat</strong>
               </b-button>
             </b-col>
@@ -176,6 +176,9 @@ export default {
 <style lang="scss">
 
 @media only screen and (max-width: 768px) {
+  .button-border-left{
+    border-left: 1px solid #128ea3;
+  }
   #feature-title {
     display: none;
   }
