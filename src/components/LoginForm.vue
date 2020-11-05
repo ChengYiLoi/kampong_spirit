@@ -51,12 +51,17 @@
       <button id="login-button" class="mt-4">
         Log In
       </button>
-      <p class="text-link">Forgot Password</p>
+      <p class="text-link text-center mt-4" v-b-modal="'password-rest'"><u>Forgot Password</u></p>
       <p class="mt-4 text-center">
         Don't have an acoount?
-        <span v-on:click="switchForm()" class="text-link">Sign up</span>
+        <span v-on:click="switchForm()" class="text-link"><u>Sign up</u></span>
       </p>
     </b-form>
+    <b-modal centered title="Reset Password" id="password-rest" ok-title="Reset">
+      <b-form-group label="Email: ">
+        <b-form-input v-model="resetEmail"></b-form-input>
+      </b-form-group>
+    </b-modal>
     <b-modal id="login-error" ok-only>
       Google account not signed up. Please sign up before trying again.
     </b-modal>
@@ -85,6 +90,7 @@ export default {
         required,
       },
     },
+    resetEmail: null
   },
   methods: {
     getUserRewards(email) {
@@ -127,7 +133,7 @@ export default {
             alert("User is authorised");
 
             data = result.data[0];
-            this.$store.state.dashOptions.marketplace.selected = true;
+            // this.$store.state.dashOptions.marketplace.selected = true;
             this.createSession(data);
             this.$router.push({ name: "Main" });
           } else {

@@ -1,149 +1,162 @@
 <template>
-  <div class="login-form text-left p-3">
-    <h2 class="text-lg-left text-center">Sign up</h2>
-    <button
-      @click="handleSignup"
-      id="google"
-      class="mt-4 d-block w-100 mx-auto px-3"
-    >
-      <span><img src="../assets/google.svg"/></span> Sign Up with Google
-    </button>
-    <b-form @submit.stop.prevent="onSubmit()">
-      <b-row class="mt-4">
-        <b-col>
-          <b-form-group label="First Name" label-for="fname">
-            <b-form-input
-              id="fname"
-              type="text"
-              placeholder="John"
-              autocomplete="off"
-              v-model="$v.form.fname.$model"
-              :state="validateState('fname')"
-              aria-describedby="fname-feedback"
-            ></b-form-input>
-            <b-form-invalid-feedback id="fname-feedback"
-              >First name is required</b-form-invalid-feedback
-            >
-          </b-form-group>
-        </b-col>
-        <b-col>
-          <b-form-group label="Last Name" label-for="lname">
-            <b-form-input
-              id="lname"
-              type="text"
-              placeholder="Doe"
-              autocomplete="off"
-              v-model="$v.form.lname.$model"
-              :state="validateState('lname')"
-              aria-describedby="lname-feedback"
-            ></b-form-input>
-            <b-form-invalid-feedback id="pnumber-feedback"
-              >Last name is required</b-form-invalid-feedback
-            >
-          </b-form-group>
-        </b-col>
-      </b-row>
-
-      <b-form-group label="Mobile Number:" label-for="phoneNum" class="mb-3">
-        <b-form-input
-          id="phoneNum"
-          type="text"
-          placeholder="911"
-          autocomplete="off"
-          v-model="$v.form.pnumber.$model"
-          :state="validateState('pnumber')"
-          aria-describedby="pnumber-feedback"
-        ></b-form-input>
-        <b-form-invalid-feedback
-          id="pnumber-feedback"
-          v-if="!$v.form.pnumber.numeric"
-          >Phone number must be numeric</b-form-invalid-feedback
-        >
-        <b-form-invalid-feedback
-          id="pnumber-feedback"
-          v-if="!$v.form.pnumber.required"
-          >Phone number is required</b-form-invalid-feedback
-        >
-      </b-form-group>
-
-      <b-form-group label="Email Address:" label-for="email" class="mb-3">
-        <b-form-input
-          id="email"
-          type="email"
-          placeholder="you@example.com"
-          autocomplete="off"
-          v-model="$v.form.email.$model"
-          :state="validateState('email')"
-          aria-describedby="email-feedback"
-        ></b-form-input>
-        <b-form-invalid-feedback
-          id="pnumber-feedback"
-          v-if="!$v.form.email.email"
-          >Email must be valid</b-form-invalid-feedback
-        >
-        <b-form-invalid-feedback
-          id="pnumber-feedback"
-          v-if="!$v.form.email.required"
-          >Email is required</b-form-invalid-feedback
-        >
-      </b-form-group>
-
-      <b-form-group label="Password:" label-for="password" class="mb-3">
-        <b-form-input
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-          autocomplete="off"
-          v-model="$v.form.password.$model"
-          :state="validateState('password')"
-          aria-describedby="password-feedback"
-        ></b-form-input>
-        <b-form-invalid-feedback
-          v-if="!$v.form.password.minLength"
-          id="passsword-feedback"
-          >Password must be at least 6 characters</b-form-invalid-feedback
-        >
-        <b-form-invalid-feedback
-          v-if="!$v.form.password.maxLength"
-          id="passsword-feedback"
-          >Password cannot exceed 12 characters</b-form-invalid-feedback
-        >
-      </b-form-group>
-
-      <b-form-group
-        label="Confirm Password:"
-        label-for="cpassword"
-        class="mb-3"
+  <div>
+    <div v-if="!isVerification" class="login-form text-left p-3">
+      <h2 class="text-lg-left text-center">Sign up</h2>
+      <button
+        @click="handleSignup"
+        id="google"
+        class="mt-4 d-block w-100 mx-auto px-3"
       >
-        <b-form-input
-          id="cpassword"
-          type="password"
-          placeholder="Enter your password"
-          autocomplete="off"
-          v-model="$v.form.cpassword.$model"
-          :state="validateState('cpassword')"
-          aria-describedby="cpassword-feedback"
-        ></b-form-input>
-        <b-form-invalid-feedback
-          v-if="!$v.form.password.required"
-          id="cpasssword-feedback"
-          >Confirm password is required</b-form-invalid-feedback
-        >
-        <b-form-invalid-feedback
-          v-if="!$v.form.cpassword.sameAsPassword"
-          id="cpasssword-feedback"
-          >Password and confirm password is not the
-          same</b-form-invalid-feedback
-        >
-      </b-form-group>
-
-      <button id="login-button" class="mt-2">
-        Sign Up
+        <span><img src="../assets/google.svg"/></span> Sign Up with Google
       </button>
-      <p class="mt-4 text-center text-link" v-on:click="switchForm()">
-        Back to Login
-      </p>
-    </b-form>
+      <b-form @submit.stop.prevent="onSubmit()">
+        <b-row class="mt-4">
+          <b-col>
+            <b-form-group label="First Name" label-for="fname">
+              <b-form-input
+                id="fname"
+                type="text"
+                placeholder="John"
+                autocomplete="off"
+                v-model="$v.form.fname.$model"
+                :state="validateState('fname')"
+                aria-describedby="fname-feedback"
+              ></b-form-input>
+              <b-form-invalid-feedback id="fname-feedback"
+                >First name is required</b-form-invalid-feedback
+              >
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group label="Last Name" label-for="lname">
+              <b-form-input
+                id="lname"
+                type="text"
+                placeholder="Doe"
+                autocomplete="off"
+                v-model="$v.form.lname.$model"
+                :state="validateState('lname')"
+                aria-describedby="lname-feedback"
+              ></b-form-input>
+              <b-form-invalid-feedback id="pnumber-feedback"
+                >Last name is required</b-form-invalid-feedback
+              >
+            </b-form-group>
+          </b-col>
+        </b-row>
+
+        <b-form-group label="Mobile Number:" label-for="phoneNum" class="mb-3">
+          <b-form-input
+            id="phoneNum"
+            type="text"
+            placeholder="911"
+            autocomplete="off"
+            v-model="$v.form.pnumber.$model"
+            :state="validateState('pnumber')"
+            aria-describedby="pnumber-feedback"
+          ></b-form-input>
+          <b-form-invalid-feedback
+            id="pnumber-feedback"
+            v-if="!$v.form.pnumber.numeric"
+            >Phone number must be numeric</b-form-invalid-feedback
+          >
+          <b-form-invalid-feedback
+            id="pnumber-feedback"
+            v-if="!$v.form.pnumber.required"
+            >Phone number is required</b-form-invalid-feedback
+          >
+        </b-form-group>
+
+        <b-form-group label="Email Address:" label-for="email" class="mb-3">
+          <b-form-input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="off"
+            v-model="$v.form.email.$model"
+            :state="validateState('email')"
+            aria-describedby="email-feedback"
+          ></b-form-input>
+          <b-form-invalid-feedback
+            id="pnumber-feedback"
+            v-if="!$v.form.email.email"
+            >Email must be valid</b-form-invalid-feedback
+          >
+          <b-form-invalid-feedback
+            id="pnumber-feedback"
+            v-if="!$v.form.email.required"
+            >Email is required</b-form-invalid-feedback
+          >
+        </b-form-group>
+
+        <b-form-group label="Password:" label-for="password" class="mb-3">
+          <b-form-input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            autocomplete="off"
+            v-model="$v.form.password.$model"
+            :state="validateState('password')"
+            aria-describedby="password-feedback"
+          ></b-form-input>
+          <b-form-invalid-feedback
+            v-if="!$v.form.password.minLength"
+            id="passsword-feedback"
+            >Password must be at least 6 characters</b-form-invalid-feedback
+          >
+          <b-form-invalid-feedback
+            v-if="!$v.form.password.maxLength"
+            id="passsword-feedback"
+            >Password cannot exceed 12 characters</b-form-invalid-feedback
+          >
+        </b-form-group>
+
+        <b-form-group
+          label="Confirm Password:"
+          label-for="cpassword"
+          class="mb-3"
+        >
+          <b-form-input
+            id="cpassword"
+            type="password"
+            placeholder="Enter your password"
+            autocomplete="off"
+            v-model="$v.form.cpassword.$model"
+            :state="validateState('cpassword')"
+            aria-describedby="cpassword-feedback"
+          ></b-form-input>
+          <b-form-invalid-feedback
+            v-if="!$v.form.password.required"
+            id="cpasssword-feedback"
+            >Confirm password is required</b-form-invalid-feedback
+          >
+          <b-form-invalid-feedback
+            v-if="!$v.form.cpassword.sameAsPassword"
+            id="cpasssword-feedback"
+            >Password and confirm password is not the
+            same</b-form-invalid-feedback
+          >
+        </b-form-group>
+
+        <button id="login-button" class="mt-2">
+          Sign Up
+        </button>
+        <p class="mt-4 text-center text-link" v-on:click="switchForm()">
+          Back to Login
+        </p>
+      </b-form>
+    </div>
+    <div v-else class="login-form p-3">
+      <h5 class="p-4">
+        A SMS has been sent to your mobile number. <br />
+        Please enter the verification code to complete the registration
+      </h5>
+      <b-form-group label-size="lg" label="Verification Code:" label-cols="4">
+        <b-form-input size="lg" v-model="vCode"></b-form-input>
+      </b-form-group>
+      <p class="text-link"><u>Resend verification code</u></p>
+      <b-button id="login-button">Submit</b-button>
+    </div>
   </div>
 </template>
 <script>
@@ -161,7 +174,10 @@ import {
 export default {
   mixins: [validationMixin],
   data() {
-    return {};
+    return {
+      isVerification: true,
+      vCode: null,
+    };
   },
   validations: {
     form: {
@@ -233,7 +249,7 @@ export default {
       });
     },
     createSession(userInfo) {
-      let userInputs = this.$v.form.$model
+      let userInputs = this.$v.form.$model;
       this.getUserRewards(userInputs["email"]);
       userInfo.isLogin = true;
       sessionStorage.setItem("userSession", JSON.stringify(userInfo));
@@ -262,29 +278,25 @@ export default {
       if (this.$v.form.$anyError) {
         return;
       } else {
-        let userInputs = this.$v.form.$model;
-        let url = `./database/registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
-        url = encodeURI(url);
-        axios.post(url).then(() => {
-          alert("Form submitted");
-          setTimeout(() => {
-            url = `./database/validate.php?email=${userInputs['email']}&password=${userInputs['password']}`;
-            url = encodeURI(url);
-            axios.get(url).then((response) => {
-              if (response.data.length == 1) {
-                
-             
-                let data = response.data[0];
-                console.log(data);
-                this.$store.state.dashOptions.marketplace.selected = true;
-                this.createSession(data);
-                this.$router.push({ name: "Main" });
-              }
-            });
-          }, 5000);
-          
-         
-        });
+        // let userInputs = this.$v.form.$model;
+        // let url = `./database/registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
+        // url = encodeURI(url);
+        // axios.post(url).then(() => {
+        //   alert("Form submitted");
+        //   setTimeout(() => {
+        //     url = `./database/validate.php?email=${userInputs['email']}&password=${userInputs['password']}`;
+        //     url = encodeURI(url);
+        //     axios.get(url).then((response) => {
+        //       if (response.data.length == 1) {
+        //         let data = response.data[0];
+        //         console.log(data);
+        //         this.$store.state.dashOptions.marketplace.selected = true;
+        //         this.createSession(data);
+        //         this.$router.push({ name: "Main" });
+        //       }
+        //     });
+        //   }, 5000);
+        // });
       }
     },
   },

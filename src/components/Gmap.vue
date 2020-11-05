@@ -29,7 +29,7 @@
                   <p>
                     <strong v-if="activeMarker['telegramid'] != null"
                       >Organiser Telegram ID: </strong
-                    >{{ activeMarker.gaID }}
+                    >{{ activeMarker.telegramid }}
                   </p>
                   <p v-if="activeMarker['cusineType'] != null">
                     <strong>Cusine type: </strong>{{ activeMarker.cusineType }}
@@ -157,10 +157,7 @@
             <b-col>
               <b-row>
                 <b-col align-self="center">
-                  <b-button
-                    variant="info"
-                    v-b-modal="'create-event-form'"
-                    class="w-100"
+                  <b-button variant="info" @click="validateLogin" class="w-100"
                     >List Event</b-button
                   >
                 </b-col>
@@ -226,7 +223,7 @@
                     >
                     </b-form-textarea>
                   </b-form-group>
-                  <b-form-group
+                  <!-- <b-form-group
                     label="Start Time: "
                     label-for="sDateTime"
                     label-cols="3"
@@ -236,7 +233,7 @@
                       type="datetime-local"
                       id="sDateTime"
                     ></b-form-input>
-                  </b-form-group>
+                  </b-form-group> -->
                   <b-form-group
                     label="End Time: "
                     label-for="eDateTime"
@@ -290,6 +287,25 @@
                     </b-col>
                   </b-row>
 
+                  <b-row v-if="createForm['eType'] == 'Give Away'">
+                    <b-col cols="12">
+                      <b-form-group label="Event Name: " label-cols="3">
+                        <b-form-input
+                          v-model="createForm['giveAwayName']"
+                        ></b-form-input>
+                      </b-form-group>
+                    </b-col>
+                    <b-col cols="12">
+                      <b-form-group label="Items Description:" label-cols="4">
+                        <b-form-textarea
+                          v-model="createForm['giveAwayDescription']"
+                          placeholder=""
+                        >
+                        </b-form-textarea>
+                      </b-form-group>
+                    </b-col>
+                  </b-row>
+
                   <b-row>
                     <b-col cols="10">
                       <b-form-group
@@ -297,7 +313,10 @@
                         label-for="teleID"
                         label-cols="5"
                       >
-                        <b-form-input id="teleID"></b-form-input>
+                        <b-form-input
+                          id="teleID"
+                          v-model="createForm['teleID']"
+                        ></b-form-input>
                       </b-form-group>
                     </b-col>
                     <b-col>
@@ -310,7 +329,7 @@
                     </b-col>
                   </b-row>
 
-                  <b-tooltip target="tooltip-tele" triggers="hover" show>
+                  <b-tooltip target="tooltip-tele">
                     Click this to get your Telegram user ID
                   </b-tooltip>
 
@@ -343,14 +362,46 @@
                       <li v-if="createForm['description'] == ''">
                         Event description cannot be empty
                       </li>
-                      <li v-if="createForm['sDateTime'] == null">
+                      <!-- <li v-if="createForm['sDateTime'] == null">
                         Start date time cannot be empty
-                      </li>
+                      </li> -->
                       <li v-if="createForm['eDateTime'] == null">
                         End date time cannot be empty
                       </li>
                       <li v-if="createForm['eType'] == null">
                         Event type cannot be empty
+                      </li>
+                      <li
+                        v-if="
+                          createForm['eType'] == 'Buffet' &&
+                            createForm['isHalal'] == null
+                        "
+                      >
+                        Food is Halal or Non-Halal is required
+                      </li>
+                      <li
+                        v-if="
+                          createForm['eType'] == 'Buffet' &&
+                            createForm.cType == null
+                        "
+                      >
+                        Cusine type is required
+                      </li>
+                      <li
+                        v-if="
+                          createForm['eType'] == 'Give Away' &&
+                            createForm.giveAwayName == ''
+                        "
+                      >
+                        Give away event name is required
+                      </li>
+                      <li
+                        v-if="
+                          createForm['eType'] == 'Give Away' &&
+                            createForm.giveAwayDescription == ''
+                        "
+                      >
+                        Give away event description is required
                       </li>
                     </ul>
                   </b-alert>
@@ -361,6 +412,14 @@
         </b-col>
         <b-col></b-col>
       </b-row>
+      <!-- <b-row>
+        <b-col></b-col>
+        <b-col>
+          <b-button id="tooltip-tele2">Tooltip</b-button>
+          <b-tooltip show target="tooltip-tele2">Will show</b-tooltip>
+        </b-col>
+        <b-col></b-col>
+      </b-row> -->
     </div>
   </div>
 </template>
@@ -381,6 +440,7 @@ export default {
   },
   data() {
     return {
+      show: true,
       currentPos: { lat: 1.406688, lng: 104.029381 },
       filter: {
         giveAway: true,
@@ -404,13 +464,16 @@ export default {
       createForm: {
         pCode: null,
         description: "",
-        sDateTime: null,
+        giveAwayName: "",
+        giveAwayDescription: "",
+
         eDateTime: null,
         eType: null,
         isHalal: null,
         cType: null,
         lat: null,
         lng: null,
+        teleID: null,
       },
       iconSize: { width: 60, height: 90, f: "px", b: "px" },
       iconScaleSize: { width: 30, height: 30, f: "px", b: "px" },
@@ -425,6 +488,14 @@ export default {
     };
   },
   methods: {
+    validateLogin() {
+      if (this.$store.state.userInfo.isLogin) {
+        this.$bvModal.show("create-event-form");
+      } else {
+        alert("user has not logged in");
+        this.$router.push({ name: "Login" });
+      }
+    },
     getcurrentWeather() {
       let url = `https://api.openweathermap.org/data/2.5/weather?q=Singapore&appid=59c4666c81f49ccae94014d00279149e&units=metric`;
       axios.get(url).then((response) => {
@@ -479,20 +550,22 @@ export default {
         // this.createForm['lng'] = pos.lng;
         this.currentPos = pos;
       });
-      this.resetFields();
     },
     resetFields() {
       alert("fields reset");
       this.createForm = {
         pCode: null,
         description: "",
-        sDateTime: null,
+        giveAwayName: "",
+        giveAwayDescription: "",
+
         eDateTime: null,
         eType: null,
         isHalal: null,
         cType: null,
         lat: null,
         lng: null,
+        teleID: null,
       };
     },
     createEvent() {
@@ -503,13 +576,34 @@ export default {
       if (this.createForm.description == "") {
         this.isCreateErrors = true;
       }
-      if (this.createForm.sDateTime == null) {
-        this.isCreateErrors = true;
-      }
+      // if (this.createForm.sDateTime == null) {
+      //   this.isCreateErrors = true;
+      // }
       if (this.createForm.eDateTime == null) {
         this.isCreateErrors = true;
       }
       if (this.createForm.eType == null) {
+        this.isCreateErrors = true;
+      }
+      if (
+        this.createForm.eType == "Buffet" &&
+        this.createForm.isHalal == null
+      ) {
+        this.isCreateErrors = true;
+      }
+      if (this.createForm.eType == "Buffet" && this.createForm.cType == null) {
+        this.isCreateErrors = true;
+      }
+      if (
+        this.createForm.eType == "Give Away" &&
+        this.createForm.giveAwayName == ""
+      ) {
+        this.isCreateErrors = true;
+      }
+      if (
+        this.createForm.eType == "Give Away" &&
+        this.createForm.giveAwayDescription == ""
+      ) {
         this.isCreateErrors = true;
       }
       if (!this.isCreateErrors) {
@@ -525,13 +619,14 @@ export default {
             this.createForm["lng"] = data.geometry.location.lng;
             console.log(this.createForm["lat"]);
             console.log(this.createForm["lng"]);
-            if(this.createForm['eType'] == 'Buffet'){
-              url = `./database/buffetmarker.php?email=${this.email}&locDesc=${this.createForm["description"]}&startDatetime=${this.createForm["sDateTime"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}`;
-            }
-            else{
-              url = ``;
+            if (this.createForm["eType"] == "Buffet") {
+              url = `./database/buffetmarker.php?email=${this.email}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
+            } else {
+              url = `./database/giveawaymarker.php?giveawayname=${this.createForm["giveAwayName"]}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&itemdesc=${this.createForm["giveAwayDescription"]}&email=${this.email}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
             }
             axios.post(url).then(() => {
+              this.resetFields();
+              console.log(url);
               alert("marker added");
               this.$bvModal.hide("create-event-form");
               this.getMarkers();
@@ -581,6 +676,7 @@ export default {
       place.minutes = minutes;
       this.activeMarker = place;
       this.infoWindowOpened = true;
+      console.log(place);
     },
     closeWindowMarker() {
       this.activeMarker = {};
@@ -653,4 +749,8 @@ export default {
 #weather-img {
   width: 40%;
 }
+// .tooltip{
+//   display: absolute !important;
+//   z-index: 2000;
+// }
 </style>

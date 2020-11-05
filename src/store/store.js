@@ -7,8 +7,8 @@ export const store = new Vuex.Store({
   state: {
     isSignup: false,
     userInfo: {
-      isLogin: false,
-      acctype: "",
+      isLogin: true,
+      acctype: "User",
       email: "",
       fname: "",
       greenpoints: "",

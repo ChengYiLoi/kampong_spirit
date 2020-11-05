@@ -9,10 +9,18 @@
           <h1>{{ isDisplayUserEvents ? "My Events" : "Events" }}</h1>
         </b-col>
         <b-col lg="2" class="responsive-col">
-          <b-button @click="displayCreateEventForm" v-if="isAdmin" variant="info" class="w-100"
+          <b-button
+            @click="displayCreateEventForm"
+            v-if="isAdmin"
+            variant="info"
+            class="w-100"
             ><strong>Create Event</strong></b-button
           >
-          <b-button variant="info" class="responsive-event-button" @click="displayUserEvents" v-else
+          <b-button
+            variant="info"
+            class="responsive-event-button"
+            @click="displayUserEvents"
+            v-else
             ><strong>{{
               isDisplayUserEvents ? "View All Events" : "My Events"
             }}</strong></b-button
@@ -20,10 +28,34 @@
         </b-col>
       </b-row>
     </div>
+    <div v-if="accType == 'User'">
+      <b-carousel :interval="4000" >
+        <b-carousel-slide>
+        <template #img>
+          <b-img fluid :src="require('../assets/carousel-1.jpg')"></b-img>
+        </template>
+        </b-carousel-slide>
+          <b-carousel-slide
+          
+        >
+        <template #img>
+          <b-img fluid :src="require('../assets/carousel-2.jpg')"></b-img>
+        </template>
+        </b-carousel-slide>
+          <b-carousel-slide
+          
+        >
+        <template #img>
+          <b-img fluid :src="require('../assets/carousel-2.jpg')"></b-img>
+        </template>
+        </b-carousel-slide>
+       
+      </b-carousel>
+    </div>
     <userevents v-if="isDisplayUserEvents"></userevents>
     <div class="p-0" v-else>
       <b-table
-       table-variant="light"
+        table-variant="light"
         head-variant="dark"
         hover
         striped
@@ -66,7 +98,7 @@
             <strong>Event Status:</strong>
             {{ eventInfo.status }}
           </p>
-         
+
           <template>
             <b-row class="pb-2">
               <b-col
@@ -730,6 +762,9 @@ export default {
     },
   },
   computed: {
+    accType() {
+      return this.$store.state.userInfo.acctype;
+    },
     checkIfUserJoined() {
       let userEvents = [];
       let eventID = this.eventInfo["eventID"];
@@ -780,11 +815,11 @@ export default {
   background-color: #e7e6e6;
   border-radius: 5px;
 }
-@media only screen and (max-width: 768px){
-  .responsive-event-button{
+@media only screen and (max-width: 768px) {
+  .responsive-event-button {
     width: 100%;
   }
-  .responsive-col{
+  .responsive-col {
     padding: 0px;
   }
 }

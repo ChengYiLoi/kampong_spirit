@@ -17,7 +17,7 @@
       <b-container>
         <b-row>
           <b-col>
-            <router-link to="Landing">
+            <router-link to="/">
                 <p id="brand" class="pt-2">Kampong Spirit</p>
             </router-link>
           
