@@ -208,10 +208,11 @@
             >
           </b-col>
           <b-modal id="view-rewards" ok-only ok-title="close">
-            <b-row v-for="reward in userRewards" :key="reward['rewardcode']">
+            <b-table striped hover head-variant="light" bordered :items="userRewards" :fields="fields"></b-table>
+            <!-- <b-row v-for="reward in userRewards" :key="reward['rewardcode']">
               <b-col>{{ reward["rewardname"] }}</b-col>
               <b-col>{{ reward["rewardcode"] }}</b-col>
-            </b-row>
+            </b-row> -->
           </b-modal>
         </b-row>
       </b-container>
@@ -308,10 +309,22 @@ export default {
     GChart,
   },
   mounted() {
-    this.checkSession();
+    this.getUserData();
+    this.getUserRewards();
   },
   data() {
     return {
+      fields:[
+        {
+          key: 'rewardname',
+          label: 'Reward Name'
+        },
+        {
+          key: 'rewardcode',
+          label: 'Reward Code'
+        }
+        
+      ],
       isVisible: false,
       newfname: "",
       newlname: "",
@@ -326,12 +339,15 @@ export default {
     };
   },
   methods: {
-    // getUserRewards() {
-    //   let url = `userrewards.php?email=${this.email}`;
-    //   axios.get(url).then((result) => {
-    //     this.$store.state.getUserRewards = result.data;
-    //   });
-    // },
+    getUserRewards() {
+      alert('getting user rewards');
+      let url = `./database/userrewards.php?email=${this.email}`;
+      axios.get(url).then((result) => {
+        this.$store.state.userRewards = result.data;
+        console.log('user rewards is');
+        console.log(result.data);
+      });
+    },
     getUserData() {
       alert('getting user data');
 
@@ -357,6 +373,7 @@ export default {
           data.isLogin = true;
           sessionStorage.setItem("userSession", JSON.stringify(data));
           this.$store.state.userInfo = data;
+          this.getUserRewards();
         });
       });
     },
@@ -373,7 +390,12 @@ export default {
       let url = `./database/updatedprofile.php?email=${this.email}`;
       getData(url, this.getUpdatedProfileInfo);
     },
-
+    updateSession(data){
+      sessionStorage.setItem("userSession", JSON.stringify(data));
+      if(localStorage.getItem("userStorage") != null){
+        localStorage.setItem("userStorage", JSON.stringify(data));
+      }
+    },
     getUpdatedProfileInfo(dataObj) {
       alert("user profile update call back");
       let data = JSON.parse(dataObj);
@@ -381,7 +403,8 @@ export default {
         data = data[0];
         data.isLogin = true;
         console.log(data);
-        sessionStorage.setItem("userSession", JSON.stringify(data));
+        this.updateSession(data);
+        // sessionStorage.setItem("userSession", JSON.stringify(data));
         this.$store.state.userInfo = data;
       }
     },

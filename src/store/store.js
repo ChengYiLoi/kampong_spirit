@@ -77,33 +77,43 @@ export const store = new Vuex.Store({
     isDisplayMarketItems: true,
     userItems: [],
     userEvents: [],
-    userRewards: [],
+    userRewards: [
+     
+    ],
     events: [],
     markers: [
-      {
-        type: "food",
-        icon: "chicken.svg",
-        lat: 1.406688,
-        lng: 104.03,
-        clickable: true,
-        draggable: false,
-      },
-      {
-        type: "refill",
-        icon: "water.svg",
-        lat: 1.406688,
-        lng: 104.033,
-        clickable: true,
-        draggable: false,
-      },
-      {
-        type: "giveAway",
-        icon: "giveaway.svg",
-        lat: 1.406688,
-        lng: 104.035,
-        clickable: true,
-        draggable: false,
-      },
+      // {
+      //  endDatetime: "2020-12-12 02:09:09",
+      //  gaID: "123",
+      //  host: "dekubhna@gmail.com",
+      //  itemDesc: "many different model",
+      //  latitude: "1.4279",
+      //  locDesc: "outside shopping mall",
+      //  longitude: "103.8447",
+      //  mimage: "giveaway.svg",
+      //  name: "g-shock watch giveaway",
+      //  startDatetime: "2020-10-21 02:06:06",
+      //  telegramid: "0",
+      //  type: "giveAway",
+      //  clickable: true,
+      //  draggable: false
+      // },
+      // {
+      //   type: "refill",
+      //   mimage: "water.svg",
+      //   latitude: 1.406688,
+      //   longitude: 104.033,
+      //   clickable: true,
+      //   draggable: false,
+      // },
+      // {
+      //   type: "giveAway",
+      //   icon: "giveaway.svg",
+      //   lat: 1.406688,
+      //   lng: 104.035,
+      //   clickable: true,
+      //   draggable: false,
+      // },
     ],
     refill: [
       {
@@ -178,60 +188,3 @@ export const store = new Vuex.Store({
 });
 
 export default store;
-
-// {
-//   iID: "34",
-//   name: "gameboy",
-//   image: "NA",
-//   category: "technology",
-//   state: "used",
-//   description: "good condition",
-//   createDate: "2020-10-22",
-//   deliveryType: "Postage",
-//   location: "yishun",
-//   status: "Open",
-//   listedBy: "wad2project@gmail.com",
-//   fname: "john"
-// },
-// {
-//   iID: "35",
-//   name: "water bottle",
-//   image: "NA",
-//   category: "essentials",
-//   state: "new",
-//   description: "good",
-//   createDate: "2020-10-29",
-//   deliveryType: "Meet Up",
-//   location: "africa",
-//   status: "Donated",
-//   listedBy: "wad2project@gmail.com",
-//   fname: "jake"
-// },
-// {
-//   iID: "36",
-//   name: "Razor Gaming Mouse",
-//   image: "01NlLQzm8PSNlDYAGHYFL8D-1..1575422627.jpg",
-//   category: "electronics",
-//   state: "used",
-//   description: "No longer want to game. Do not want it to go to waste",
-//   createDate: "2020-10-10",
-//   deliveryType: "Meet Up",
-//   location: "Ang Mo Kio avenue 10, Singapore",
-//   status: "Open",
-//   listedBy: "wad2project@gmail.com",
-//   fname: "jill"
-// },
-// {
-//   iID: "37",
-//   name: "Foolscap Paper",
-//   image: "a78431348a861763d477277b4da4533e.jpg",
-//   category: "Books and Stationary",
-//   state: "new",
-//   description: "I am working now, I do not need this anymore",
-//   createDate: "2020-10-10",
-//   deliveryType: "Mee Up",
-//   location: "Dakota crescent Singapore",
-//   status: "Open",
-//   listedBy: "wad2project@gmail.com",
-//   fname: "james"
-// },

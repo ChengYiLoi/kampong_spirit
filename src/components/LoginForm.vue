@@ -51,12 +51,15 @@
       <button id="login-button" class="mt-4">
         Log In
       </button>
-
+      <p class="text-link">Forgot Password</p>
       <p class="mt-4 text-center">
         Don't have an acoount?
         <span v-on:click="switchForm()" class="text-link">Sign up</span>
       </p>
     </b-form>
+    <b-modal id="login-error" ok-only>
+      Google account not signed up. Please sign up before trying again.
+    </b-modal>
   </div>
 </template>
 <script>
@@ -128,7 +131,8 @@ export default {
             this.createSession(data);
             this.$router.push({ name: "Main" });
           } else {
-            alert("user has not signed up");
+            this.$bvModal.show('login-error');
+            
           }
         });
       });

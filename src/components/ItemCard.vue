@@ -226,6 +226,7 @@ import postData from "../postData";
 var axios = require("axios");
 export default {
   props: ["item"],
+ 
   data() {
     return {
       itemPicture: null,
