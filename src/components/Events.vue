@@ -29,44 +29,43 @@
       </b-row>
     </div>
     <div v-if="accType == 'User'">
-      <b-carousel :interval="4000" >
+      <b-carousel :interval="4000">
         <b-carousel-slide>
-        <template #img>
-          <b-img fluid :src="require('../assets/carousel-1.jpg')"></b-img>
-        </template>
+          <template #img>
+            <b-img fluid :src="require('../assets/carousel-1.png')"></b-img>
+          </template>
         </b-carousel-slide>
-          <b-carousel-slide
-          
-        >
-        <template #img>
-          <b-img fluid :src="require('../assets/carousel-2.jpg')"></b-img>
-        </template>
+        <b-carousel-slide>
+          <template #img>
+            <b-img fluid :src="require('../assets/carousel-2.png')"></b-img>
+          </template>
         </b-carousel-slide>
-          <b-carousel-slide
-          
-        >
-        <template #img>
-          <b-img fluid :src="require('../assets/carousel-2.jpg')"></b-img>
-        </template>
+        <b-carousel-slide>
+          <template #img>
+            <b-img fluid :src="require('../assets/carousel-3.png')"></b-img>
+          </template>
         </b-carousel-slide>
-       
       </b-carousel>
     </div>
     <userevents v-if="isDisplayUserEvents"></userevents>
     <div class="p-0" v-else>
       <b-table
+        v-if="isAdmin"
         table-variant="light"
         head-variant="dark"
         hover
         striped
         selectable
         select-mode="single"
-        :fields="isAdmin ? '' : fields['user']"
         stacked="md"
         :items="events"
-        @row-selected="selectedEvent"
+        @row-selected="updateSelectedEvent"
       >
       </b-table>
+      <div v-else>
+        <eventcard v-for="event in events" :key="event.eventID"></eventcard>
+      </div>
+
       <b-modal
         hide-footer
         id="event-modal-user"
@@ -123,37 +122,7 @@
           </template>
         </div>
       </b-modal>
-      <b-modal
-        id="event-modal-admin"
-        hide-footer
-        centered
-        size="md"
-        :title="eventInfo['title']"
-      >
-        <template>
-          <b-row class="pb-2">
-            <b-col
-              ><b-button
-                @click="getAllParticipants"
-                class="w-100"
-                variant="success"
-                v-b-modal="'mark-event-form'"
-                >Mark Event as Completed</b-button
-              ></b-col
-            >
-          </b-row>
-          <b-row>
-            <b-col
-              ><b-button
-                class="w-100"
-                variant="primary"
-                v-b-modal="'edit-event-form'"
-                >Edit Event Details</b-button
-              ></b-col
-            >
-          </b-row>
-        </template>
-      </b-modal>
+
       <b-modal
         id="mark-event-form"
         centered
@@ -192,156 +161,11 @@
           <strong>Confirm cancel {{ eventInfo["title"] }}?</strong>
         </p>
       </b-modal>
-      <b-modal
-        id="edit-event-form"
-        size="lg"
-        title="Edit Event"
-        hide-footer
-        button-size="lg"
-      >
-        <b-form class="modal-info p-3">
-          <b-form-group label="Event Name:" label-for="eTitle">
-            <b-form-input
-              v-model="eventTitle"
-              id="eTitle"
-              type="text"
-              :value="eventInfo['title']"
-            >
-            </b-form-input>
-          </b-form-group>
-          <b-form-group label="Event Description:" label-for="eDescription">
-            <b-form-textarea
-              v-model="eDescription"
-              id="eDescription"
-              :value="eventInfo['description']"
-            >
-            </b-form-textarea>
-          </b-form-group>
-          <b-row>
-            <b-col>
-              <b-form-group label="Location:" label-for="location">
-                <b-form-input
-                  v-model="location"
-                  id="location"
-                  type="text"
-                  :value="eventInfo['location']"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col cols="4">
-              <b-form-group label="Postal Code:" label-for="pCode">
-                <b-form-input
-                  v-model="pCode"
-                  id="pCode"
-                  type="text"
-                  :value="eventInfo['postalCode']"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col>
-              <b-form-group
-                label="Maximum Participants:"
-                label-for="mParticipants"
-              >
-                <b-form-input
-                  v-model="mParticipants"
-                  id="mParticipants"
-                  type="number"
-                  min="0"
-                  :value="eventInfo['maxcapacity']"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col>
-              <b-form-group label="Green Points Reward:" label-for="gPoints">
-                <b-form-input
-                  :value="eventInfo['pointsEarn']"
-                  v-model="gPoints"
-                  id="gPoints"
-                  type="number"
-                  min="0"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col>
-              <b-row>
-                <b-col>
-                  <b-form-group label="Event Type:" label-for="eventType">
-                    <b-form-input
-                      v-model="eventType"
-                      id="eType"
-                      type="text"
-                      :value="eventInfo['type']"
-                    >
-                    </b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </b-col>
-          </b-row>
 
-          <b-row>
-            <b-col>
-              <b-form-group label="Start Date Time:" label-for="sDateTime">
-                <b-form-input
-                  :value="eventInfo['startDatetime']"
-                  v-model="sDateTime"
-                  id="sDateTime"
-                  type="datetime-local"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col>
-              <b-form-group label="End Date Time:" label-for="eDateTime">
-                <b-form-input
-                  :value="eventInfo['endDatetime']"
-                  v-model="eDateTime"
-                  id="eDateTime"
-                  type="datetime-local"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-button variant="warning" v-b-modal="'confirm-cancel'" class="w-100"
-            >Cancel Event</b-button
-          >
-        </b-form>
-        <b-alert :show="isEditErrors" class="w-100" variant="warning">
-          <ul>
-            <li v-if="eventTitle == ''">Event name cannot be empty</li>
-            <li v-if="eDescription == ''">Event description cannot be empty</li>
-            <li v-if="location == ''">Event location cannot be empty</li>
-            <li v-if="pCode == ''">Event postal code cannot be empty</li>
-            <li v-if="mParticipants == ''">
-              Maximum event participants code cannot be empty
-            </li>
-            <li v-if="eventType == ''">Event type cannot be empty</li>
-          </ul>
-        </b-alert>
-        <template>
-          <b-row class="pb-2">
-            <b-col class="pr-0"
-              ><b-button class=" w-100" variant="danger"
-                >Cancel</b-button
-              ></b-col
-            >
-            <b-col class="pl-1"
-              ><b-button class="w-100" variant="success" @click="updateEvent"
-                >Save</b-button
-              ></b-col
-            >
-          </b-row>
-        </template>
-      </b-modal>
-      <b-modal
+      <eventcreateform></eventcreateform>
+      <eventeditform :eventInfo="selectedEvent"></eventeditform>
+
+      <!-- <b-modal
         id="create-event-form"
         size="lg"
         title="Create New Event"
@@ -462,40 +286,38 @@
             >
           </b-row>
         </template>
-      </b-modal>
+      </b-modal> -->
     </div>
   </div>
 </template>
 <script>
+import eventeditform from "../components/EventEditForm";
+import eventcreateform from "../components/EventCreateForm";
 import dashbar from "../components/Dashbar";
 import userevents from "../components/UserEvents";
+import eventcard from "../components/eventCard";
 var axios = require("axios");
 export default {
   mounted() {
     this.getAllEvents();
   },
   components: {
+    eventeditform,
+    eventcreateform,
     dashbar,
     userevents,
+    eventcard,
   },
   data() {
     return {
-      isCreateErrors: false,
+      // isCreateErrors: false,
       isEditErrors: false,
       isDisplayUserEvents: false,
       isProcessing: false,
       eventInfo: {},
       selectedParticipants: [],
       eventParticipants: [],
-      eventTitle: "",
-      eDescription: "",
-      location: "",
-      pCode: "",
-      mParticipants: "",
-      gPoints: 0,
-      eventType: "",
-      sDateTime: "",
-      eDateTime: "",
+      selectedEvent: {},
       onModalShow: false,
       fields: {
         user: [
@@ -565,56 +387,7 @@ export default {
         this.eventParticipants = result.data;
       });
     },
-    updateEvent() {
-      this.isEditErrors = false;
-      if (this.eventTitle == "") {
-        this.isEditErrors = true;
-      }
-      if (this.eDescription == "") {
-        this.isEditErrors = true;
-      }
-      if (this.location == "") {
-        this.isEditErrors = true;
-      }
-      if (this.pCode == "") {
-        this.isEditErrors = true;
-      }
-      if (this.mParticipants == "") {
-        this.isEditErrors = true;
-      }
-      if (this.eventType == "") {
-        this.isEditErrors = true;
-      }
-      if (!this.isEditErrors) {
-        let parseStartDate = Date.parse(this.sDateTime);
-        let parseEndDate = Date.parse(this.eDateTime);
 
-        if (
-          (isNaN(parseStartDate) && isNaN(parseEndDate)) ||
-          parseStartDate < parseEndDate
-        ) {
-          let url = `./database/update_event.php?eventID=${this.eventInfo["eventID"]}&title=${this.eventTitle}&type=${this.eventType}&startDatetime=${this.sDateTime}&endDatetime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}`;
-          url = encodeURI(url);
-          axios.post(url).then(() => {
-            alert("event has been updated");
-            this.$bvModal.hide("edit-event-form");
-            this.getAllEvents();
-            this.eventTitle = "";
-            this.eDescription = "";
-            this.location = "";
-            this.pCode = "";
-            this.mParticipants = "";
-            this.gPoints = 0;
-            this.eventType = "";
-            this.sDateTime = "";
-            this.eDateTime = "";
-          });
-        } else {
-          alert("end date must be later than start date");
-          this.$bvModal.show("edit-event-form");
-        }
-      }
-    },
     cancelEvent() {
       let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
       url = encodeURI(url);
@@ -650,55 +423,14 @@ export default {
       this.$bvModal.hide("edit-event-form");
       this.getAllEvents();
     },
-    createNewEvent() {
-      this.isCreateErrors = false;
-      if (this.eventTitle == "") {
-        this.isCreateErrors = true;
-      }
-      if (this.eDescription == "") {
-        this.isCreateErrors = true;
-      }
-      if (this.location == "") {
-        this.isCreateErrors = true;
-      }
-      if (this.pCode == "") {
-        this.isCreateErrors = true;
-      }
-      if (this.mParticipants == "") {
-        this.isCreateErrors = true;
-      }
-      if (this.eventType == "") {
-        this.isCreateErrors = true;
-      }
-      if (this.sDateTime == "") {
-        this.isCreateErrors = true;
-      }
-      if (this.eDateTime == "") {
-        this.isCreateErrors = true;
-      }
-      if (!this.isCreateErrors) {
-        let parseStartDate = Date.parse(this.sDateTime);
-        let parseEndDate = Date.parse(this.eDateTime);
-        if (parseEndDate > parseStartDate) {
-          let url = `./database/create_event.php?title=${this.eventTitle}&type=${this.eventType}&startDateTime=${this.sDateTime}&endDateTime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}`;
-          url = encodeURI(url);
-          axios.post(url).then(() => {
-            alert("event has been created");
-            this.getAllEvents();
-            this.$bvModal.hide("create-event-form");
-            this.$bvModal.hide("event-modal-admin");
-          });
-        } else {
-          alert("End date must be later than start date");
-        }
-      }
-    },
+
     getAllEvents() {
       let url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
       url = encodeURI(url);
       axios.get(url).then((result) => {
         alert("Retrieved all events");
         this.$store.state.events = result.data;
+        console.log(result.data);
         url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
         url = encodeURI(url);
         axios.get(url).then((result) => {
@@ -731,15 +463,32 @@ export default {
       });
       this.$bvModal.hide("event-modal-user");
     },
-    selectedEvent(selectedEventInfo) {
-      this.eventInfo = selectedEventInfo[0];
-      this.eventTitle = selectedEventInfo[0].title;
-      this.eDescription = selectedEventInfo[0].description;
-      this.location = selectedEventInfo[0].location;
-      this.pCode = selectedEventInfo[0].postalCode;
-      this.mParticipants = selectedEventInfo[0].maxcapacity;
-      this.gPoints = selectedEventInfo[0].pointsEarn;
-      this.eventType = selectedEventInfo[0].type;
+    updateSelectedEvent(selectedEventInfo) {
+      // this.selectedEvent = selectedEventInfo[0];
+      console.log(this.selectedEvent);
+      this.selectedEvent = {
+        description: selectedEventInfo[0].description,
+        endDatetime: selectedEventInfo[0].endDatetime,
+        eventID: selectedEventInfo[0].eventID,
+        image: selectedEventInfo[0].image,
+        location: selectedEventInfo[0].location,
+        maxcapacity: selectedEventInfo[0].maxcapacity,
+        title: selectedEventInfo[0].title,
+        numPart: selectedEventInfo[0].numPart,
+        pointsEarn: selectedEventInfo[0].pointsEarn,
+        postalCode: selectedEventInfo[0].postalCode,
+        startDatetime: selectedEventInfo[0].startDatetime,
+        type: selectedEventInfo[0].type,
+      };
+      console.log(this.selectedEvent);
+      // this.eventInfo = selectedEventInfo[0];
+      // this.eventTitle = selectedEventInfo[0].title;
+      // this.eDescription = selectedEventInfo[0].description;
+      // this.location = selectedEventInfo[0].location;
+      // this.pCode = selectedEventInfo[0].postalCode;
+      // this.mParticipants = selectedEventInfo[0].maxcapacity;
+      // this.gPoints = selectedEventInfo[0].pointsEarn;
+      // this.eventType = selectedEventInfo[0].type;
 
       this.isAdmin
         ? this.$bvModal.show("event-modal-admin")

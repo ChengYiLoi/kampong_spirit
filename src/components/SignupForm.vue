@@ -144,6 +144,9 @@
         <p class="mt-4 text-center text-link" v-on:click="switchForm()">
           Back to Login
         </p>
+        <b-alert v-if="isTaken" show variant="warning">
+          Email is already registered
+        </b-alert>
       </b-form>
     </div>
     <div v-else class="login-form p-3">
@@ -155,7 +158,7 @@
         <b-form-input size="lg" v-model="vCode"></b-form-input>
       </b-form-group>
       <p class="text-link"><u>Resend verification code</u></p>
-      <b-button id="login-button">Submit</b-button>
+      <b-button id="login-button" @click="addUser">Submit</b-button>
     </div>
   </div>
 </template>
@@ -175,8 +178,9 @@ export default {
   mixins: [validationMixin],
   data() {
     return {
-      isVerification: true,
+      isVerification: false,
       vCode: null,
+      isTaken: false,
     };
   },
   validations: {
@@ -211,6 +215,45 @@ export default {
     },
   },
   methods: {
+    addUser() {
+      let url = `./database/smsverify.php?enteredcode=${this.vCode}`;
+      axios.get(url).then((response) => {
+        console.log(response);
+        if (response.data.length == 1) {
+          let userInputs = this.$v.form.$model;
+          url = `./database/registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
+          url = encodeURI(url);
+          axios.post(url).then(() => {
+            alert("Form submitted");
+            setTimeout(() => {
+              url = `./database/validate.php?email=${userInputs["email"]}&password=${userInputs["password"]}`;
+              url = encodeURI(url);
+              axios.get(url).then((response) => {
+                this.resetFields();
+                if (response.data.length == 1) {
+                  let data = response.data[0];
+                  console.log(data);
+
+                  this.$store.state.dashOptions.marketplace.selected = true;
+                  this.createSession(data);
+                  this.$router.push({ name: "Main" });
+                }
+              });
+            }, 3000);
+          });
+        }
+      });
+    },
+    resetFields(){
+      this.$v.form.fname.$model = "";
+      this.$v.form.lname.$model = "";
+      this.$v.form.pnumber.$model = "";
+
+      this.$v.form.email.$model = "";
+      this.$v.form.password.$model = "";
+      this.$v.form.cpassword.$model = "";
+
+    },
     handleSignup() {
       this.$gAuth.signIn().then((user) => {
         console.log("user", user);
@@ -228,23 +271,29 @@ export default {
             console.log(lname);
           }
         }
-
-        let idtoken = user.wc["login_hint"];
-        let url = `./database/signupgmail.php?lname=${lname}&fname=${fname}&email=${email}&idtoken=${idtoken}`;
-        url = encodeURI(url);
-        axios.post(url).then(() => {
-          setTimeout(() => {
-            url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+        let url = `./database/checkemail.php?email=${email}`;
+        axios.get(url).then((response) => {
+          if (response.data.length >= 1) {
+            this.isTaken = true;
+          } else {
+            let idtoken = user.wc["login_hint"];
+            url = `./database/signupgmail.php?lname=${lname}&fname=${fname}&email=${email}&idtoken=${idtoken}`;
             url = encodeURI(url);
-            axios.get(url).then((response) => {
-              if (response.data.length == 1) {
-                let data = response.data[0];
-                this.$store.state.dashOptions.marketplace.selected = true;
-                this.createSession(data);
-                this.$router.push({ name: "Main" });
-              }
+            axios.post(url).then(() => {
+              setTimeout(() => {
+                url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+                url = encodeURI(url);
+                axios.get(url).then((response) => {
+                  if (response.data.length == 1) {
+                    let data = response.data[0];
+                    this.$store.state.dashOptions.marketplace.selected = true;
+                    this.createSession(data);
+                    this.$router.push({ name: "Main" });
+                  }
+                });
+              }, 5000);
             });
-          }, 5000);
+          }
         });
       });
     },
@@ -278,25 +327,17 @@ export default {
       if (this.$v.form.$anyError) {
         return;
       } else {
-        // let userInputs = this.$v.form.$model;
-        // let url = `./database/registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
-        // url = encodeURI(url);
-        // axios.post(url).then(() => {
-        //   alert("Form submitted");
-        //   setTimeout(() => {
-        //     url = `./database/validate.php?email=${userInputs['email']}&password=${userInputs['password']}`;
-        //     url = encodeURI(url);
-        //     axios.get(url).then((response) => {
-        //       if (response.data.length == 1) {
-        //         let data = response.data[0];
-        //         console.log(data);
-        //         this.$store.state.dashOptions.marketplace.selected = true;
-        //         this.createSession(data);
-        //         this.$router.push({ name: "Main" });
-        //       }
-        //     });
-        //   }, 5000);
-        // });
+        let url = `./database/checkemail.php?email=${this.$v.form.email.$model}`;
+        axios.get(url).then((response) => {
+          if (response.data.length >= 1) {
+            this.isTaken = true;
+          } else {
+            this.isVerification = true;
+            console.log(this.$v.form.pnumber.$model);
+            url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
+            axios.post(url);
+          }
+        });
       }
     },
   },

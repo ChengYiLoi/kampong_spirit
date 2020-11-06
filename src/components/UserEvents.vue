@@ -1,6 +1,7 @@
 <template>
   <div class="p-0">
-    <b-table
+    <eventcard></eventcard>
+    <!-- <b-table
       bordered
       outlined
       hover
@@ -12,7 +13,8 @@
       :items="userEvents"
       @row-selected="selectedEvent"
     >
-    </b-table>
+    </b-table> -->
+
     <b-modal
       id="event-modal-info"
       centered
@@ -48,7 +50,11 @@
 </template>
 <script>
 var axios = require("axios");
+import eventcard from '../components/eventCard'
 export default {
+  components:{
+    eventcard
+  },
   data() {
     return {
       user: [

@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row class="pt-2">
       <b-col></b-col>
-      <b-col cols="2">
+      <b-col cols="4">
         <b-button class="w-100 d-block mx-auto" v-b-modal="'addNewItemForm'"
           >Add new Item</b-button
         >

@@ -43,12 +43,12 @@ export default {
       let user
       if(localStorage.getItem('userStorage') != null){
         alert('User did not logout');
-        user = localStorage.getItem('userStorage');
+        user = JSON.parse(localStorage.getItem('userStorage'));
         this.$store.state.userInfo = user;
       }
       else if(sessionStorage.getItem('userStorage') != null){
         alert('session found');
-        user = sessionStorage.getItem('userSession');
+        user = JSON.parse(sessionStorage.getItem('userSession'));
         this.$store.state.userInfo = user;
       }
     }

@@ -28,8 +28,9 @@
               </b-button>
               <b-button
                 v-on:click="toggleMarketPlace()"
-                class="responsive-market-button"
+                class="responsive-market-button p-2"
                 v-else
+                variant="info"
               >
                 <strong>Market Place</strong>
               </b-button>
@@ -146,8 +147,11 @@ export default {
       },
     };
   },
-  mounted() {
+  created(){
     this.checkSession();
+  },
+  mounted() {
+    // this.checkSession();
   },
   methods: {
     toggleFilter(type) {
@@ -216,11 +220,13 @@ export default {
       if (sessionStorage.getItem("userSession") != null) {
         userSession = JSON.parse(sessionStorage.getItem("userSession"));
         console.log("user session is");
-        this.$store.state["userInfo"] = userSession;
-      } else if (localStorage.getItem("userStorage") != null) {
-        userSession = JSON.parse(sessionStorage.getItem("userStorage"));
-        this.$store.state["userInfo"] = userSession;
+        this.$store.state.userInfo = userSession;
       }
+      if (localStorage.getItem("userStorage") != null) {
+        userSession = JSON.parse(localStorage.getItem("userStorage"));
+        this.$store.state.userInfo = userSession;
+      }
+      console.log(this.$store.state['userInfo']);
       this.getItems();
     },
     toggleMarketPlace() {

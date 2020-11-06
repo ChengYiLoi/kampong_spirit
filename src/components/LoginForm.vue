@@ -51,19 +51,31 @@
       <button id="login-button" class="mt-4">
         Log In
       </button>
-      <p class="text-link text-center mt-4" v-b-modal="'password-rest'"><u>Forgot Password</u></p>
+      <p class="text-link text-center mt-4" v-b-modal="'password-rest'">
+        <u>Forgot Password</u>
+      </p>
       <p class="mt-4 text-center">
         Don't have an acoount?
         <span v-on:click="switchForm()" class="text-link"><u>Sign up</u></span>
       </p>
     </b-form>
-    <b-modal centered title="Reset Password" id="password-rest" ok-title="Reset">
+    <b-modal
+      centered
+      title="Reset Password"
+      id="password-rest"
+      ok-title="Reset"
+      @ok="resetPass"
+    >
       <b-form-group label="Email: ">
         <b-form-input v-model="resetEmail"></b-form-input>
       </b-form-group>
     </b-modal>
     <b-modal id="login-error" ok-only>
       Google account not signed up. Please sign up before trying again.
+    </b-modal>
+    <b-modal id="reset-confirmation" ok-only class="text-center" centered>
+      An email will be sent to your email. Please follow the instruction in the
+      email to reset your password.
     </b-modal>
   </div>
 </template>
@@ -78,6 +90,7 @@ export default {
   data() {
     return {
       keepLogged: false,
+      resetEmail: null,
     };
   },
   validations: {
@@ -90,9 +103,19 @@ export default {
         required,
       },
     },
-    resetEmail: null
+    resetEmail: null,
   },
   methods: {
+    resetPass() {
+      let url = `./database/checkemail.php?email=${this.resetEmail}`;
+      axios.get(url).then((response) => {
+        if (response.data.length == 1) {
+          url = `forgetpassword.php?email=${this.resetEmail}`;
+          axios.post(url);
+          this.$bvModal.show("reset-confirmation");
+        }
+      });
+    },
     getUserRewards(email) {
       let url = `./database/userrewards.php?email=${email}`;
       url = encodeURI(url);
@@ -137,8 +160,7 @@ export default {
             this.createSession(data);
             this.$router.push({ name: "Main" });
           } else {
-            this.$bvModal.show('login-error');
-            
+            this.$bvModal.show("login-error");
           }
         });
       });

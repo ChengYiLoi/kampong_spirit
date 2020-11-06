@@ -89,7 +89,7 @@
 
       <b-row class="m-2">
         <b-col></b-col>
-        <b-col lg="4" class="filter p-2">
+        <b-col lg="6" class="filter p-2">
           <b-row>
             <b-col>
               <h4><u>Current Weather</u></h4>
@@ -99,17 +99,23 @@
                 fluid
                 :src="require(`../assets/${weather.img}.svg`)"
               ></b-img>
-              <p>{{ weather.description }}</p>
+              <p>
+                <strong>{{ weather.description }}</strong>
+              </p>
               <b-row>
-                <b-col class="text-right">
-                  <p>{{ weather.temperature }}&#176;C</p></b-col
+                <b-col class="text-center">
+                  <p>
+                    <strong>{{ weather.temperature }}&#176;C</strong>
+                  </p></b-col
                 >
-                <b-col class="text-left"
-                  ><p>{{ weather.humidity }}%RH</p></b-col
+                <b-col class="text-center"
+                  ><p>
+                    <strong>{{ weather.humidity }}%RH</strong>
+                  </p></b-col
                 >
               </b-row>
             </b-col>
-            
+
             <b-col class="text-center">
               <b-row align-v="center">
                 <b-col>
@@ -153,7 +159,6 @@
                 </b-col>
               </b-row>
             </b-col>
-
           </b-row>
           <b-row>
             <b-col>
@@ -307,22 +312,43 @@
                       </b-form-group>
                     </b-col>
                   </b-row>
-
+                  <b-row>
+                    <b-col cols="2"></b-col>
+                    <b-col>
+                      <b-row>
+                        <b-col cols="12" class="text-right">
+                          <p id="tele-text">
+                            <i>Click this if you don't know your ID</i>
+                          </p>
+                        </b-col>
+                      </b-row>
+                      <b-row>
+                        <b-col cols="12" class="text-right">
+                          <b-img
+                            fluid
+                            class="pr-1"
+                            :src="require(`../assets/arrow.svg`)"
+                          ></b-img>
+                        </b-col>
+                      </b-row>
+                    </b-col>
+                  </b-row>
                   <b-row>
                     <b-col cols="10">
                       <b-form-group
-                        label="Telegram user ID: "
+                        label="Telegram user ID: (Number only)"
                         label-for="teleID"
                         label-cols="5"
                       >
                         <b-form-input
                           id="teleID"
                           v-model="createForm['teleID']"
+                          placeholder="Optional"
                         ></b-form-input>
                       </b-form-group>
                     </b-col>
-                    <b-col>
-                      <span id="tooltip-tele">
+                    <b-col class="text-right">
+                      <span id="tooltip-tele" @click="telegram">
                         <b-img
                           fluid
                           :src="require(`../assets/telegram.svg`)"
@@ -331,9 +357,9 @@
                     </b-col>
                   </b-row>
 
-                  <b-tooltip target="tooltip-tele">
+                  <!-- <b-tooltip target="tooltip-tele">
                     Click this to get your Telegram user ID
-                  </b-tooltip>
+                  </b-tooltip> -->
 
                   <template>
                     <b-row class="pb-2">
@@ -372,6 +398,9 @@
                       </li>
                       <li v-if="createForm['eType'] == null">
                         Event type cannot be empty
+                      </li>
+                      <li v-if="isNumber">
+                        Telegram ID must be a number
                       </li>
                       <li
                         v-if="
@@ -443,7 +472,7 @@ export default {
   data() {
     return {
       show: true,
-      currentPos: { lat: 1.406688, lng: 104.029381 },
+      currentPos: { lat: null, lng: null },
       filter: {
         giveAway: true,
         refill: true,
@@ -490,6 +519,10 @@ export default {
     };
   },
   methods: {
+    telegram() {
+      let url = `https://t.me/kampung_spirit_bot`;
+      window.open(url);
+    },
     validateLogin() {
       if (this.$store.state.userInfo.isLogin) {
         this.$bvModal.show("create-event-form");
@@ -567,7 +600,7 @@ export default {
         cType: null,
         lat: null,
         lng: null,
-        teleID: null,
+        teleID: "",
       };
     },
     createEvent() {
@@ -606,6 +639,9 @@ export default {
         this.createForm.eType == "Give Away" &&
         this.createForm.giveAwayDescription == ""
       ) {
+        this.isCreateErrors = true;
+      }
+      if (isNaN(this.createForm.teleID)) {
         this.isCreateErrors = true;
       }
       if (!this.isCreateErrors) {
@@ -718,6 +754,9 @@ export default {
   },
 
   computed: {
+    isNumber() {
+      return isNaN(this.createForm["teleID"]);
+    },
     markers() {
       return this.$store.state.markers;
     },
@@ -755,4 +794,15 @@ export default {
 //   display: absolute !important;
 //   z-index: 2000;
 // }
+#tooltip-tele {
+  cursor: pointer;
+}
+#tele-text {
+  color: #f37777;
+}
+@media only screen and (max-width: 425px) {
+  .custom-control-label {
+    font-size: 1rem !important;
+  }
+}
 </style>

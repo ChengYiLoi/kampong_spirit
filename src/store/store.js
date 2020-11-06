@@ -8,7 +8,7 @@ export const store = new Vuex.Store({
     isSignup: false,
     userInfo: {
       isLogin: true,
-      acctype: "User",
+      acctype: "Admin",
       email: "",
       fname: "",
       greenpoints: "",
@@ -111,7 +111,23 @@ export const store = new Vuex.Store({
     userItems: [],
     userEvents: [],
     userRewards: [],
-    events: [],
+    events: [
+      // {
+      //   description: "old event",
+      //   endDatetime: "2020-10-26 23:03:00",
+      //   eventID: "339",
+      //   image: "",
+      //   location: "where wherre",
+      //   maxcapacity: "30",
+      //   numPart: "2",
+      //   pointsEarn: "1",
+      //   postalCode: "123456",
+      //   startDatetime: "2020-10-25 23:03:00",
+      //   status: "Completed",
+      //   title: "old event",
+      //   type: "Sleep",
+      // },
+    ],
     markers: [
       // {
       //  endDatetime: "2020-12-12 02:09:09",
