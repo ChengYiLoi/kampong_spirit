@@ -109,6 +109,7 @@
                 >
               </b-row>
             </b-col>
+            
             <b-col class="text-center">
               <b-row align-v="center">
                 <b-col>
@@ -152,6 +153,7 @@
                 </b-col>
               </b-row>
             </b-col>
+
           </b-row>
           <b-row>
             <b-col>

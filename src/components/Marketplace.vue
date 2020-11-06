@@ -47,15 +47,68 @@
         </b-col>
       </b-row>
     </div>
+    <div>
+      <b-row class="pt-2">
+        <b-col></b-col>
+        <b-col>
+          <b-dropdown text="Filter" offset="-35">
+            <div class="p-2">
+              <b-form-checkbox
+                @change="toggleFilter('Electronics')"
+                v-model="filter['Electronics']"
+                >Electronics</b-form-checkbox
+              >
+              <b-form-checkbox
+                @change="toggleFilter('Technology')"
+                v-model="filter['Technology']"
+                >Technology</b-form-checkbox
+              >
+              <b-form-checkbox
+                @change="toggleFilter(`Books and Stationary`)"
+                v-model="filter[`Books and Stationary`]"
+                >Books and Sationary</b-form-checkbox
+              >
+              <b-form-checkbox
+                @change="toggleFilter(`Assistive Device`)"
+                v-model="filter[`Assistive Device`]"
+                >Assistive Device</b-form-checkbox
+              >
+              <b-form-checkbox
+                @change="toggleFilter(`Beauty Accessories`)"
+                v-model="filter[`Beauty Accessories`]"
+                >Beauty Accessories</b-form-checkbox
+              >
+              <b-form-checkbox
+                @change="toggleFilter('Essentials')"
+                v-model="filter['Essentials']"
+                >Essentials</b-form-checkbox
+              >
+              <b-form-checkbox
+                @change="toggleFilter(`Others`)"
+                v-model="filter[`Others`]"
+                >Others</b-form-checkbox
+              >
+              <!-- <b-row>
+                <b-col cols="6">
+                  <b-form-checkbox>Electronics</b-form-checkbox>
+                </b-col>
+                <b-col>
+                  <b-form-checkbox>Technology</b-form-checkbox>
+                </b-col>
+              </b-row> -->
+            </div>
+          </b-dropdown>
+        </b-col>
+        <b-col></b-col>
+      </b-row>
+    </div>
 
     <b-row v-if="displayMarketItems" class="m-0 main d-inline">
       <b-col>
         <b-card-group columns>
-          <itemcard
-            v-for="item in items"
-            :key="item.iID"
-            :item="item"
-          ></itemcard>
+          <div v-for="item in items" :key="item.iID">
+            <itemcard v-if="filter[item.category]" :item="item"></itemcard>
+          </div>
         </b-card-group>
       </b-col>
     </b-row>
@@ -81,12 +134,25 @@ export default {
     useritems,
   },
   data() {
-    return {};
+    return {
+      filter: {
+        Electronics: true,
+        Technology: true,
+        Essentials: true,
+        "Books and Stationary": true,
+        "Assistive Device": true,
+        "Beauty Accessories": true,
+        Others: true,
+      },
+    };
   },
   mounted() {
     this.checkSession();
   },
   methods: {
+    toggleFilter(type) {
+      this.filter[type] = !this.filter[type];
+    },
     getItems() {
       let url = `./database/getItems.php`;
       url = encodeURI(url);

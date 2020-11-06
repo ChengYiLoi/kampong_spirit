@@ -70,7 +70,7 @@
         <div>
           <b-row >
             <b-col class="pr-0"
-              ><b-button class="w-100 item-options" variant="danger">Close</b-button></b-col
+              ><b-button class="w-100 item-options" variant="danger" @click="$bvModal.hide(`${item.name}`)">Close</b-button></b-col
             >
             <b-col class="pl-0"
               ><b-button 
