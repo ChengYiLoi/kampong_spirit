@@ -1,6 +1,17 @@
 <template>
   <div class="p-0">
-    <eventcard></eventcard>
+    <b-row class="p-2">
+      <b-col>
+        <b-card-group columns>
+          <eventcard
+            v-for="event in userEvents"
+            :key="event.eventID"
+            :eventInfo="event"
+          ></eventcard>
+        </b-card-group>
+      </b-col>
+    </b-row>
+
     <!-- <b-table
       bordered
       outlined
@@ -15,45 +26,15 @@
     >
     </b-table> -->
 
-    <b-modal
-      id="event-modal-info"
-      centered
-      cancel-title="Close"
-      ok-title="Withdraw"
-      cancel-variant="danger"
-      ok-variant="success"
-      size="md"
-      button-size="lg"
-      :title="eventInfo['title']"
-      @ok="withdrawEvent"
-    >
-      <div class="event-info p-2">
-        <p><strong>Type:</strong> {{ eventInfo.type }}</p>
-        <p><strong>Description:</strong> {{ eventInfo.description }}</p>
-        <p><strong>Location:</strong> {{ eventInfo.location }}</p>
-        <p><strong>Postal Code:</strong> {{ eventInfo.postalCode }}</p>
-        <p><strong>Start Date Time:</strong> {{ eventInfo.startDatetime }}</p>
-        <p><strong>End Date Time:</strong> {{ eventInfo.endDatetime }}</p>
-        <p><strong>Green Points Reward:</strong> {{ eventInfo.pointsEarn }}</p>
-
-        <p>
-          <strong>Current Number of Participants Joined:</strong>
-          {{ eventInfo.numpart }}
-        </p>
-        <p>
-          <strong>Maximum Number of Participants Joined:</strong>
-          {{ eventInfo.maxcapacity }}
-        </p>
-      </div>
-    </b-modal>
+   
   </div>
 </template>
 <script>
-var axios = require("axios");
-import eventcard from '../components/eventCard'
+
+import eventcard from "../components/eventCard";
 export default {
-  components:{
-    eventcard
+  components: {
+    eventcard,
   },
   data() {
     return {
@@ -92,42 +73,20 @@ export default {
       this.eventInfo = selectedEventInfo[0];
       this.$bvModal.show("event-modal-info");
     },
-    withdrawEvent() {
-      let eventID = this.eventInfo["eventID"];
-      let email = this.getUserEmail;
-      console.log(eventID);
-      console.log(email);
-      let url = `./database/withdraw.php?eventID=${eventID}&email=${email}`;
-      url = encodeURI(url);
-      axios.post(url).then(() => {
-        alert("User has withdrawed");
-        url = `./database/withdraw_joincount.php?eventID=${eventID}`;
-        url = encodeURI(url);
-        axios.post(url).then(() => {
-          url = `./database/getUserEvents.php?email=${email}`;
-          url = encodeURI(url);
-          axios.get(url).then((result) => {
-            alert("User events has been updated");
-            this.$store.state.userEvents = result.data;
-            this.$bvModal.hide('event-modal-info');
-          });
-        });
-      });
-      this.$bvModal.hide('event-modal-info');
-    },
+    
   },
   computed: {
     userEvents() {
       return this.$store.state.userEvents;
     },
-    getUserEmail() {
-      let email = "";
-      if (sessionStorage.getItem("userSession") != null) {
-        let userSession = JSON.parse(sessionStorage.getItem("userSession"));
-        email = userSession["email"];
-      }
-      return email;
-    },
+    // getUserEmail() {
+    //   let email = "";
+    //   if (sessionStorage.getItem("userSession") != null) {
+    //     let userSession = JSON.parse(sessionStorage.getItem("userSession"));
+    //     email = userSession["email"];
+    //   }
+    //   return email;
+    // },
   },
 };
 </script>

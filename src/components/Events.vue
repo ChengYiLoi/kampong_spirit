@@ -47,9 +47,79 @@
         </b-carousel-slide>
       </b-carousel>
     </div>
+    <b-row class="pt-2">
+      <b-col></b-col>
+      <b-col>
+        <b-dropdown text="Filter" offset="-35">
+          <div class="p-2">
+             <b-form-checkbox 
+            v-model="filter['Jan']"
+            >
+            January
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['Feb']"
+            >
+            February
+            </b-form-checkbox>
+             <b-form-checkbox
+            v-model="filter['Mar']"
+            >
+            March
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['Apr']"
+            >
+            April
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['May']"
+            >
+            May
+            </b-form-checkbox>
+             <b-form-checkbox
+            v-model="filter['Jun']"
+            >
+            June
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['Jul']"
+            >
+            July
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['Aug']"
+            >
+            August
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['Sep']"
+            >
+            September
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['Oct']"
+            >
+            October
+            </b-form-checkbox>
+            <b-form-checkbox 
+            v-model="filter['Nov']"
+            >
+            November
+            </b-form-checkbox>
+             <b-form-checkbox 
+            v-model="filter['Dec']"
+            >
+            December
+            </b-form-checkbox>
+          </div>
+        </b-dropdown>
+      </b-col>
+      <b-col></b-col>
+    </b-row>
     <userevents v-if="isDisplayUserEvents"></userevents>
     <div class="p-0" v-else>
-      <b-table
+      <!-- <b-table
         v-if="isAdmin"
         table-variant="light"
         head-variant="dark"
@@ -61,91 +131,21 @@
         :items="events"
         @row-selected="updateSelectedEvent"
       >
-      </b-table>
-      <div v-else>
-        <eventcard v-for="event in events" :key="event.eventID"></eventcard>
-      </div>
+      </b-table> -->
+      <b-row class="p-2">
+        <b-col>
+          <b-card-group columns>
+            <div v-for="event in events" :key="event.eventID">
+              <eventcard
+                v-if="filter[getMonth(event)]"
+                :eventInfo="event"
+              ></eventcard>
+            </div>
+          </b-card-group>
+        </b-col>
+      </b-row>
 
-      <b-modal
-        hide-footer
-        id="event-modal-user"
-        centered
-        size="md"
-        button-size="lg"
-        :title="eventInfo['title']"
-      >
-        <!-- <h4 class="text-center">Confirm joining {{eventInfo['title']}}?</h4> -->
-        <div class="event-info p-2">
-          <p><strong>Type:</strong> {{ eventInfo.type }}</p>
-          <p><strong>Description:</strong> {{ eventInfo.description }}</p>
-          <p><strong>Location:</strong> {{ eventInfo.location }}</p>
-          <p><strong>Postal Code:</strong> {{ eventInfo.postalCode }}</p>
-          <p><strong>Start Date Time:</strong> {{ eventInfo.startDatetime }}</p>
-          <p><strong>End Date Time:</strong> {{ eventInfo.endDatetime }}</p>
-          <p>
-            <strong>Green Points Reward:</strong> {{ eventInfo.pointsEarn }}
-          </p>
-          <p>
-            <strong>Current Number of Participants Joined:</strong>
-            {{ eventInfo.numPart }}
-          </p>
-          <p>
-            <strong>Maximum Number of Participants:</strong>
-            {{ eventInfo.maxcapacity }}
-          </p>
-          <p>
-            <strong>Event Status:</strong>
-            {{ eventInfo.status }}
-          </p>
-
-          <template>
-            <b-row class="pb-2">
-              <b-col
-                ><b-button
-                  class=" w-100"
-                  variant="danger"
-                  @click="$bvModal.hide('event-modal-user')"
-                  >{{
-                    checkIfUserJoined ? "Already Joined Event" : "Close"
-                  }}</b-button
-                ></b-col
-              >
-              <b-col class="pl-1" v-if="!checkIfUserJoined"
-                ><b-button
-                  class="w-100"
-                  variant="success"
-                  @click="emailConfirmation"
-                  >Create</b-button
-                ></b-col
-              >
-            </b-row>
-          </template>
-        </div>
-      </b-modal>
-
-      <b-modal
-        id="mark-event-form"
-        centered
-        size="md"
-        title="Participants"
-        cancel-variant="danger"
-        ok-title="Distribute Green Points"
-        ok-variant="success"
-        @ok="distributeGreenPoints"
-      >
-        <template>
-          <div>
-            <b-form-checkbox
-              v-for="participant in eventParticipants"
-              :key="participant.email"
-              :value="participant.email"
-              v-model="selectedParticipants"
-            >
-              {{ participant.email }}
-            </b-form-checkbox>
-          </div>
-        </template>
-      </b-modal>
+   
 
       <b-modal
         id="confirm-cancel"
@@ -163,7 +163,6 @@
       </b-modal>
 
       <eventcreateform></eventcreateform>
-      <eventeditform :eventInfo="selectedEvent"></eventeditform>
 
       <!-- <b-modal
         id="create-event-form"
@@ -291,7 +290,6 @@
   </div>
 </template>
 <script>
-import eventeditform from "../components/EventEditForm";
 import eventcreateform from "../components/EventCreateForm";
 import dashbar from "../components/Dashbar";
 import userevents from "../components/UserEvents";
@@ -302,7 +300,6 @@ export default {
     this.getAllEvents();
   },
   components: {
-    eventeditform,
     eventcreateform,
     dashbar,
     userevents,
@@ -310,13 +307,27 @@ export default {
   },
   data() {
     return {
+      filter: {
+        Jan: true,
+        Feb: true,
+        Mar: true,
+        Apr: true,
+        May: true,
+        Jun: true,
+        Jul: true,
+        Aug: true,
+        Sep: true,
+        Oct: true,
+        Nov: true,
+        Dec: true,
+
+      },
       // isCreateErrors: false,
       isEditErrors: false,
-      isDisplayUserEvents: false,
       isProcessing: false,
       eventInfo: {},
-      selectedParticipants: [],
-      eventParticipants: [],
+      
+     
       selectedEvent: {},
       onModalShow: false,
       fields: {
@@ -363,30 +374,8 @@ export default {
       this.eDateTime = "";
       this.$bvModal.show("create-event-form");
     },
-    distributeGreenPoints() {
-      console.log(`selected partcipants are ${this.selectedParticipants}`);
-
-      this.selectedParticipants.forEach((participantEmail) => {
-        let url = `./database/update_greenpoints.php?eventID=${this.eventInfo["eventID"]}&email=${participantEmail}`;
-        url = encodeURI(url);
-
-        axios.post(url).then(() => {
-          url = `./database/mark_completed.php?eventID=${this.eventInfo["eventID"]}`;
-          url = encodeURI(url);
-          axios.get(url);
-        });
-      });
-      alert("Green points distributed");
-    },
-    getAllParticipants() {
-      let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
-      url = encodeURI(url);
-      axios.get(url).then((result) => {
-        alert("Event participants retrieved");
-        console.log(result.data);
-        this.eventParticipants = result.data;
-      });
-    },
+    
+   
 
     cancelEvent() {
       let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
@@ -440,32 +429,10 @@ export default {
         });
       });
     },
-    emailConfirmation() {
-      alert("sending email to user");
-      let email = this.getUserEmail;
-      let eventID = this.eventInfo["eventID"];
-      let title = this.eventInfo["title"];
-      let type = this.eventInfo["type"];
-      let startDateTime = this.eventInfo["startDatetime"];
-      let endDateTime = this.eventInfo["endDatetime"];
-      let location = this.eventInfo["location"];
-      let postalCode = this.eventInfo["postalCode"];
-      let pointsEarn = this.eventInfo["pointsEarn"];
-      let url = `./database/send_email.php?email=${email}&eventID=${eventID}&title=${title}&type=${type}&startDatetime=${startDateTime}&endDatetime=${endDateTime}&location=${location}&postalCode=${postalCode}&pointsEarn=${pointsEarn}`;
-      url = encodeURI(url);
-      axios.get(url).then(() => {
-        alert("email has been sent");
-        url = `./database/insert_join.php?eventID=${eventID}&email=${email}`;
-        url = encodeURI(url);
-        axios.get(url).then(() => {
-          alert("join events has been updated");
-        });
-      });
-      this.$bvModal.hide("event-modal-user");
-    },
+
     updateSelectedEvent(selectedEventInfo) {
       // this.selectedEvent = selectedEventInfo[0];
-      console.log(this.selectedEvent);
+      alert("update fired");
       this.selectedEvent = {
         description: selectedEventInfo[0].description,
         endDatetime: selectedEventInfo[0].endDatetime,
@@ -507,27 +474,38 @@ export default {
         this.getAllEvents();
       }
 
-      this.isDisplayUserEvents = !this.isDisplayUserEvents;
+      this.$store.state.isDisplayUserEvents = !this.$store.state
+        .isDisplayUserEvents;
+    },
+    getMonth(event) {
+      var months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      var dateObj = new Date(event.startDatetime);
+      var month = months[dateObj.getMonth()].toString();
+     
+      return month;
     },
   },
   computed: {
+    isDisplayUserEvents() {
+      return this.$store.state.isDisplayUserEvents;
+    },
     accType() {
       return this.$store.state.userInfo.acctype;
     },
-    checkIfUserJoined() {
-      let userEvents = [];
-      let eventID = this.eventInfo["eventID"];
-      let isJoined = false;
-      userEvents = this.$store.state.userEvents;
-      userEvents.forEach((event) => {
-        console.log(event["eventID"]);
-        if (eventID === event["eventID"]) {
-          alert("event id found");
-          isJoined = true;
-        }
-      });
-      return isJoined;
-    },
+
     getUserEmail() {
       let email = "";
       if (sessionStorage.getItem("userSession") != null) {
@@ -540,6 +518,7 @@ export default {
       // let output = [];
       let events = [];
       events = this.$store.state.events;
+      console.log(events);
 
       return events;
     },

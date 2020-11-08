@@ -4,7 +4,7 @@
     class="card-info h-100"
     v-on:click="renderFeature()"
   >
-    <b-row>
+    <b-row class="p-2">
       <b-col cols="">
         <b-img fluid :src="require(`../assets/${cardObject.img}`)"
       /></b-col>

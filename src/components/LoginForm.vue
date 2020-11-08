@@ -55,7 +55,7 @@
         <u>Forgot Password</u>
       </p>
       <p class="mt-4 text-center">
-        Don't have an acoount?
+        Don't have an account?
         <span v-on:click="switchForm()" class="text-link"><u>Sign up</u></span>
       </p>
     </b-form>
@@ -109,8 +109,9 @@ export default {
     resetPass() {
       let url = `./database/checkemail.php?email=${this.resetEmail}`;
       axios.get(url).then((response) => {
+        console.log(response);
         if (response.data.length == 1) {
-          url = `forgetpassword.php?email=${this.resetEmail}`;
+          url = `./database/forgetpassword.php?email=${this.resetEmail}`;
           axios.post(url);
           this.$bvModal.show("reset-confirmation");
         }

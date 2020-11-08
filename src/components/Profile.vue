@@ -208,7 +208,14 @@
             >
           </b-col>
           <b-modal id="view-rewards" ok-only ok-title="close">
-            <b-table striped hover head-variant="light" bordered :items="userRewards" :fields="fields"></b-table>
+            <b-table
+              striped
+              hover
+              head-variant="light"
+              bordered
+              :items="userRewards"
+              :fields="fields"
+            ></b-table>
             <!-- <b-row v-for="reward in userRewards" :key="reward['rewardcode']">
               <b-col>{{ reward["rewardname"] }}</b-col>
               <b-col>{{ reward["rewardcode"] }}</b-col>
@@ -230,68 +237,70 @@
             ></b-progress>
           </b-col>
         </b-row> -->
-        <h3 class="text-center responsive-text">
-          <strong>Achivements</strong>
-        </h3>
-        <b-row>
-          <b-col class="" id="tooltip-bronze">
-            <b-tooltip target="tooltip-bronze" triggers="hover">
-              {{
-                eventCount >= 20
-                  ? "Achievement for participating 20 events"
-                  : "Unlocks when you have participated 20 events"
-              }}
-            </b-tooltip>
-            <b-img
-              v-if="eventCount >= 20"
-              fluid
-              :src="require('../assets/bronzeMedalUnlocked.svg')"
-            ></b-img>
-            <b-img
-              v-else
-              fluid
-              :src="require('../assets/bronzeMedalLocked.svg')"
-            ></b-img>
-          </b-col>
-          <b-col id="tooltip-silver">
-            <b-tooltip target="tooltip-silver" triggers="hover">
-              {{
-                eventCount >= 50
-                  ? "Achievement for participating 50 events"
-                  : "Unlocks when you have participated 50 events"
-              }}
-            </b-tooltip>
-            <b-img
-              v-if="eventCount >= 50"
-              fluid
-              :src="require('../assets/silverMedalUnlocked.svg')"
-            ></b-img>
-            <b-img
-              v-else
-              fluid
-              :src="require('../assets/silverMedalLocked.svg')"
-            ></b-img>
-          </b-col>
-          <b-col id="tooltip-gold">
-            <b-tooltip target="tooltip-gold" triggers="hover">
-              {{
-                eventCount == 100
-                  ? "Achievement for participating 1000 events"
-                  : "Unlocks when you have participated 1000 events"
-              }}
-            </b-tooltip>
-            <b-img
-              v-if="gPoints == 100"
-              fluid
-              :src="require('../assets/goldMedalUnlocked.svg')"
-            ></b-img>
-            <b-img
-              v-else
-              fluid
-              :src="require('../assets/goldMedalLocked.svg')"
-            ></b-img>
-          </b-col>
-        </b-row>
+        <div class="user-info p-2">
+          <h3 class="text-center responsive-text">
+            <strong>Achivements</strong>
+          </h3>
+          <b-row>
+            <b-col class="" id="tooltip-bronze">
+              <b-tooltip target="tooltip-bronze" triggers="hover">
+                {{
+                  eventCount >= 20
+                    ? "Achievement for participating 20 events"
+                    : "Unlocks when you have participated 20 events"
+                }}
+              </b-tooltip>
+              <b-img
+                v-if="eventCount >= 20"
+                fluid
+                :src="require('../assets/bronzeMedalUnlocked.svg')"
+              ></b-img>
+              <b-img
+                v-else
+                fluid
+                :src="require('../assets/bronzeMedalLocked.svg')"
+              ></b-img>
+            </b-col>
+            <b-col id="tooltip-silver">
+              <b-tooltip target="tooltip-silver" triggers="hover">
+                {{
+                  eventCount >= 50
+                    ? "Achievement for participating 50 events"
+                    : "Unlocks when you have participated 50 events"
+                }}
+              </b-tooltip>
+              <b-img
+                v-if="eventCount >= 50"
+                fluid
+                :src="require('../assets/silverMedalUnlocked.svg')"
+              ></b-img>
+              <b-img
+                v-else
+                fluid
+                :src="require('../assets/silverMedalLocked.svg')"
+              ></b-img>
+            </b-col>
+            <b-col id="tooltip-gold">
+              <b-tooltip target="tooltip-gold" triggers="hover">
+                {{
+                  eventCount == 1000
+                    ? "Achievement for participating 1000 events"
+                    : "Unlocks when you have participated 1000 events"
+                }}
+              </b-tooltip>
+              <b-img
+                v-if="eventCount == 1000"
+                fluid
+                :src="require('../assets/goldMedalUnlocked.svg')"
+              ></b-img>
+              <b-img
+                v-else
+                fluid
+                :src="require('../assets/goldMedalLocked.svg')"
+              ></b-img>
+            </b-col>
+          </b-row>
+        </div>
       </div>
     </div>
   </div>
@@ -314,16 +323,15 @@ export default {
   },
   data() {
     return {
-      fields:[
+      fields: [
         {
-          key: 'rewardname',
-          label: 'Reward Name'
+          key: "rewardname",
+          label: "Reward Name",
         },
         {
-          key: 'rewardcode',
-          label: 'Reward Code'
-        }
-        
+          key: "rewardcode",
+          label: "Reward Code",
+        },
       ],
       isVisible: false,
       newfname: "",
@@ -340,22 +348,22 @@ export default {
   },
   methods: {
     getUserRewards() {
-      alert('getting user rewards');
+      alert("getting user rewards");
       let url = `./database/userrewards.php?email=${this.email}`;
       axios.get(url).then((result) => {
         this.$store.state.userRewards = result.data;
-        console.log('user rewards is');
+        console.log("user rewards is");
         console.log(result.data);
       });
     },
     getUserData() {
-      alert('getting user data');
+      alert("getting user data");
 
       let url = `./database/updatedprofile.php?email=${this.email}`;
       axios.get(url).then((result) => {
         let data = result.data[0];
         data.isLogin = true;
-        console.log('User data is');
+        console.log("User data is");
         console.log(result.data);
         sessionStorage.setItem("userSession", JSON.stringify(data));
         this.$store.state.userInfo = data;
@@ -390,9 +398,9 @@ export default {
       let url = `./database/updatedprofile.php?email=${this.email}`;
       getData(url, this.getUpdatedProfileInfo);
     },
-    updateSession(data){
+    updateSession(data) {
       sessionStorage.setItem("userSession", JSON.stringify(data));
-      if(localStorage.getItem("userStorage") != null){
+      if (localStorage.getItem("userStorage") != null) {
         localStorage.setItem("userStorage", JSON.stringify(data));
       }
     },

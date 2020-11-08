@@ -12,7 +12,7 @@
       <b-form @submit.stop.prevent="onSubmit()">
         <b-row class="mt-4">
           <b-col>
-            <b-form-group label="First Name" label-for="fname">
+            <b-form-group label="First Name: " label-for="fname">
               <b-form-input
                 id="fname"
                 type="text"
@@ -28,7 +28,7 @@
             </b-form-group>
           </b-col>
           <b-col>
-            <b-form-group label="Last Name" label-for="lname">
+            <b-form-group label="Last Name: " label-for="lname">
               <b-form-input
                 id="lname"
                 type="text"
@@ -168,11 +168,12 @@ import { validationMixin } from "vuelidate";
 import {
   required,
   minLength,
-  alpha,
+ 
   numeric,
   email,
   maxLength,
   sameAs,
+  
 } from "vuelidate/lib/validators";
 export default {
   mixins: [validationMixin],
@@ -187,11 +188,13 @@ export default {
     form: {
       fname: {
         required,
-        alpha,
+      
+        
+        
       },
       lname: {
         required,
-        alpha,
+        
       },
       pnumber: {
         required,

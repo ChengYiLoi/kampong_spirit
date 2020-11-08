@@ -1,38 +1,60 @@
 <template>
   <div>
     <b-modal
-      id="event-modal-admin"
+      :id="`${this.eventInfo.eventID}-admin`"
       hide-footer
       centered
       size="md"
       :title="eventInfo['title']"
     >
-      <template>
-        <b-row class="pb-2">
-          <b-col
-            ><b-button
-              @click="getAllParticipants"
-              class="w-100"
-              variant="success"
-              v-b-modal="'mark-event-form'"
-              >Mark Event as Completed</b-button
-            ></b-col
-          >
-        </b-row>
-        <b-row>
-          <b-col
-            ><b-button
-              class="w-100"
-              variant="primary"
-              v-b-modal="'edit-event-form'"
-              >Edit Event Details</b-button
-            ></b-col
-          >
-        </b-row>
-      </template>
+      <div class="event-info p-2">
+        <p><strong>Type:</strong> {{ eventInfo.type }}</p>
+        <p><strong>Description:</strong> {{ eventInfo.description }}</p>
+        <p><strong>Location:</strong> {{ eventInfo.location }}</p>
+        <p><strong>Postal Code:</strong> {{ eventInfo.postalCode }}</p>
+        <p><strong>Date:</strong> {{ startDate }}</p>
+        <p><strong>Time:</strong> {{ startEndTime }}</p>
+        <p><strong>Green Points Reward:</strong> {{ eventInfo.pointsEarn }}</p>
+        <p>
+          <strong>Current Number of Participants Joined:</strong>
+          {{ eventInfo.numPart }}
+        </p>
+        <p>
+          <strong>Maximum Number of Participants:</strong>
+          {{ eventInfo.maxcapacity }}
+        </p>
+        <p>
+          <strong>Event Status:</strong>
+          {{ eventInfo.status }}
+        </p>
+
+        <template>
+          <b-row class="pb-2">
+            <b-col
+              ><b-button
+                @click="getAllParticipants"
+                class="w-100"
+                variant="success"
+                v-b-modal="`mark-event-form-${eventInfo.eventID}`"
+                >Mark Event as Completed</b-button
+              ></b-col
+            >
+          </b-row>
+          <b-row>
+            <b-col
+              ><b-button
+                class="w-100"
+                variant="primary"
+                v-b-modal="`edit-event-form-${this.eventInfo.eventID}`"
+                >Edit Event Details</b-button
+              ></b-col
+            >
+          </b-row>
+        </template>
+      </div>
     </b-modal>
     <b-modal
-      id="edit-event-form"
+      :id="`edit-event-form-${eventInfo.eventID}`"
       size="lg"
       title="Edit Event"
       hide-footer
@@ -165,6 +187,30 @@
         </b-row>
       </template>
     </b-modal>
+
+    <b-modal
+      :id="`mark-event-form-${eventInfo.eventID}`"
+      centered
+      size="md"
+      title="Participants"
+      cancel-variant="danger"
+      ok-title="Distribute Green Points"
+      ok-variant="success"
+      @ok="distributeGreenPoints"
+    >
+      <template>
+        <div>
+          <b-form-checkbox
+            v-for="participant in eventParticipants"
+            :key="participant.email"
+            :value="participant.email"
+            v-model="selectedParticipants"
+          >
+            {{ participant.email }}
+          </b-form-checkbox>
+        </div>
+      </template>
+    </b-modal>
   </div>
 </template>
 <script>
@@ -186,9 +232,35 @@ export default {
       //   eventType: "",
       sDateTime: "",
       eDateTime: "",
+      selectedParticipants: [],
+      eventParticipants: [],
     };
   },
   methods: {
+    distributeGreenPoints() {
+      console.log(`selected partcipants are ${this.selectedParticipants}`);
+      this.$bvModal.hide(`${this.eventInfo.eventID}-admin`);
+      this.selectedParticipants.forEach((participantEmail) => {
+        let url = `./database/update_greenpoints.php?eventID=${this.eventInfo["eventID"]}&email=${participantEmail}`;
+        url = encodeURI(url);
+
+        axios.post(url).then(() => {
+          url = `./database/mark_completed.php?eventID=${this.eventInfo["eventID"]}`;
+          url = encodeURI(url);
+          axios.get(url);
+        });
+      });
+      alert("Green points distributed");
+    },
+    getAllParticipants() {
+      let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
+      url = encodeURI(url);
+      axios.get(url).then((result) => {
+        alert("Event participants retrieved");
+        console.log(result.data);
+        this.eventParticipants = result.data;
+      });
+    },
     updateEvent() {
       this.isEditErrors = false;
       if (this.eventInfo["title"] == "") {
@@ -250,8 +322,8 @@ export default {
             }
           }
           console.log(this.eventInfo);
-            url = `./database/update_event.php?eventID=${this.eventInfo["eventID"]}&title=${this.eventInfo["title"]}&type=${this.eventInfo["type"]}&startDatetime=${this.eventInfo["startDatetime"]}&endDatetime=${this.eventInfo["endDatetime"]}&location=${this.eventInfo["location"]}&postalCode=${this.eventInfo["postalCode"]}&description=${this.eventInfo["description"]}&pointsEarn=${this.eventInfo["pointsEarn"]}&maxcapacity=${this.eventInfo["maxcapacity"]}&image=${this.eventPictureName}`;
-            url = encodeURI(url);
+          url = `./database/update_event.php?eventID=${this.eventInfo["eventID"]}&title=${this.eventInfo["title"]}&type=${this.eventInfo["type"]}&startDatetime=${this.eventInfo["startDatetime"]}&endDatetime=${this.eventInfo["endDatetime"]}&location=${this.eventInfo["location"]}&postalCode=${this.eventInfo["postalCode"]}&description=${this.eventInfo["description"]}&pointsEarn=${this.eventInfo["pointsEarn"]}&maxcapacity=${this.eventInfo["maxcapacity"]}&image=${this.eventPictureName}`;
+          url = encodeURI(url);
           axios.post(url).then(() => {
             alert("event has been updated");
             this.$bvModal.hide("edit-event-form");
@@ -288,6 +360,55 @@ export default {
         email = userSession["email"];
       }
       return email;
+    },
+    startEndTime() {
+      var startDateTimeObj = new Date(this.eventInfo.startDatetime);
+      var endDateTimeObj = new Date(this.eventInfo.endDatetime);
+      var sHour = startDateTimeObj.toLocaleTimeString("en-SG").split("");
+      var eHour = endDateTimeObj.toLocaleTimeString("en-SG").split("");
+      sHour = sHour
+        .slice(0, 5)
+        .concat([" "])
+        .concat(sHour.slice(9, 11))
+        .join("")
+        .toString()
+        .toUpperCase();
+      eHour = eHour
+        .slice(0, 5)
+        .concat([" "])
+        .concat(eHour.slice(9, 11))
+        .join("")
+        .toString()
+        .toUpperCase();
+      var output = `${sHour} to ${eHour}`.toString();
+      return output;
+    },
+    startDate() {
+      var startDateTime = this.eventInfo.startDatetime;
+      var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      var months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      var dateObj = new Date(startDateTime);
+      var date = dateObj.getDate().toString();
+
+      var day = days[dateObj.getDay()];
+      var month = months[dateObj.getMonth()];
+      var year = dateObj.getFullYear();
+      var output = `${day}, ${date} ${month} ${year}`.toString();
+
+      return output;
     },
   },
 };

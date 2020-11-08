@@ -13,11 +13,9 @@
             ><strong>About Us</strong></router-link
           ></b-nav-item
         >
-        <b-nav-item class="my-1"
-          ><router-link class="link" to="/login"
-            ><strong>Log in or Sign Up</strong>
-          </router-link></b-nav-item
-        >
+        <b-nav-item class="my-1" @click="isLoggedIn">
+          <strong class="link">Log in or Sign Up</strong>
+        </b-nav-item>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
@@ -25,9 +23,28 @@
 
 <script>
 export default {
-   props:['isAbout'],
+  props: ["isAbout"],
   data() {
     return {};
+  },
+  methods: {
+    isLoggedIn() {
+      let userSession;
+      if (sessionStorage.getItem("userSession") != null) {
+        userSession = JSON.parse(sessionStorage.getItem("userSession"));
+        this.$store.state.userInfo = userSession;
+      } else if (localStorage.getItem("userStorage") != null) {
+        userSession = JSON.parse(localStorage.getItem("userStorage"));
+        this.$store.state.userInfo = userSession;
+      }
+
+      if (userSession != null) {
+        alert("user did not log out");
+        this.$router.push({ name: "Main" });
+      } else {
+        this.$router.push({ name: "Login" });
+      }
+    },
   },
 };
 </script>

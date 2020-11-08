@@ -50,7 +50,7 @@
       </b-col>
     </b-row>
 
-    <b-modal :id="`${item.name}`" centered :title="`${item.name}`" hide-footer>
+    <b-modal :id="`${item.iID}`" centered :title="`${item.name}`" hide-footer>
       <b-img
         fluid
         class="d-block mx-auto w-50"
@@ -141,7 +141,7 @@
       <p>Are you Sure?</p>
     </b-modal>
 
-    <b-modal :id="`${item.name}-edit`" centered title="Edit Item" hide-footer>
+    <b-modal :id="`${item.iID}-edit`" centered title="Edit Item" hide-footer>
       <b-form class="modal-info p-3">
         <b-form-group label="Item Picture:" label-for="itemPicture">
           <b-form-file id="itemPicture" v-model="itemPicture"></b-form-file>
@@ -365,7 +365,7 @@ export default {
     showModal(item) {
       // show or hide the modal, if the item is donated, it will not show
       if (item.status != "Donated") {
-        this.$bvModal.show(this.item.name);
+        this.$bvModal.show(this.item.iID);
       }
     },
     editItem(item) {

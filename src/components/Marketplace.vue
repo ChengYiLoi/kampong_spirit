@@ -55,7 +55,7 @@
           <b-dropdown text="Filter" offset="-35">
             <div class="p-2">
               <b-form-checkbox
-                @change="toggleFilter('Electronics')"
+             
                 v-model="filter['Electronics']"
                 >Electronics</b-form-checkbox
               >
@@ -65,27 +65,27 @@
                 >Technology</b-form-checkbox
               >
               <b-form-checkbox
-                @change="toggleFilter(`Books and Stationary`)"
+               
                 v-model="filter[`Books and Stationary`]"
                 >Books and Sationary</b-form-checkbox
               >
               <b-form-checkbox
-                @change="toggleFilter(`Assistive Device`)"
+             
                 v-model="filter[`Assistive Device`]"
                 >Assistive Device</b-form-checkbox
               >
               <b-form-checkbox
-                @change="toggleFilter(`Beauty Accessories`)"
+              
                 v-model="filter[`Beauty Accessories`]"
                 >Beauty Accessories</b-form-checkbox
               >
               <b-form-checkbox
-                @change="toggleFilter('Essentials')"
+                
                 v-model="filter['Essentials']"
                 >Essentials</b-form-checkbox
               >
               <b-form-checkbox
-                @change="toggleFilter(`Others`)"
+               
                 v-model="filter[`Others`]"
                 >Others</b-form-checkbox
               >
@@ -154,9 +154,7 @@ export default {
     // this.checkSession();
   },
   methods: {
-    toggleFilter(type) {
-      this.filter[type] = !this.filter[type];
-    },
+   
     getItems() {
       let url = `./database/getItems.php`;
       url = encodeURI(url);

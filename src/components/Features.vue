@@ -58,6 +58,7 @@ export default {
 <style lang="scss">
 #features {
   background-color: #acacac;
+  min-height: 100vh;
   
 }
 #title {
