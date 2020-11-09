@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row class="pt-2">
       <b-col></b-col>
-      <b-col cols="4">
+      <b-col cols="2">
         <b-button class="w-100 d-block mx-auto" v-b-modal="'addNewItemForm'"
           >Add new Item</b-button
         >
@@ -104,6 +104,9 @@ export default {
     };
   },
   methods: {
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
     onSubmit() {
       var fd = new FormData();
 
@@ -125,6 +128,7 @@ export default {
         extension == "jpg" ||
         extension == "svg"
       ) {
+        this.toggleLoading();
         let url = `./database/addItems.php?pictureName=${itemPictureName}&itemName=${this.itemName}&selectedCategory=${this.selectedCategory}&selectedCondition=${this.selectedCondition}&itemDescription=${this.itemDescription}&selectedDeliveryType=${this.selectedDeliveryType}&location=${this.location}&userEmail=${this.userEmail}`;
         url = encodeURI(url);
         axios.post(url).then(() => {
@@ -132,9 +136,11 @@ export default {
           axios.post(url, fd).then(() => {
             url = `./database/getUserItems.php?useremail=${this.userEmail}`;
             axios.get(url).then((result) => {
-              alert("User items have been updated");
-              console.log(result);
-              this.$store.state.userItems = result.data;
+              setTimeout(() => {
+                this.toggleLoading();
+                console.log(result);
+                this.$store.state.userItems = result.data;
+              }, 1800);
             });
           });
         });
@@ -145,6 +151,9 @@ export default {
     },
   },
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     userItems() {
       return this.$store.state.userItems;
     },

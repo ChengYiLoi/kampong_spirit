@@ -32,8 +32,8 @@
       <!-- <b-col cols="6" v-if="isDisplayMarketItems" class="item-info-text">
         Listed by: {{ item.fname }}
       </b-col> -->
-      <b-col cols="12"><br></b-col>
-      <b-col cols="12" class="text-right pb-2">
+      <b-col cols="12"><br /></b-col>
+      <b-col cols="12" class="text-right pb-2" v-if="isDisplayMarketItems">
         <b-row>
           <b-col>
             <p>
@@ -41,7 +41,10 @@
               <span>
                 {{ item.fname }}{{ item.lname }}
                 <div id="profile-bg" class="d-inline">
-                  <b-img  id="item-profile" :src="'./images/' + `${item.profilepic}`"></b-img>
+                  <b-img
+                    id="item-profile"
+                    :src="'./images/' + `${item.profilepic}`"
+                  ></b-img>
                 </div>
               </span>
             </p>
@@ -67,15 +70,20 @@
         </p>
       </div>
       <template v-if="!isUserItems">
-        <div>
-          <b-row >
-            <b-col class="pr-0"
-              ><b-button class="w-100 item-options" variant="danger" @click="$bvModal.hide(`${item.name}`)">Close</b-button></b-col
+        <div class="mt-2">
+          <b-row>
+            <b-col class=""
+              ><b-button
+                class="w-100"
+                variant="danger"
+                @click="$bvModal.hide(`${item.iID}`)"
+                >Close</b-button
+              ></b-col
             >
-            <b-col class="pl-0"
-              ><b-button 
+            <b-col class=""
+              ><b-button
                 @click="displayChat('CWD')"
-                class="w-100 item-options"
+                class="w-100"
                 variant="success"
                 >Chat</b-button
               ></b-col
@@ -110,11 +118,7 @@
         </b-row>
         <b-row>
           <b-col class="pr-0"
-            ><b-button
-              variant="danger"
-              class="w-100"
-              >Delete</b-button
-            ></b-col
+            ><b-button variant="danger" class="w-100">Delete</b-button></b-col
           >
 
           <b-col class="pl-1"
@@ -137,7 +141,13 @@
       </template>
     </b-modal>
 
-    <b-modal id="item-delete-confirmation" ok-title="Yes" ok-variant="success" cancel-variant="danger" @ok="deleteItem(`${item['iID']}`)">
+    <b-modal
+      id="item-delete-confirmation"
+      ok-title="Yes"
+      ok-variant="success"
+      cancel-variant="danger"
+      @ok="deleteItem(`${item['iID']}`)"
+    >
       <p>Are you Sure?</p>
     </b-modal>
 
@@ -226,7 +236,7 @@ import postData from "../postData";
 var axios = require("axios");
 export default {
   props: ["item"],
- 
+
   data() {
     return {
       itemPicture: null,
@@ -308,12 +318,10 @@ export default {
             extension == "jpg" ||
             extension == "svg"
           ) {
-            axios.post(url, fd).then(() => {
-              alert("image has been uploaded");
-            });
+            axios.post(url, fd).then(() => {});
           }
         }
-
+        
         url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
         url = encodeURI(url);
         axios.post(url).then(() => {
@@ -324,6 +332,7 @@ export default {
           }
           url = encodeURI(url);
           axios.get(url).then((result) => {
+            this.$bvModal.hide(`${this.item.iID}-edit`);
             if (this.$store.state.isDisplayMarketItems) {
               this.$store.state.items = result.data;
             } else {
@@ -332,7 +341,6 @@ export default {
           });
         });
         // postData(url, this.updateItemInfoCallBack);
-        this.$bvModal.hide(`${this.item.name}-edit`);
       }
     },
 
@@ -377,7 +385,7 @@ export default {
       this.selectedDeliveryType = item.deliveryType;
       this.location = item.location;
       this.$bvModal.hide(`${item.name}`);
-      this.$bvModal.show(`${item.name}-edit`);
+      this.$bvModal.show(`${item.iID}-edit`);
     },
     deleteItem(iID) {
       // deletes the item
@@ -386,14 +394,12 @@ export default {
       url = encodeURI(url);
       axios.post(url).then(() => {
         if (!this.isDisplayMarketItems) {
-          alert("display market place is false");
           url = `./database/getUserItems.php?useremail=${email}`;
           url = encodeURI(url);
           axios.post(url).then((result) => {
             this.$store.state.userItems = result.data;
           });
         } else {
-          alert("display market place is true");
           url = `./database/getItems.php`;
           axios.post(url).then((result) => {
             this.$store.state.items = result.data;
@@ -459,12 +465,12 @@ export default {
 <style lang="scss">
 $white: rgb(245, 245, 245);
 
-.item-options{
+.item-options {
   border-radius: 0px;
 }
 
 #profile-bg {
-  img{
+  img {
     width: 5%;
   }
 }
@@ -522,6 +528,5 @@ $white: rgb(245, 245, 245);
   .item-info-text {
     font-size: 1rem;
   }
-  
 }
 </style>

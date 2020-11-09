@@ -26,9 +26,13 @@
                   <p v-if="activeMarker['type'] != 'refill'">
                     <strong>Location: </strong>{{ activeMarker.locDesc }}
                   </p>
-                  <p>
-                    <strong v-if="activeMarker['telegramid'] != null"
-                      >Organiser Telegram ID: </strong
+                  <p
+                    v-if="
+                      activeMarker['telegramid'] != null &&
+                        activeMarker['telegramid'] != '0'
+                    "
+                  >
+                    <strong>Organiser Telegram ID: </strong
                     >{{ activeMarker.telegramid }}
                   </p>
                   <p v-if="activeMarker['cusineType'] != null">
@@ -99,17 +103,17 @@
                 fluid
                 :src="require(`../assets/${weather.img}.svg`)"
               ></b-img>
-              <p>
+              <p class="weather-description">
                 <strong>{{ weather.description }}</strong>
               </p>
               <b-row>
                 <b-col class="text-center">
-                  <p>
+                  <p class="weather-text">
                     <strong>{{ weather.temperature }}&#176;C</strong>
                   </p></b-col
                 >
                 <b-col class="text-center"
-                  ><p>
+                  ><p class="weather-text">
                     <strong>{{ weather.humidity }}%RH</strong>
                   </p></b-col
                 >
@@ -215,6 +219,7 @@
                   >
                     <b-form-input
                       v-model="createForm['pCode']"
+                      placeholder="#######"
                       id="pCode"
                     ></b-form-input>
                   </b-form-group>
@@ -376,9 +381,13 @@
                           class="w-100"
                           variant="success"
                           @click="createEvent"
-                          >Create</b-button
-                        ></b-col
-                      >
+                        >
+                          <div v-if="!isLoading">Create</div>
+                          <b-spinner
+                            v-else
+                            label="spinner"
+                          ></b-spinner> </b-button
+                      ></b-col>
                     </b-row>
                   </template>
                   <b-alert
@@ -452,6 +461,13 @@
         <b-col></b-col>
       </b-row> -->
     </div>
+    <!-- <b-spinner
+      v-else
+      class="spinner-center"
+      style="width: 5rem; height: 5rem"
+      label="spinner"
+      variant="success"
+    ></b-spinner> -->
   </div>
 </template>
 
@@ -519,6 +535,9 @@ export default {
     };
   },
   methods: {
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
     telegram() {
       let url = `https://t.me/kampung_spirit_bot`;
       window.open(url);
@@ -575,7 +594,6 @@ export default {
       });
     },
     getCurrentLocation() {
-      alert("getting current location");
       navigator.geolocation.getCurrentPosition((position) => {
         var pos = {
           lat: position.coords.latitude,
@@ -587,7 +605,6 @@ export default {
       });
     },
     resetFields() {
-      alert("fields reset");
       this.createForm = {
         pCode: null,
         description: "",
@@ -645,37 +662,48 @@ export default {
         this.isCreateErrors = true;
       }
       if (!this.isCreateErrors) {
+        this.toggleLoading();
         var data;
         let key = "AIzaSyBum4Aau6RFj_MyiKFERdj5xKq812WJfVU";
         let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${this.createForm["pCode"]}&key=${key}`;
         axios.get(url).then((response) => {
+         console.log(response);
           if (response["status"] == 200) {
-            data = response.data.results[0];
-            console.log("data is");
-            console.log(data);
-            this.createForm["lat"] = data.geometry.location.lat;
-            this.createForm["lng"] = data.geometry.location.lng;
-            console.log(this.createForm["lat"]);
-            console.log(this.createForm["lng"]);
-            if (this.createForm["eType"] == "Buffet") {
-              url = `./database/buffetmarker.php?email=${this.email}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
-            } else {
-              url = `./database/giveawaymarker.php?giveawayname=${this.createForm["giveAwayName"]}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&itemdesc=${this.createForm["giveAwayDescription"]}&email=${this.email}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
+            if (response.data.results.length != 0) {
+              data = response.data.results[0];
+              console.log("data is");
+              console.log(data);
+              this.createForm["lat"] = data.geometry.location.lat;
+              this.createForm["lng"] = data.geometry.location.lng;
+              this.currentPos = {
+                lat: parseFloat(data.geometry.location.lat),
+                lng: parseFloat(data.geometry.location.lng),
+              };
+              if (this.createForm["eType"] == "Buffet") {
+                url = `./database/buffetmarker.php?email=${this.email}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
+              } else {
+                url = `./database/giveawaymarker.php?giveawayname=${this.createForm["giveAwayName"]}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&itemdesc=${this.createForm["giveAwayDescription"]}&email=${this.email}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
+              }
+              axios.post(url).then(() => {
+                setTimeout(() => {
+                  this.toggleLoading();
+                  this.resetFields();
+                  console.log(url);
+                  this.$bvModal.hide("create-event-form");
+                  this.getMarkers();
+                }, 2000);
+              });
             }
-            axios.post(url).then(() => {
-              this.resetFields();
-              console.log(url);
-              alert("marker added");
-              this.$bvModal.hide("create-event-form");
-              this.getMarkers();
-            });
+            else{
+              this.toggleLoading();
+              alert('Marker could not be created');
+            }
           }
         });
-
-        this.$bvModal.hide("create-event-form");
-      } else {
-        this.$bvModal.show("create-event-form");
       }
+      //else {
+      //   this.$bvModal.show("create-event-form");
+      // }
     },
     setMarker(data) {
       console.log(data);
@@ -754,6 +782,9 @@ export default {
   },
 
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     isNumber() {
       return isNaN(this.createForm["teleID"]);
     },
@@ -790,6 +821,12 @@ export default {
 #weather-img {
   width: 40%;
 }
+.weather-text {
+  font-size: 1.6rem;
+}
+.weather-description {
+  font-size: 1.3rem;
+}
 // .tooltip{
 //   display: absolute !important;
 //   z-index: 2000;
@@ -803,6 +840,9 @@ export default {
 @media only screen and (max-width: 425px) {
   .custom-control-label {
     font-size: 1rem !important;
+  }
+  .weather-text {
+    font-size: 1rem;
   }
 }
 </style>

@@ -49,47 +49,37 @@
       </b-row>
     </div>
     <div>
-      <b-row class="pt-2">
-        <b-col></b-col>
-        <b-col>
-          <b-dropdown text="Filter" offset="-35">
-            <div class="p-2">
-              <b-form-checkbox
-             
-                v-model="filter['Electronics']"
-                >Electronics</b-form-checkbox
-              >
-              <b-form-checkbox
-                @change="toggleFilter('Technology')"
-                v-model="filter['Technology']"
-                >Technology</b-form-checkbox
-              >
-              <b-form-checkbox
-               
-                v-model="filter[`Books and Stationary`]"
-                >Books and Sationary</b-form-checkbox
-              >
-              <b-form-checkbox
-             
-                v-model="filter[`Assistive Device`]"
-                >Assistive Device</b-form-checkbox
-              >
-              <b-form-checkbox
-              
-                v-model="filter[`Beauty Accessories`]"
-                >Beauty Accessories</b-form-checkbox
-              >
-              <b-form-checkbox
-                
-                v-model="filter['Essentials']"
-                >Essentials</b-form-checkbox
-              >
-              <b-form-checkbox
-               
-                v-model="filter[`Others`]"
-                >Others</b-form-checkbox
-              >
-              <!-- <b-row>
+      <div v-if="!isLoading">
+        <div>
+          <b-row class="pt-2">
+            <b-col></b-col>
+            <b-col>
+              <b-dropdown text="Filter" offset="-35">
+                <div class="p-2">
+                  <b-form-checkbox v-model="filter['Electronics']"
+                    >Electronics</b-form-checkbox
+                  >
+                  <b-form-checkbox
+                    @change="toggleFilter('Technology')"
+                    v-model="filter['Technology']"
+                    >Technology</b-form-checkbox
+                  >
+                  <b-form-checkbox v-model="filter[`Books and Stationary`]"
+                    >Books and Sationary</b-form-checkbox
+                  >
+                  <b-form-checkbox v-model="filter[`Assistive Device`]"
+                    >Assistive Device</b-form-checkbox
+                  >
+                  <b-form-checkbox v-model="filter[`Beauty Accessories`]"
+                    >Beauty Accessories</b-form-checkbox
+                  >
+                  <b-form-checkbox v-model="filter['Essentials']"
+                    >Essentials</b-form-checkbox
+                  >
+                  <b-form-checkbox v-model="filter[`Others`]"
+                    >Others</b-form-checkbox
+                  >
+                  <!-- <b-row>
                 <b-col cols="6">
                   <b-form-checkbox>Electronics</b-form-checkbox>
                 </b-col>
@@ -97,28 +87,35 @@
                   <b-form-checkbox>Technology</b-form-checkbox>
                 </b-col>
               </b-row> -->
-            </div>
-          </b-dropdown>
-        </b-col>
-        <b-col></b-col>
-      </b-row>
+                </div>
+              </b-dropdown>
+            </b-col>
+            <b-col></b-col>
+          </b-row>
+        </div>
+        <b-row v-if="displayMarketItems" class="m-0 main d-inline">
+          <b-col>
+            <b-card-group columns>
+              <div v-for="item in items" :key="item.iID">
+                <itemcard v-if="filter[item.category]" :item="item"></itemcard>
+              </div>
+            </b-card-group>
+          </b-col>
+        </b-row>
+        <b-row v-else>
+          <b-col>
+            <useritems></useritems>
+          </b-col>
+        </b-row>
+      </div>
+      <b-spinner
+        class="spinner-center"
+        style="width: 5rem; height: 5rem"
+        label="spinner"
+        variant="success"
+        v-else
+      ></b-spinner>
     </div>
-
-    <b-row v-if="displayMarketItems" class="m-0 main d-inline">
-      <b-col>
-        <b-card-group columns>
-          <div v-for="item in items" :key="item.iID">
-            <itemcard v-if="filter[item.category]" :item="item"></itemcard>
-          </div>
-        </b-card-group>
-      </b-col>
-    </b-row>
-
-    <b-row v-else>
-      <b-col>
-        <useritems></useritems>
-      </b-col>
-    </b-row>
   </div>
 </template>
 <script>
@@ -147,21 +144,25 @@ export default {
       },
     };
   },
-  created(){
+  created() {
     this.checkSession();
   },
   mounted() {
     // this.checkSession();
   },
   methods: {
-   
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
     getItems() {
+      this.toggleLoading();
       let url = `./database/getItems.php`;
       url = encodeURI(url);
       postData(url, this.renderItems);
     },
     getUserItems() {
-      alert("get user items");
+      this.toggleLoading();
+      // alert("get user items");
       let userSession;
       if (localStorage.getItem("userStorage")) {
         userSession = JSON.parse(localStorage.getItem("userStorage"));
@@ -171,22 +172,27 @@ export default {
 
       let email = userSession["email"];
       let url = `./database/getUserItems.php?useremail=${email}`;
-      alert(`get user items email is ${email}`);
+      // alert(`get user items email is ${email}`);
       getData(url, this.renderUserItems);
     },
 
     renderUserItems(data) {
-      console.log(JSON.parse(data));
-      this.$store.state.userItems = JSON.parse(data);
+      setTimeout(() => {
+        console.log(JSON.parse(data));
+        this.toggleLoading();
+        this.$store.state.userItems = JSON.parse(data);
+      }, 1800);
     },
 
     renderItems(data) {
-      console.log(JSON.parse(data));
-      this.$store.state.items = JSON.parse(data);
+      setTimeout(() => {
+        this.toggleLoading();
+        console.log(JSON.parse(data));
+        this.$store.state.items = JSON.parse(data);
+      }, 1800);
     },
     displayMyItems() {
       if (!this.validateLogin()) {
-        alert("user has not logged in");
         this.$router.push({ name: "Login" });
       } else if (this.$store.state.isDisplayMarketItems) {
         this.getUserItems();
@@ -214,6 +220,7 @@ export default {
       return isLogged;
     },
     checkSession() {
+      // this.toggleLoading();
       let userSession;
       if (sessionStorage.getItem("userSession") != null) {
         userSession = JSON.parse(sessionStorage.getItem("userSession"));
@@ -224,17 +231,19 @@ export default {
         userSession = JSON.parse(localStorage.getItem("userStorage"));
         this.$store.state.userInfo = userSession;
       }
-      console.log(this.$store.state['userInfo']);
+      console.log(this.$store.state["userInfo"]);
       this.getItems();
     },
     toggleMarketPlace() {
-      alert("updated market place items");
       this.$store.state.isDisplayMarketItems = !this.$store.state
         .isDisplayMarketItems;
       this.getItems();
     },
   },
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     items() {
       return this.$store.state.items;
     },

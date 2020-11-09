@@ -11,7 +11,7 @@
         <b-col cols="2"></b-col>
       </b-row>
     </div>
-    <div class="main h-100 p-4">
+    <div class="main h-100 p-4" v-if="!isLoading">
       <b-container fluid class="text-left user-info p-3">
         <b-row align-v="center">
           <b-col lg="9">
@@ -40,7 +40,9 @@
             id="user-name"
             centered
             title="Change Name"
+            ok-variant="success"
             ok-title="Update"
+            cancel-variant="danger"
             @ok="updateInfo"
           >
             <b-form-group label="First Name: " label-for="fname">
@@ -57,6 +59,22 @@
                 type="text"
               ></b-form-input>
             </b-form-group>
+            <!-- <template>
+              <div class="mt-2">
+                <b-row>
+                  <b-col>
+                    <b-button
+                      variant="danger"
+                      @click="$bvModal.hide('user-name')"
+                      >Cancel</b-button
+                    >
+                  </b-col>
+                  <b-col>
+                    <b-button @click="updateInfo">Update</b-button>
+                  </b-col>
+                </b-row>
+              </div>
+            </template> -->
           </b-modal>
         </b-row>
         <b-row align-v="center">
@@ -207,7 +225,7 @@
               >View Rewards</b-button
             >
           </b-col>
-          <b-modal id="view-rewards" ok-only ok-title="close">
+          <b-modal id="view-rewards" ok-only ok-title="Close" ok-variant="danger">
             <b-table
               striped
               hover
@@ -303,6 +321,13 @@
         </div>
       </div>
     </div>
+    <b-spinner
+      class="spinner-center"
+      style="width: 5rem; height: 5rem"
+      label="spinner"
+      variant="success"
+      v-else
+    ></b-spinner>
   </div>
 </template>
 <script>
@@ -317,9 +342,9 @@ export default {
     dashbar,
     GChart,
   },
-  mounted() {
+  created() {
+    this.toggleLoading();
     this.getUserData();
-    this.getUserRewards();
   },
   data() {
     return {
@@ -347,26 +372,32 @@ export default {
     };
   },
   methods: {
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
     getUserRewards() {
-      alert("getting user rewards");
+      
       let url = `./database/userrewards.php?email=${this.email}`;
       axios.get(url).then((result) => {
-        this.$store.state.userRewards = result.data;
-        console.log("user rewards is");
-        console.log(result.data);
+        setTimeout(() => {
+          this.toggleLoading();
+          this.$store.state.userRewards = result.data;
+          console.log("user rewards is");
+          console.log(result.data);
+        }, 1800);
       });
     },
     getUserData() {
-      alert("getting user data");
-
+      
       let url = `./database/updatedprofile.php?email=${this.email}`;
       axios.get(url).then((result) => {
         let data = result.data[0];
         data.isLogin = true;
         console.log("User data is");
         console.log(result.data);
-        sessionStorage.setItem("userSession", JSON.stringify(data));
+        // sessionStorage.setItem("userSession", JSON.stringify(data));
         this.$store.state.userInfo = data;
+        this.getUserRewards();
       });
     },
     deductPoints(points, rCode, rDescription) {
@@ -387,14 +418,11 @@ export default {
     },
     updateInfo() {
       console.log(this.newpassword);
-
-      alert("about to send data");
       let url = `./database/editprofile.php?fname=${this.newfname}&lname=${this.newlname}&email=${this.email}&mobileno=${this.newmobileno}&password=${this.newpassword}`;
       url = encodeURI(url);
       postData(url, this.updateUsernameCallBack);
     },
     updateUsernameCallBack() {
-      alert("call back success");
       let url = `./database/updatedprofile.php?email=${this.email}`;
       getData(url, this.getUpdatedProfileInfo);
     },
@@ -405,16 +433,19 @@ export default {
       }
     },
     getUpdatedProfileInfo(dataObj) {
-      alert("user profile update call back");
-      let data = JSON.parse(dataObj);
-      if (data[0] != null) {
-        data = data[0];
-        data.isLogin = true;
-        console.log(data);
-        this.updateSession(data);
-        // sessionStorage.setItem("userSession", JSON.stringify(data));
-        this.$store.state.userInfo = data;
-      }
+      this.toggleLoading();
+      setTimeout(() => {
+        let data = JSON.parse(dataObj);
+        if (data[0] != null) {
+          data = data[0];
+          data.isLogin = true;
+          console.log(data);
+          this.updateSession(data);
+          this.toggleLoading();
+          // sessionStorage.setItem("userSession", JSON.stringify(data));
+          this.$store.state.userInfo = data;
+        }
+      }, 3000);
     },
     toggleVisibility() {
       this.isVisible = !this.isVisible;
@@ -461,7 +492,7 @@ export default {
           console.log(month);
 
           if (monthsWithEvents[month] === "") {
-            alert("found matching month");
+            // alert("found matching month");
             monthsWithEvents[month] = [month, 1];
           } else {
             monthsWithEvents[month] = [month, monthsWithEvents[month][1] + 1];
@@ -479,6 +510,9 @@ export default {
     },
   },
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     isChartData() {
       return this.$store.state.chartData.length > 1;
     },

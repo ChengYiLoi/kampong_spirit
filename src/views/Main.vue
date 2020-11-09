@@ -23,7 +23,7 @@ import marketplace from "../components/Marketplace.vue";
 import profile from "../components/Profile.vue";
 export default {
   mounted() {
-    alert("main page mounted");
+    
     this.checkSessionOrLocalStorage();
   },
   components: {

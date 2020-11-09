@@ -5,10 +5,10 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
-
+    isSpinner: false,
     isSignup: false,
     userInfo: {
-      isLogin: true,
+      isLogin: false,
       acctype: "",
       email: "",
       fname: "",
@@ -263,7 +263,7 @@ export const store = new Vuex.Store({
       { value: "Books and Stationary", text: "Books and Stationary" },
       { value: "Assistive Device", text: "Assistive Device" },
       { value: "Beauty Accessories", text: "Beauty Accessories" },
-      { value: "essentials", text: "Essentials" },
+      { value: "Essentials", text: "Essentials" },
       { value: "Others", text: "Others" },
     ],
     itemConditionRadio: [

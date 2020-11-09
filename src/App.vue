@@ -165,6 +165,10 @@ body::-webkit-scrollbar {
     color: #d2fdff;
     font-style: italic;
   }
+  .spinner-center{
+    margin: 18% auto 0%;
+    
+  }
 }
 @media only screen and (max-width: 426px) {
   #app #brand {

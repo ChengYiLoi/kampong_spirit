@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import postData from '../postData';
+// import postData from '../postData';
 export default {
   props: ["cardObject"],
   data() {
@@ -32,7 +32,7 @@ export default {
   methods: {
     renderFeature() {
       let selectedName = this.cardObject.dashOption;
-      alert(`Selected is ${selectedName}`);
+     
 
       this.$store.state.dashOptions.profile.selected = false;
       this.$store.state.dashOptions.map.selected = false;
@@ -40,20 +40,20 @@ export default {
       this.$store.state.dashOptions.marketplace.selected = false;
 
       this.$store.state.dashOptions[selectedName].selected = true;
-      if (selectedName == "marketplace") {
-        this.getItems();
-      }
+      // if (selectedName == "marketplace") {
+      //   this.getItems();
+      // }
       this.$router.push({ name: "Main" });
     },
-    getItems() {
-      let url = `./database/getItems.php`;
-      url = encodeURI(url);
-      postData(url, this.renderItems);
-    },
-    renderItems(data) {
-      console.log(JSON.parse(data));
-      this.$store.state.items = JSON.parse(data);
-    },
+    // getItems() {
+    //   let url = `./database/getItems.php`;
+    //   url = encodeURI(url);
+    //   postData(url, this.renderItems);
+    // },
+    // renderItems(data) {
+    //   console.log(JSON.parse(data));
+    //   this.$store.state.items = JSON.parse(data);
+    // },
   },
   
 };

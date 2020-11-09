@@ -31,6 +31,11 @@ const routes = [
     name: "About",
     component: () => import("../views/About.vue")
   },
+  {
+    path: "*",
+    name: "404",
+    component: ()=> import('../views/NotFound.vue')
+  }
 ];
 
 const router = new VueRouter({

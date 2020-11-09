@@ -77,7 +77,7 @@
               ><b-button
                 class=" w-100"
                 variant="danger"
-                @click="$bvModal.hide('event-modal-user')"
+                @click="$bvModal.hide(`${eventInfo.eventID}`)"
                 >{{
                   checkIfUserJoined ? "Already Joined Event" : "Close"
                 }}</b-button
@@ -88,9 +88,12 @@
                 class="w-100"
                 variant="success"
                 @click="emailConfirmation"
-                >Join</b-button
-              ></b-col
-            >
+              >
+                <div v-if="!isButtonSpinner">
+                  Join
+                </div>
+                <b-spinner v-else label="spinning"></b-spinner> </b-button
+            ></b-col>
           </b-row>
         </template>
       </div>
@@ -132,16 +135,27 @@
               ></b-col
             >
             <b-col class="pl-1"
-              ><b-button class="w-100" variant="success" @click="withdrawEvent"
-                >Withdraw</b-button
-              ></b-col
-            >
+              ><b-button class="w-100" variant="success" @click="withdrawEvent">
+                <div v-if="!isButtonSpinner">Withdraw</div>
+                <b-spinner v-else label="spinner"></b-spinner> </b-button
+            ></b-col>
           </b-row>
         </template>
       </div>
     </b-modal>
-
-  
+    <b-modal
+      :id="`event-join-confirmation-${eventInfo.eventID}`"
+      ok-only
+      ok-title="Close"
+      ok-variant="danger"
+      centered
+    >
+      <p class="text-center">
+        Successfully Joined <strong>{{ eventInfo.title }}</strong
+        >. Please check your email to confirm your attendance via the link
+        attached in the email.
+      </p>
+    </b-modal>
   </div>
 </template>
 <script>
@@ -156,12 +170,19 @@ export default {
     return {
       // selectedParticipants: [],
       // eventParticipants: [],
+      isButtonSpinner: false,
     };
   },
   methods: {
-   
-   
+    toggleButtonLoading() {
+      this.isButtonSpinner = !this.isButtonSpinner;
+    },
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
+
     withdrawEvent() {
+      this.toggleButtonLoading();
       let eventID = this.eventInfo["eventID"];
       let email = this.getUserEmail;
       console.log(eventID);
@@ -169,20 +190,20 @@ export default {
       let url = `./database/withdraw.php?eventID=${eventID}&email=${email}`;
       url = encodeURI(url);
       axios.post(url).then(() => {
-        alert("User has withdrawed");
         url = `./database/withdraw_joincount.php?eventID=${eventID}`;
         url = encodeURI(url);
         axios.post(url).then(() => {
           url = `./database/getUserEvents.php?email=${email}`;
           url = encodeURI(url);
           axios.get(url).then((result) => {
-            alert("User events has been updated");
-            this.$store.state.userEvents = result.data;
-            this.$bvModal.hide("event-modal-info");
+            setTimeout(() => {
+              this.toggleButtonLoading();
+              this.$store.state.userEvents = result.data;
+              this.$bvModal.hide(`${this.eventInfo.eventID}`);
+            }, 1500);
           });
         });
       });
-      this.$bvModal.hide("event-modal-info");
     },
     displayModal() {
       if (!this.isAdmin) {
@@ -196,7 +217,7 @@ export default {
       }
     },
     emailConfirmation() {
-      alert("sending email to user");
+      this.toggleButtonLoading();
       let email = this.getUserEmail;
       let eventID = this.eventInfo["eventID"];
       let title = this.eventInfo["title"];
@@ -209,17 +230,23 @@ export default {
       let url = `./database/send_email.php?email=${email}&eventID=${eventID}&title=${title}&type=${type}&startDatetime=${startDateTime}&endDatetime=${endDateTime}&location=${location}&postalCode=${postalCode}&pointsEarn=${pointsEarn}`;
       url = encodeURI(url);
       axios.get(url).then(() => {
-        this.$bvModal.hide(`${this.eventInfo.eventID}`);
-        alert("email has been sent");
-        url = `./database/insert_join.php?eventID=${eventID}&email=${email}`;
-        url = encodeURI(url);
-        axios.get(url).then(() => {
-          alert("join events has been updated");
-        });
+        setTimeout(() => {
+          this.toggleButtonLoading();
+          this.$bvModal.hide(`${this.eventInfo.eventID}`);
+          this.$bvModal.show(
+            `event-join-confirmation-${this.eventInfo.eventID}`,
+          );
+          url = `./database/insert_join.php?eventID=${eventID}&email=${email}`;
+          url = encodeURI(url);
+          axios.get(url);
+        }, 1200);
       });
     },
   },
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     isDisplayUserEvents() {
       return this.$store.state.isDisplayUserEvents;
     },

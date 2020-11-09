@@ -16,7 +16,6 @@
               <b-form-input
                 id="fname"
                 type="text"
-                placeholder="John"
                 autocomplete="off"
                 v-model="$v.form.fname.$model"
                 :state="validateState('fname')"
@@ -32,7 +31,6 @@
               <b-form-input
                 id="lname"
                 type="text"
-                placeholder="Doe"
                 autocomplete="off"
                 v-model="$v.form.lname.$model"
                 :state="validateState('lname')"
@@ -49,7 +47,6 @@
           <b-form-input
             id="phoneNum"
             type="text"
-            placeholder="911"
             autocomplete="off"
             v-model="$v.form.pnumber.$model"
             :state="validateState('pnumber')"
@@ -71,7 +68,6 @@
           <b-form-input
             id="email"
             type="email"
-            placeholder="you@example.com"
             autocomplete="off"
             v-model="$v.form.email.$model"
             :state="validateState('email')"
@@ -93,7 +89,6 @@
           <b-form-input
             id="password"
             type="password"
-            placeholder="Enter your password"
             autocomplete="off"
             v-model="$v.form.password.$model"
             :state="validateState('password')"
@@ -119,7 +114,6 @@
           <b-form-input
             id="cpassword"
             type="password"
-            placeholder="Enter your password"
             autocomplete="off"
             v-model="$v.form.cpassword.$model"
             :state="validateState('cpassword')"
@@ -138,8 +132,12 @@
           >
         </b-form-group>
 
-        <button id="login-button" class="mt-2">
-          Sign Up
+        <button id="login-button" class="mt-2" :disabled="isLoading">
+          <b-spinner v-if="isLoading" label="spinning"></b-spinner>
+
+          <div v-else>
+            Sign Up
+          </div>
         </button>
         <p class="mt-4 text-center text-link" v-on:click="switchForm()">
           Back to Login
@@ -158,7 +156,12 @@
         <b-form-input size="lg" v-model="vCode"></b-form-input>
       </b-form-group>
       <p class="text-link"><u>Resend verification code</u></p>
-      <b-button id="login-button" @click="addUser">Submit</b-button>
+      <b-button id="login-button" @click="addUser">
+       <b-spinner v-if="isLoading" label="spinning"></b-spinner>
+        <div v-else>
+          Submit
+        </div>
+      </b-button>
     </div>
   </div>
 </template>
@@ -168,12 +171,10 @@ import { validationMixin } from "vuelidate";
 import {
   required,
   minLength,
- 
   numeric,
   email,
   maxLength,
   sameAs,
-  
 } from "vuelidate/lib/validators";
 export default {
   mixins: [validationMixin],
@@ -188,13 +189,9 @@ export default {
     form: {
       fname: {
         required,
-      
-        
-        
       },
       lname: {
         required,
-        
       },
       pnumber: {
         required,
@@ -218,7 +215,11 @@ export default {
     },
   },
   methods: {
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
     addUser() {
+      this.toggleLoading();
       let url = `./database/smsverify.php?enteredcode=${this.vCode}`;
       axios.get(url).then((response) => {
         console.log(response);
@@ -247,7 +248,7 @@ export default {
         }
       });
     },
-    resetFields(){
+    resetFields() {
       this.$v.form.fname.$model = "";
       this.$v.form.lname.$model = "";
       this.$v.form.pnumber.$model = "";
@@ -255,7 +256,6 @@ export default {
       this.$v.form.email.$model = "";
       this.$v.form.password.$model = "";
       this.$v.form.cpassword.$model = "";
-
     },
     handleSignup() {
       this.$gAuth.signIn().then((user) => {
@@ -330,11 +330,13 @@ export default {
       if (this.$v.form.$anyError) {
         return;
       } else {
+        this.toggleLoading();
         let url = `./database/checkemail.php?email=${this.$v.form.email.$model}`;
         axios.get(url).then((response) => {
           if (response.data.length >= 1) {
             this.isTaken = true;
           } else {
+            this.toggleLoading();
             this.isVerification = true;
             console.log(this.$v.form.pnumber.$model);
             url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
@@ -345,6 +347,9 @@ export default {
     },
   },
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     form() {
       return this.$store.state.signupForm.form;
     },

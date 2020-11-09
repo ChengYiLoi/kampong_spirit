@@ -28,98 +28,75 @@
         </b-col>
       </b-row>
     </div>
-    <div v-if="accType == 'User'">
-      <b-carousel :interval="4000">
-        <b-carousel-slide>
-          <template #img>
-            <b-img fluid :src="require('../assets/carousel-1.png')"></b-img>
-          </template>
-        </b-carousel-slide>
-        <b-carousel-slide>
-          <template #img>
-            <b-img fluid :src="require('../assets/carousel-2.png')"></b-img>
-          </template>
-        </b-carousel-slide>
-        <b-carousel-slide>
-          <template #img>
-            <b-img fluid :src="require('../assets/carousel-3.png')"></b-img>
-          </template>
-        </b-carousel-slide>
-      </b-carousel>
-    </div>
-    <b-row class="pt-2">
-      <b-col></b-col>
-      <b-col>
-        <b-dropdown text="Filter" offset="-35">
-          <div class="p-2">
-             <b-form-checkbox 
-            v-model="filter['Jan']"
-            >
-            January
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['Feb']"
-            >
-            February
-            </b-form-checkbox>
-             <b-form-checkbox
-            v-model="filter['Mar']"
-            >
-            March
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['Apr']"
-            >
-            April
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['May']"
-            >
-            May
-            </b-form-checkbox>
-             <b-form-checkbox
-            v-model="filter['Jun']"
-            >
-            June
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['Jul']"
-            >
-            July
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['Aug']"
-            >
-            August
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['Sep']"
-            >
-            September
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['Oct']"
-            >
-            October
-            </b-form-checkbox>
-            <b-form-checkbox 
-            v-model="filter['Nov']"
-            >
-            November
-            </b-form-checkbox>
-             <b-form-checkbox 
-            v-model="filter['Dec']"
-            >
-            December
-            </b-form-checkbox>
-          </div>
-        </b-dropdown>
-      </b-col>
-      <b-col></b-col>
-    </b-row>
-    <userevents v-if="isDisplayUserEvents"></userevents>
-    <div class="p-0" v-else>
-      <!-- <b-table
+    <div v-if="!isLoading">
+      <div v-if="accType == 'User'">
+        <b-carousel :interval="4000">
+          <b-carousel-slide>
+            <template #img>
+              <b-img fluid :src="require('../assets/carousel-1.png')"></b-img>
+            </template>
+          </b-carousel-slide>
+          <b-carousel-slide>
+            <template #img>
+              <b-img fluid :src="require('../assets/carousel-2.png')"></b-img>
+            </template>
+          </b-carousel-slide>
+          <b-carousel-slide>
+            <template #img>
+              <b-img fluid :src="require('../assets/carousel-3.png')"></b-img>
+            </template>
+          </b-carousel-slide>
+        </b-carousel>
+      </div>
+      <b-row class="pt-2">
+        <b-col></b-col>
+        <b-col>
+          <b-dropdown text="Filter" offset="-35">
+            <div class="p-2">
+              <b-form-checkbox v-model="filter['Jan']">
+                January
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Feb']">
+                February
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Mar']">
+                March
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Apr']">
+                April
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['May']">
+                May
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Jun']">
+                June
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Jul']">
+                July
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Aug']">
+                August
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Sep']">
+                September
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Oct']">
+                October
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Nov']">
+                November
+              </b-form-checkbox>
+              <b-form-checkbox v-model="filter['Dec']">
+                December
+              </b-form-checkbox>
+            </div>
+          </b-dropdown>
+        </b-col>
+        <b-col></b-col>
+      </b-row>
+      <userevents v-if="isDisplayUserEvents"></userevents>
+      <div class="p-0" v-else>
+        <!-- <b-table
         v-if="isAdmin"
         table-variant="light"
         head-variant="dark"
@@ -132,39 +109,37 @@
         @row-selected="updateSelectedEvent"
       >
       </b-table> -->
-      <b-row class="p-2">
-        <b-col>
-          <b-card-group columns>
-            <div v-for="event in events" :key="event.eventID">
-              <eventcard
-                v-if="filter[getMonth(event)]"
-                :eventInfo="event"
-              ></eventcard>
-            </div>
-          </b-card-group>
-        </b-col>
-      </b-row>
+        <b-row class="p-2">
+          <b-col>
+            <b-card-group columns>
+              <div v-for="event in events" :key="event.eventID">
+                <eventcard
+                  v-if="filter[getMonth(event)]"
+                  :eventInfo="event"
+                ></eventcard>
+              </div>
+            </b-card-group>
+          </b-col>
+        </b-row>
 
-   
+        <b-modal
+          id="confirm-cancel"
+          size="sm"
+          ok-title="Confirm"
+          ok-variant="success"
+          cancel-variant="danger"
+          hide-header
+          centered
+          @ok="cancelEvent"
+        >
+          <p class="text-center">
+            <strong>Confirm cancel {{ eventInfo["title"] }}?</strong>
+          </p>
+        </b-modal>
 
-      <b-modal
-        id="confirm-cancel"
-        size="sm"
-        ok-title="Confirm"
-        ok-variant="success"
-        cancel-variant="danger"
-        hide-header
-        centered
-        @ok="cancelEvent"
-      >
-        <p class="text-center">
-          <strong>Confirm cancel {{ eventInfo["title"] }}?</strong>
-        </p>
-      </b-modal>
+        <eventcreateform></eventcreateform>
 
-      <eventcreateform></eventcreateform>
-
-      <!-- <b-modal
+        <!-- <b-modal
         id="create-event-form"
         size="lg"
         title="Create New Event"
@@ -286,7 +261,15 @@
           </b-row>
         </template>
       </b-modal> -->
+      </div>
     </div>
+    <b-spinner
+      v-else
+      class="spinner-center"
+      style="width: 5rem; height: 5rem"
+      label="spinner"
+      variant="success"
+    ></b-spinner>
   </div>
 </template>
 <script>
@@ -320,14 +303,12 @@ export default {
         Oct: true,
         Nov: true,
         Dec: true,
-
       },
       // isCreateErrors: false,
       isEditErrors: false,
       isProcessing: false,
       eventInfo: {},
-      
-     
+
       selectedEvent: {},
       onModalShow: false,
       fields: {
@@ -362,6 +343,9 @@ export default {
     };
   },
   methods: {
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
     displayCreateEventForm() {
       this.eventTitle = "";
       this.eDescription = "";
@@ -374,8 +358,6 @@ export default {
       this.eDateTime = "";
       this.$bvModal.show("create-event-form");
     },
-    
-   
 
     cancelEvent() {
       let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
@@ -414,19 +396,21 @@ export default {
     },
 
     getAllEvents() {
+      this.toggleLoading();
       let url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
       url = encodeURI(url);
       axios.get(url).then((result) => {
-        alert("Retrieved all events");
-        this.$store.state.events = result.data;
-        console.log(result.data);
+        setTimeout(() => {
+          this.toggleLoading();
+          this.$store.state.events = result.data;
+          console.log(result.data);
+        }, 1800);
+
         url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
         url = encodeURI(url);
         axios.get(url).then((result) => {
-          alert("Retrieved user events");
-          alert(`User email is ${this.getUserEmail}`);
           this.$store.state.userEvents = result.data;
-        });
+        }); // need to get events that the user has joined so cards will display "Already Joined Event"
       });
     },
 
@@ -463,17 +447,19 @@ export default {
     },
     displayUserEvents() {
       if (!this.isDisplayUserEvents) {
+        this.toggleLoading();
         let url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
         url = encodeURI(url);
         axios.get(url).then((result) => {
-          alert("Retrieved user events");
-          alert(`User email is ${this.getUserEmail}`);
-          this.$store.state.userEvents = result.data;
+          setTimeout(() => {
+            this.toggleLoading();
+
+            this.$store.state.userEvents = result.data;
+          }, 1800);
         });
       } else {
         this.getAllEvents();
       }
-
       this.$store.state.isDisplayUserEvents = !this.$store.state
         .isDisplayUserEvents;
     },
@@ -494,11 +480,14 @@ export default {
       ];
       var dateObj = new Date(event.startDatetime);
       var month = months[dateObj.getMonth()].toString();
-     
+
       return month;
     },
   },
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     isDisplayUserEvents() {
       return this.$store.state.isDisplayUserEvents;
     },

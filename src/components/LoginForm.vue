@@ -14,7 +14,6 @@
         <b-form-input
           id="email"
           type="email"
-          placeholder="you@example.com"
           autocomplete="off"
           v-model="$v.form.email.$model"
           :state="validateState('email')"
@@ -34,7 +33,6 @@
         <b-form-input
           id="password"
           type="password"
-          placeholder="Enter your password"
           autocomplete="off"
           v-model="$v.form.password.$model"
           :state="validateState('password')"
@@ -47,28 +45,64 @@
       <b-form-checkbox value="remember" class="my-3" v-model="keepLogged"
         >Keep me logged In</b-form-checkbox
       >
+      <b-alert show v-if="islogInvalid" variant="warning">
+        Log in details is incorrect
+      </b-alert>
 
-      <button id="login-button" class="mt-4">
-        Log In
+      <button id="login-button" class="mt-4" :disabled="isLoading">
+        <b-spinner v-if="isLoading" label="spinning"></b-spinner>
+
+        <div v-else>
+          Log In
+        </div>
       </button>
-      <p class="text-link text-center mt-4" v-b-modal="'password-rest'">
-        <u>Forgot Password</u>
-      </p>
-      <p class="mt-4 text-center">
+      <b-row class="mt-4">
+        <b-col></b-col>
+        <b-col>
+          <p class=" text-center">
+            <u class="text-link" v-b-modal="'password-rest'">Forgot Password</u>
+          </p>
+        </b-col>
+        <b-col></b-col>
+      </b-row>
+
+      <p class=" text-center">
         Don't have an account?
         <span v-on:click="switchForm()" class="text-link"><u>Sign up</u></span>
       </p>
     </b-form>
-    <b-modal
-      centered
-      title="Reset Password"
-      id="password-rest"
-      ok-title="Reset"
-      @ok="resetPass"
-    >
+    <b-modal centered title="Reset Password" id="password-rest" hide-footer>
       <b-form-group label="Email: ">
         <b-form-input v-model="resetEmail"></b-form-input>
       </b-form-group>
+      <b-alert show variant="warning" v-if="!isEmailValid" class="my-2">
+        Email is invalid
+      </b-alert>
+      <template>
+        <b-row>
+          <b-col>
+            <b-button
+              class="w-100"
+              variant="danger"
+              @click="$bvModal.hide('password-rest')"
+              >Cancel</b-button
+            >
+          </b-col>
+          <b-col>
+            <b-button
+              :disabled="isLoading"
+              @click="resetPass"
+              class="w-100"
+              variant="success"
+            >
+              <b-spinner v-if="isLoading" label="spinning"></b-spinner>
+              <div v-else>
+                Reset
+              </div>
+            </b-button>
+          </b-col>
+        </b-row>
+      </template>
     </b-modal>
     <b-modal id="login-error" ok-only>
       Google account not signed up. Please sign up before trying again.
@@ -91,6 +125,8 @@ export default {
     return {
       keepLogged: false,
       resetEmail: null,
+      isEmailValid: true,
+      islogInvalid: false,
     };
   },
   validations: {
@@ -106,14 +142,24 @@ export default {
     resetEmail: null,
   },
   methods: {
+    toggleLoading() {
+      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
     resetPass() {
+      this.toggleLoading();
       let url = `./database/checkemail.php?email=${this.resetEmail}`;
       axios.get(url).then((response) => {
         console.log(response);
         if (response.data.length == 1) {
+          this.toggleLoading();
           url = `./database/forgetpassword.php?email=${this.resetEmail}`;
           axios.post(url);
           this.$bvModal.show("reset-confirmation");
+        } else {
+          setTimeout(() => {
+            this.toggleLoading();
+            this.isEmailValid = false;
+          }, 1800);
         }
       });
     },
@@ -185,25 +231,38 @@ export default {
       getData(url, this.authLogin);
     },
     authLogin(dataObj) {
+      this.toggleLoading();
       let data = JSON.parse(dataObj);
       console.log(data);
       if (data[0] != null) {
-        data = data[0];
-        let sessionObj = data;
-
-        alert("auth login");
-        alert("session created");
-        this.createSession(sessionObj);
-        this.$store.state.dashOptions.marketplace.selected = true;
-        this.$router.push({ name: "Main" });
+        setTimeout(() => {
+          data = data[0];
+          this.islogInvalid = false;
+          let sessionObj = data;
+          this.createSession(sessionObj);
+          this.toggleLoading();
+          this.$store.state.dashOptions.marketplace.selected = true;
+          this.$router.push({ name: "Main" });
+        }, 2000);
       } else {
-        alert("Login info incorrect");
-        document.getElementById("email").value = null;
-        document.getElementById("password").value = null;
+        setTimeout(() => {
+          this.toggleLoading();
+          this.islogInvalid = true;
+          this.$v.form.email.$model = "";
+          this.$v.form.password.$model = "";
+          this.$v.form.email.$error = true;
+          this.$v.form.password.$error = true;
+          // this.$v.form.$reset;
+          // this.$v.$reset;
+          // this.$v.$touch;
+        }, 1500);
       }
     },
   },
   computed: {
+    isLoading() {
+      return this.$store.state.isSpinner;
+    },
     form() {
       return this.$store.state.loginForm.form; //last pointed property needs to be "form" or validation and processing will not work
     },
@@ -211,6 +270,27 @@ export default {
 };
 </script>
 <style lang="scss">
+$white: rgb(245, 245, 245);
+.modal-content {
+  border: unset;
+
+  header {
+    background-color: #f4976c;
+    color: $white;
+    button {
+      color: $white;
+
+      &:hover {
+        color: $white;
+        opacity: 1;
+      }
+    }
+  }
+  .modal-info {
+    background-color: #eeeff1;
+    border-radius: 5px;
+  }
+}
 .login-form {
   background-color: white;
   border-radius: 10px;
@@ -247,6 +327,9 @@ export default {
     color: #824ea0;
     font-weight: 900;
     cursor: pointer;
+    &:focus {
+      outline: transparent;
+    }
   }
 }
 
