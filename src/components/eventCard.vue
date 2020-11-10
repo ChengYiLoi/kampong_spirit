@@ -89,10 +89,10 @@
                 variant="success"
                 @click="emailConfirmation"
               >
-                <div v-if="!isButtonSpinner">
+                <div v-if="!isButtonLoading">
                   Join
                 </div>
-                <b-spinner v-else label="spinning"></b-spinner> </b-button
+                <b-spinner style="width: 1.0rem; height: 1.0rem" v-else label="spinning"></b-spinner> </b-button
             ></b-col>
           </b-row>
         </template>
@@ -136,8 +136,8 @@
             >
             <b-col class="pl-1"
               ><b-button class="w-100" variant="success" @click="withdrawEvent">
-                <div v-if="!isButtonSpinner">Withdraw</div>
-                <b-spinner v-else label="spinner"></b-spinner> </b-button
+                <div v-if="!isButtonLoading">Withdraw</div>
+                <b-spinner v-else label="spinner" style="width: 1.0rem; height: 1.0rem"></b-spinner> </b-button
             ></b-col>
           </b-row>
         </template>
@@ -170,12 +170,12 @@ export default {
     return {
       // selectedParticipants: [],
       // eventParticipants: [],
-      isButtonSpinner: false,
+      
     };
   },
   methods: {
     toggleButtonLoading() {
-      this.isButtonSpinner = !this.isButtonSpinner;
+       this.$store.state.isButtonSpinner = !this.$store.state.isButtonSpinner;
     },
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
@@ -244,6 +244,9 @@ export default {
     },
   },
   computed: {
+     isButtonLoading() {
+      return this.$store.state.isButtonSpinner;
+    },
     isLoading() {
       return this.$store.state.isSpinner;
     },

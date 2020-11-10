@@ -324,6 +324,8 @@ export default {
         
         url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
         url = encodeURI(url);
+        console.log('edit item url is');
+        console.log(url);
         axios.post(url).then(() => {
           if (this.$store.state.isDisplayMarketItems) {
             url = `./database/getItems.php`;
@@ -392,6 +394,8 @@ export default {
       let email = this.$store.state.userInfo["email"];
       let url = `./database/deleteitem.php?iID=${iID}&email=${email}`;
       url = encodeURI(url);
+      console.log('delete url is');
+      console.log(url);
       axios.post(url).then(() => {
         if (!this.isDisplayMarketItems) {
           url = `./database/getUserItems.php?useremail=${email}`;

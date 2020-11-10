@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
+    isButtonSpinner: false,
     isSpinner: false,
     isSignup: false,
     userInfo: {
@@ -17,7 +18,7 @@ export const store = new Vuex.Store({
       mobileno: "",
       password: "",
       profilepic: "NA",
-      numofevents: 1000
+      numofevents: ""
     },
     loginForm: {
       form: {

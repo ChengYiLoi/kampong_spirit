@@ -53,6 +53,36 @@
         <div>
           <b-row class="pt-2">
             <b-col></b-col>
+            <b-col cols="5">
+              <b-input-group>
+                <template #prepend>
+                  <b-form-select
+                    v-model="searchFilter"
+                    :options="searchOptions"
+                  >
+                  </b-form-select>
+                  <!-- <b-dropdown :text="searchSelected" variant="info">
+                    <b-dropdown-item v-model="searchSelected">User</b-dropdown-item>
+                  </b-dropdown> -->
+                </template>
+                <b-form-input
+                  v-model="searchInput"
+                  placeholder="Search by item name / username"
+                ></b-form-input>
+                <template>
+                  <b-button variant="success" @click="search">
+                    <div v-if="!isButtonLoading">
+                      Search
+                    </div>
+                    <b-spinner v-else label="spinning" style="width: 1.0rem; height: 1.0rem"></b-spinner>
+                  </b-button>
+                </template>
+              </b-input-group>
+            </b-col>
+            <b-col></b-col>
+          </b-row>
+          <b-row class="pt-2">
+            <b-col></b-col>
             <b-col>
               <b-dropdown text="Filter" offset="-35">
                 <div class="p-2">
@@ -124,7 +154,7 @@ import itemcard from "../components/ItemCard";
 import useritems from "../components/UserItems";
 import getData from "../getData";
 import postData from "../postData";
-
+var axios = require("axios");
 export default {
   components: {
     dashbar,
@@ -133,6 +163,12 @@ export default {
   },
   data() {
     return {
+      searchOptions: [
+        { value: "item", text: "Item" },
+        { value: "user", text: "User" },
+      ],
+      searchFilter: "item",
+      searchInput: "",
       filter: {
         Electronics: true,
         Technology: true,
@@ -151,6 +187,28 @@ export default {
     // this.checkSession();
   },
   methods: {
+    search() {
+      this.toggleButtonLoading();
+      if (this.searchInput != "") {
+        let url = `./database/search.php?dropdown=${this.searchFilter}&search=${this.searchInput}`;
+        url = encodeURI(url);
+        axios.get(url).then((response) => {
+          setTimeout(() => {
+            this.toggleButtonLoading();
+            console.log(response);
+            console.log(response.data);
+            this.searchInput = "";
+            this.$store.state.items = response.data;
+          }, 1500);
+        });
+      } else {
+        this.toggleButtonLoading();
+        this.getItems();
+      }
+    },
+    toggleButtonLoading() {
+      this.$store.state.isButtonSpinner = !this.$store.state.isButtonSpinner;
+    },
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
     },
@@ -241,6 +299,9 @@ export default {
     },
   },
   computed: {
+    isButtonLoading() {
+      return this.$store.state.isButtonSpinner;
+    },
     isLoading() {
       return this.$store.state.isSpinner;
     },

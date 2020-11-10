@@ -200,12 +200,25 @@
             <b-container>
               <b-button
                 :disabled="gPoints < 50 ? true : false"
-                v-b-modal="'aCouponCode'"
                 class="w-100"
                 variant="primary"
-                @click="deductPoints(50, '10OOFF', 'Amazon $10 off')"
-                >Generate Amazon coupon code (50 Green Points)</b-button
+                @click="deductPoints(50, '10OFF', 'Amazon $10 off')"
+                >Amazon coupon code (50 Green Points)</b-button
               >
+              <b-button
+                :disabled="gPoints < 10 ? true : false"
+                variant="primary"
+                @click="deductPoints(10, '2OFF', 'Grab Food $2 off')"
+              >
+                Grab coupon code (10 Green Points)
+              </b-button>
+              <b-button
+                :disabled="gPoints < 10 ? true : false"
+                variant="primary"
+                @click="deductPoints(10, '5OFF', 'Foodpanda $5 off')"
+              >
+                Foodpanda coupon code (10 Green Points)
+              </b-button>
             </b-container>
 
             <b-modal
@@ -214,7 +227,10 @@
               ok-title="close"
               ok-variant="danger"
             >
-              <p class="w-100">Green points have been successfully deducted</p>
+              <p class="w-100">
+                Green points have been successfully deducted. Click
+                <strong>View Rewards</strong> to view the coupon code
+              </p>
             </b-modal>
           </b-modal>
         </b-row>
@@ -225,7 +241,12 @@
               >View Rewards</b-button
             >
           </b-col>
-          <b-modal id="view-rewards" ok-only ok-title="Close" ok-variant="danger">
+          <b-modal
+            id="view-rewards"
+            ok-only
+            ok-title="Close"
+            ok-variant="danger"
+          >
             <b-table
               striped
               hover
@@ -376,7 +397,6 @@ export default {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
     },
     getUserRewards() {
-      
       let url = `./database/userrewards.php?email=${this.email}`;
       axios.get(url).then((result) => {
         setTimeout(() => {
@@ -388,7 +408,6 @@ export default {
       });
     },
     getUserData() {
-      
       let url = `./database/updatedprofile.php?email=${this.email}`;
       axios.get(url).then((result) => {
         let data = result.data[0];

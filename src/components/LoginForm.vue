@@ -48,7 +48,17 @@
       <b-alert show v-if="islogInvalid" variant="warning">
         Log in details is incorrect
       </b-alert>
-
+      <template>
+        <vue-recaptcha
+          ref="recaptcha"
+          sitekey="6LcSL-EZAAAAALTIqkRuFDRdRI9v0f27DdaSehcr"
+          :loadRecaptchaScript="true"
+          @verify="onVerify"
+        ></vue-recaptcha>
+      </template>
+      <b-alert show v-if="!isReCaptcha" variant="warning" class="mt-2 mb-0 text-center">
+        Please do the reCAPTCHA validation before logging in
+      </b-alert>
       <button id="login-button" class="mt-4" :disabled="isLoading">
         <b-spinner v-if="isLoading" label="spinning"></b-spinner>
 
@@ -114,6 +124,7 @@
   </div>
 </template>
 <script>
+import VueRecaptcha from "vue-recaptcha";
 import { validationMixin } from "vuelidate";
 import { required, email } from "vuelidate/lib/validators";
 import getData from "../getData";
@@ -121,12 +132,17 @@ var axios = require("axios");
 export default {
   mixins: [validationMixin],
   props: ["isSignup"],
+  components: {
+    VueRecaptcha,
+  },
   data() {
     return {
       keepLogged: false,
       resetEmail: null,
       isEmailValid: true,
       islogInvalid: false,
+      reCaptcha: null,
+      isReCaptcha: true
     };
   },
   validations: {
@@ -142,6 +158,10 @@ export default {
     resetEmail: null,
   },
   methods: {
+    onVerify(response) {
+      console.log(response);
+      this.reCaptcha = response;
+    },
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
     },
@@ -226,9 +246,16 @@ export default {
       url = encodeURI(url);
       this.$v.form.$touch();
       if (this.$v.form.$anyError) {
+        this.$refs.recaptcha.error();
         return;
       }
-      getData(url, this.authLogin);
+      if (this.reCaptcha != "") {
+        this.isReCaptcha = true;
+        getData(url, this.authLogin);
+      }
+      else{
+        this.isReCaptcha = false;
+      }
     },
     authLogin(dataObj) {
       this.toggleLoading();
