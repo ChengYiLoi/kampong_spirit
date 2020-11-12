@@ -48,15 +48,20 @@
       <b-alert show v-if="islogInvalid" variant="warning">
         Log in details is incorrect
       </b-alert>
-      <template>
+      <!-- <template>
         <vue-recaptcha
           ref="recaptcha"
           sitekey="6LcSL-EZAAAAALTIqkRuFDRdRI9v0f27DdaSehcr"
           :loadRecaptchaScript="true"
           @verify="onVerify"
         ></vue-recaptcha>
-      </template>
-      <b-alert show v-if="!isReCaptcha" variant="warning" class="mt-2 mb-0 text-center">
+      </template> -->
+      <b-alert
+        show
+        v-if="!isReCaptcha"
+        variant="warning"
+        class="mt-2 mb-0 text-center"
+      >
         Please do the reCAPTCHA validation before logging in
       </b-alert>
       <button id="login-button" class="mt-4" :disabled="isLoading">
@@ -124,7 +129,7 @@
   </div>
 </template>
 <script>
-import VueRecaptcha from "vue-recaptcha";
+// import VueRecaptcha from "vue-recaptcha";
 import { validationMixin } from "vuelidate";
 import { required, email } from "vuelidate/lib/validators";
 import getData from "../getData";
@@ -133,7 +138,7 @@ export default {
   mixins: [validationMixin],
   props: ["isSignup"],
   components: {
-    VueRecaptcha,
+    // VueRecaptcha,
   },
   data() {
     return {
@@ -141,8 +146,8 @@ export default {
       resetEmail: null,
       isEmailValid: true,
       islogInvalid: false,
-      reCaptcha: null,
-      isReCaptcha: true
+      reCaptcha: "a",
+      isReCaptcha: true,
     };
   },
   validations: {
@@ -212,24 +217,29 @@ export default {
             email = user[props].getEmail();
           }
         }
-        let data;
-        let idtoken = user.wc["login_hint"];
-        let url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
-        url = encodeURI(url);
-        axios.get(url).then((result) => {
-          alert("check with DB was done");
-          console.log(result.data);
-          if (result.data.length == 1) {
-            alert("User is authorised");
+        if (this.reCaptcha != "") {
+          let data;
+          let idtoken = user.wc["login_hint"];
+          let url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+          url = encodeURI(url);
+          axios.get(url).then((result) => {
+            alert("check with DB was done");
+            console.log(result.data);
+            if (result.data.length == 1) {
+              alert("User is authorised");
 
-            data = result.data[0];
-            // this.$store.state.dashOptions.marketplace.selected = true;
-            this.createSession(data);
-            this.$router.push({ name: "Main" });
-          } else {
-            this.$bvModal.show("login-error");
-          }
-        });
+              data = result.data[0];
+              // this.$store.state.dashOptions.marketplace.selected = true;
+              this.createSession(data);
+              this.$router.push({ name: "Main" });
+            } else {
+              this.$bvModal.show("login-error");
+            }
+          });
+        }
+        else{
+          this.isReCaptcha = false;
+        }
       });
     },
     switchForm() {
@@ -252,8 +262,8 @@ export default {
       if (this.reCaptcha != "") {
         this.isReCaptcha = true;
         getData(url, this.authLogin);
-      }
-      else{
+      } else {
+        this.$refs.recaptcha.reset();
         this.isReCaptcha = false;
       }
     },

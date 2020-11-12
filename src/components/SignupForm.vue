@@ -155,7 +155,7 @@
       <b-form-group label-size="lg" label="Verification Code:" label-cols="4">
         <b-form-input size="lg" v-model="vCode"></b-form-input>
       </b-form-group>
-      <p class="text-link"><u>Resend verification code</u></p>
+      <p class="text-link" @click="resendCode"><u>Resend verification code</u></p>
       <b-button id="login-button" @click="addUser">
        <b-spinner v-if="isLoading" label="spinning"></b-spinner>
         <div v-else>
@@ -217,6 +217,11 @@ export default {
   methods: {
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
+    },
+    resendCode(){
+      alert('resend');
+      let url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
+      axios.post(url);
     },
     addUser() {
       this.toggleLoading();

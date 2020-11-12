@@ -292,20 +292,25 @@ export default {
       var endDateTimeObj = new Date(this.eventInfo.endDatetime);
       var sHour = startDateTimeObj.toLocaleTimeString("en-SG").split("");
       var eHour = endDateTimeObj.toLocaleTimeString("en-SG").split("");
-      sHour = sHour
-        .slice(0, 5)
+      
+      
+          sHour = sHour
+        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
         .concat([" "])
-        .concat(sHour.slice(9, 11))
+        .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 9, 11))
         .join("")
         .toString()
         .toUpperCase();
       eHour = eHour
-        .slice(0, 5)
+        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
         .concat([" "])
-        .concat(eHour.slice(9, 11))
+        .concat(eHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 9, 11))
         .join("")
         .toString()
         .toUpperCase();
+      
+    
+    
       var output = `${sHour} to ${eHour}`.toString();
       return output;
     },

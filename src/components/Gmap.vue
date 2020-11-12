@@ -13,18 +13,297 @@
     </div>
     <div class="main">
       <gmap-map :center="currentPos" :zoom="16" id="map" class="mx-1">
+        <!-- @click='setMarker' for gmap-map if want to allow user to place marker on map -->
         <gmap-info-window
           :options="infoWindowOptions"
           :position="infoWindowPosition"
           :opened="infoWindowOpened"
           @closeclick="closeWindowMarker"
         >
+          <b-modal
+            :id="
+              activeMarker['gaID'] == undefined
+                ? `edit-marker-${activeMarker['bID']}`
+                : `edit-marker-${activeMarker['gaID']}`
+            "
+            title="Edit Marker"
+            hide-footer
+            centered
+          >
+            <b-row>
+              <b-col>
+                <b-form-group
+                  label="Latitude: "
+                  label-for="latitude"
+                  label-cols="2"
+                  class="d-none"
+                >
+                  <b-form-input
+                    id="latitude"
+                    disabled
+                    v-model="editForm['latitude']"
+                  >
+                  </b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col>
+                <b-form-group
+                  label="Longitude: "
+                  label-for="longitude"
+                  label-cols="2"
+                  class="d-none"
+                >
+                  <b-form-input
+                    id="longitude"
+                    disabled
+                    v-model="editForm['longitude']"
+                  >
+                  </b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-form-group
+              label="Postal Code: "
+              label-for="pCode"
+              label-cols="3"
+            >
+              <b-form-input
+                v-model="editForm['postalcode']"
+                placeholder="#######"
+                id="pCode"
+              ></b-form-input>
+            </b-form-group>
+            <b-form-group
+              label="Location Description:"
+              label-cols="4"
+              label-for="descriptionInput"
+            >
+              <b-form-textarea
+                v-model="editForm['locDesc']"
+                id="descriptionInput"
+                placeholder="Briefly describe your event"
+              >
+              </b-form-textarea>
+            </b-form-group>
+            <!-- <b-form-group
+                    label="Start Time: "
+                    label-for="sDateTime"
+                    label-cols="3"
+                  >
+                    <b-form-input
+                      v-model="createForm['sDateTime']"
+                      type="datetime-local"
+                      id="sDateTime"
+                    ></b-form-input>
+                  </b-form-group> -->
+            <b-form-group
+              label="End Time: "
+              label-for="eDateTime"
+              label-cols="3"
+            >
+              <b-form-input
+                v-model="editForm['endDatetime']"
+                type="datetime-local"
+                id="eDateTime"
+                :min="currentDateTime"
+              ></b-form-input>
+            </b-form-group>
+            <b-form-group label="Event Type:" label-for="eventType">
+              <b-form-radio-group
+                id="eventType"
+                :options="eventTypeRadio"
+                v-model="editForm['type']"
+                stacked
+              >
+              </b-form-radio-group>
+            </b-form-group>
+
+            <b-row v-if="editForm['type'] == 'Buffet'">
+              <b-col>
+                <b-form-group
+                  label="Cusine Type:"
+                  label-for="cType"
+                  label-cols="4"
+                >
+                  <b-form-input
+                    id="cType"
+                    v-model="editForm['cuisineType']"
+                  ></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col cols="4">
+                <b-form-group>
+                  <b-form-radio-group
+                    :options="cusineRadio"
+                    v-model="editForm['halal']"
+                    stacked
+                  >
+                  </b-form-radio-group>
+                </b-form-group>
+              </b-col>
+            </b-row>
+
+            <b-row v-if="editForm['type'] == 'Give Away'">
+              <b-col cols="12">
+                <b-form-group label="Event Name: " label-cols="3">
+                  <b-form-input v-model="editForm['name']"></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col cols="12">
+                <b-form-group label="Items Description:" label-cols="4">
+                  <b-form-textarea
+                    v-model="editForm['itemDesc']"
+                    placeholder=""
+                  >
+                  </b-form-textarea>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col cols="2"></b-col>
+              <b-col>
+                <b-row>
+                  <b-col cols="12" class="text-right">
+                    <p id="tele-text">
+                      <i>Click this if you don't know your ID</i>
+                    </p>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col cols="12" class="text-right">
+                    <b-img
+                      fluid
+                      class="pr-1"
+                      :src="require(`../assets/arrow.svg`)"
+                    ></b-img>
+                  </b-col>
+                </b-row>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col cols="10">
+                <b-form-group
+                  label="Telegram user ID: (Number only)"
+                  label-for="teleID"
+                  label-cols="5"
+                >
+                  <b-form-input
+                    id="teleID"
+                    v-model="editForm['telegramid']"
+                    placeholder="Optional"
+                  ></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col class="text-right">
+                <span id="tooltip-tele" @click="telegram">
+                  <b-img fluid :src="require(`../assets/telegram.svg`)"></b-img>
+                </span>
+              </b-col>
+            </b-row>
+
+            <!-- <b-tooltip target="tooltip-tele">
+                    Click this to get your Telegram user ID
+                  </b-tooltip> -->
+
+            <template>
+              <b-row class="pb-2">
+                <b-col class="pr-0"
+                  ><b-button
+                    class=" w-100"
+                    variant="danger"
+                    @click="
+                      $bvModal.hide(
+                        activeMarker['gaID'] == undefined
+                          ? `edit-marker-${activeMarker['bID']}`
+                          : `edit-marker-${activeMarker['gaID']}`,
+                      )
+                    "
+                    >Cancel</b-button
+                  ></b-col
+                >
+                <b-col class="pl-1"
+                  ><b-button
+                    class="w-100"
+                    variant="success"
+                    @click="updateMarker"
+                  >
+                    <div v-if="!isLoading">Update</div>
+                    <b-spinner v-else label="spinner"></b-spinner> </b-button
+                ></b-col>
+              </b-row>
+            </template>
+            <b-alert :show="isCreateErrors" class="w-100" variant="warning">
+              <ul>
+                <li v-if="editForm['locDesc'] == ''">
+                  Event description cannot be empty
+                </li>
+                <!-- <li v-if="createForm['sDateTime'] == null">
+                        Start date time cannot be empty
+                      </li> -->
+                <li v-if="editForm['endDatetime'] == null">
+                  End date time cannot be empty
+                </li>
+                <li v-if="editForm['type'] == null">
+                  Event type cannot be empty
+                </li>
+                <li v-if="isNumber">
+                  Telegram ID must be a number
+                </li>
+                <li
+                  v-if="
+                    editForm['type'] == 'Buffet' && editForm['halal'] == null
+                  "
+                >
+                  Food is Halal or Non-Halal is required
+                </li>
+                <li
+                  v-if="
+                    editForm['type'] == 'Buffet' &&
+                      editForm['cuisineType'] == null
+                  "
+                >
+                  Cusine type is required
+                </li>
+                <li
+                  v-if="
+                    editForm['type'] == 'Give Away' && editForm['name'] == ''
+                  "
+                >
+                  Give away event name is required
+                </li>
+                <li
+                  v-if="
+                    editForm['type'] == 'Give Away' &&
+                      editForm['itemDesc'] == ''
+                  "
+                >
+                  Give away event description is required
+                </li>
+              </ul>
+            </b-alert>
+          </b-modal>
+          <b-modal
+            centered
+            :id="
+              activeMarker['gaID'] == undefined
+                ? `delete-marker-confirm-${activeMarker['bID']}`
+                : `delete-marker-confirm-${activeMarker['gaID']}`
+            "
+            cancel-variant="warning"
+            ok-title="Delete"
+            ok-variant="danger"
+            @ok="deleteMarker"
+          >
+            <h4 class="text-center">Confirm delete marker?</h4>
+          </b-modal>
           <div>
             <b-container fluid class="marker-info">
               <b-row>
                 <b-col class="py-2 text-left">
                   <p v-if="activeMarker['type'] != 'refill'">
-                    <strong>Location: </strong>{{ activeMarker.locDesc }}
+                    <strong>Description: </strong>{{ activeMarker.locDesc }}
                   </p>
                   <p
                     v-if="
@@ -56,21 +335,59 @@
                 </b-col>
               </b-row>
             </b-container>
-            <b-button
-              variant="info"
-              @click="
-                getDirections(
-                  activeMarker['latitude'],
-                  activeMarker['longitude'],
-                )
-              "
-              >Get Directions</b-button
-            >
+            <b-row>
+              <b-col>
+                <b-button
+                  class="w-100"
+                  variant="info"
+                  @click="
+                    getDirections(
+                      activeMarker['latitude'],
+                      activeMarker['longitude'],
+                    )
+                  "
+                  >Get Directions</b-button
+                >
+              </b-col>
+            </b-row>
+            <hr v-if="email == activeMarker['host']" />
+            <b-row v-if="email == activeMarker['host']" class="my-2">
+              <b-col>
+                <b-button
+                  variant="danger"
+                  class="w-100"
+                  @click="
+                    deletMarkerConfirm(
+                      activeMarker['gaID'] == undefined
+                        ? `delete-marker-confirm-${activeMarker['bID']}`
+                        : `delete-marker-confirm-${activeMarker['gaID']}`,
+                    )
+                  "
+                >
+                  Delete Marker
+                </b-button>
+              </b-col>
+              <b-col>
+                <b-button
+                  variant="primary"
+                  class="w-100"
+                  @click="
+                    showEditMarkerForm(
+                      activeMarker['gaID'] == undefined
+                        ? `edit-marker-${activeMarker['bID']}`
+                        : `edit-marker-${activeMarker['gaID']}`,
+                    )
+                  "
+                >
+                  Edit Marker
+                </b-button>
+              </b-col>
+            </b-row>
           </div>
         </gmap-info-window>
         <gmap-marker
           v-for="marker in markers"
-          :key="marker.type"
+          :key="marker.latitude"
           :position="
             filter[marker['type']]
               ? {
@@ -130,9 +447,9 @@
                 <b-col md="12" class="p-2">
                   <b-form-checkbox
                     size="lg"
-                    v-model="filter['giveAway']"
+                    v-model="filter['Give Away']"
                     switch
-                    @click="updateFilter('giveAway')"
+                    @click="updateFilter('Give Away')"
                   >
                     Give Away
                   </b-form-checkbox>
@@ -142,9 +459,9 @@
                 <b-col md="12" class="p-2">
                   <b-form-checkbox
                     size="lg"
-                    v-model="filter['food']"
+                    v-model="filter['Buffet']"
                     switch
-                    @click="updateFilter('food')"
+                    @click="updateFilter('Buffet')"
                   >
                     Buffet
                   </b-form-checkbox>
@@ -255,6 +572,7 @@
                       v-model="createForm['eDateTime']"
                       type="datetime-local"
                       id="eDateTime"
+                      :min="currentDateTime"
                     ></b-form-input>
                   </b-form-group>
                   <b-form-group label="Event Type:" label-for="eType">
@@ -380,7 +698,7 @@
                         ><b-button
                           class="w-100"
                           variant="success"
-                          @click="createEvent"
+                          @click="createMarker"
                         >
                           <div v-if="!isLoading">Create</div>
                           <b-spinner
@@ -480,7 +798,7 @@ export default {
   },
   mounted() {
     this.getCurrentLocation();
-    this.getcurrentWeather();
+    // this.getcurrentWeather();
   },
   components: {
     dashbar,
@@ -490,9 +808,10 @@ export default {
       show: true,
       currentPos: { lat: null, lng: null },
       filter: {
-        giveAway: true,
+        "Give Away": true,
         refill: true,
-        food: true,
+        Buffet: true,
+        marker: true,
       },
       weather: {
         img: "",
@@ -508,12 +827,25 @@ export default {
 
       allLocations: {},
       isCreateErrors: false,
+      isEditErrors: false,
       createForm: {
         pCode: null,
         description: "",
         giveAwayName: "",
         giveAwayDescription: "",
-
+        eDateTime: null,
+        eType: null,
+        isHalal: null,
+        cType: null,
+        lat: null,
+        lng: null,
+        teleID: null,
+      },
+      editForm: {
+        pCode: null,
+        description: "",
+        giveAwayName: "",
+        giveAwayDescription: "",
         eDateTime: null,
         eType: null,
         isHalal: null,
@@ -535,6 +867,110 @@ export default {
     };
   },
   methods: {
+    deleteMarker() {
+      let url = `./database/deletebuffet.php?email=${this.activeMarker["host"]}&bid=${this.activeMarker["bID"]}`;
+      if (this.activeMarker["type"] == "Give Away") {
+        url = `./database/deletegiveaway.php?email=${this.activeMarker["host"]}&gaid=${this.activeMarker["gaID"]}`;
+      }
+      console.log(url);
+      axios.post(url);
+      this.$bvModal.hide(
+        this.activeMarker["gaID"] == undefined
+          ? `delete-marker-confirm-${this.activeMarker["bID"]}`
+          : `delete-marker-confirm-${this.activeMarker["gaID"]}`,
+      );
+      this.getMarkers();
+    },
+    deletMarkerConfirm(modal) {
+      this.$bvModal.show(modal);
+    },
+    updateMarker() {
+      this.isEditErrors = false;
+      if (this.editForm["postalcode"] == "") {
+        this.isCreateErrors = true;
+      }
+      if (this.editForm["locDesc"] == "") {
+        this.isCreateErrors = true;
+      }
+      // if (this.createForm.sDateTime == null) {
+      //   this.isCreateErrors = true;
+      // }
+      if (this.editForm["endDatetime"] == null) {
+        this.isCreateErrors = true;
+      }
+      if (this.editForm["type"] == null) {
+        this.isCreateErrors = true;
+      }
+      if (this.editForm["type"] == "Buffet" && this.editForm["halal"] == null) {
+        this.isCreateErrors = true;
+      }
+      if (
+        this.editForm["type"] == "Buffet" &&
+        this.editForm["cuisineType"] == null
+      ) {
+        this.isCreateErrors = true;
+      }
+      if (this.editForm["type"] == "Give Away" && this.editForm["name"] == "") {
+        this.isCreateErrors = true;
+      }
+      if (
+        this.editForm["type"] == "Give Away" &&
+        this.editForm["itemDesc"] == ""
+      ) {
+        this.isCreateErrors = true;
+      }
+      if (isNaN(this.editForm["telegramid"])) {
+        this.isCreateErrors = true;
+      }
+      if (!this.isEditErrors) {
+        console.log(this.editForm["postalcode"]);
+        var data;
+        let key = "AIzaSyBum4Aau6RFj_MyiKFERdj5xKq812WJfVU";
+        let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${this.editForm["postalcode"]}&key=${key}`;
+        console.log(url);
+        axios.get(url).then((response) => {
+          if (response.data.results.length != 0) {
+            data = response.data.results[0];
+            this.editForm["latitude"] = data.geometry.location.lat;
+            this.editForm["longitude"] = data.geometry.location.lng;
+            this.currentPos = {
+              lat: parseFloat(data.geometry.location.lat),
+              lng: parseFloat(data.geometry.location.lng),
+            };
+            url = `./database/editbuffet.php?email=${this.editForm["host"]}&bid=${this.editForm["bID"]}&locdescription=${this.editForm["locDesc"]}&latitude=${this.editForm["latitude"]}&longitude=${this.editForm["longitude"]}&endtime=${this.editForm["endDatetime"]}&cusinetype=${this.editForm["cuisineType"]}&halalstatus=${this.editForm["halal"]}&pcode=${this.editForm["postalcode"]}`;
+            if (this.editForm["type"] == "Give Away") {
+              url = `./database/editgiveaway.php?email=${this.editForm["host"]}&gaid=${this.editForm["gaID"]}&locdescription=${this.editForm["locDesc"]}&latitude=${this.editForm["latitude"]}&longitude=${this.editForm["longitude"]}&endtime=${this.editForm["endDatetime"]}&eventname=${this.editForm["name"]}&itemdesc=${this.editForm["itemDesc"]}&pcode=${this.editForm["postalcode"]}`;
+            }
+            console.log(url);
+            url = encodeURI(url);
+            axios.post(url).then(() => {
+              this.$bvModal.hide(
+                this.activeMarker["gaID"] == undefined
+                  ? `edit-marker-${this.activeMarker["bID"]}`
+                  : `edit-marker-${this.activeMarker["gaID"]}`,
+              );
+              this.editForm = {};
+              this.getMarkers();
+              this.infoWindowOpened = false;
+            });
+          }
+        });
+      }
+    },
+    showEditMarkerForm(modal) {
+      let markerInfoObj = {};
+      for (var property in this.activeMarker) {
+        markerInfoObj[property] = this.activeMarker[property];
+      }
+
+      this.editForm = markerInfoObj;
+      this.editForm["latitude"] = parseFloat(this.editForm["latitude"]);
+      this.editForm["longitude"] = parseFloat(this.editForm["longitude"]);
+      this.editForm["telegramid"] =
+        this.editForm["telegramid"] == "0" ? "" : this.editForm["telegramid"];
+
+      this.$bvModal.show(modal);
+    },
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
     },
@@ -546,7 +982,6 @@ export default {
       if (this.$store.state.userInfo.isLogin) {
         this.$bvModal.show("create-event-form");
       } else {
-        alert("user has not logged in");
         this.$router.push({ name: "Login" });
       }
     },
@@ -562,9 +997,18 @@ export default {
         if (data.weather[0]["main"] == "Rain") {
           this.weather.img = "rainy";
         } else if (data.weather[0]["main"] == "Clouds") {
-          this.weather.img = "cloudy";
+          let currentTime = new Date().getHours();
+          console.log(currentTime);
+          if (currentTime > 19 || currentTime < 7) {
+            this.weather.img = "cloudy-moon";
+          } // if the weather is cloudy and is already past sunset
+          else {
+            this.weather.img = "cloudy-sun";
+          } // if the weather is cloudy and is before sunset
         } else if (data.weather[0]["main"] == "Clear") {
           this.weather.img = "clear";
+        } else {
+          this.weather.img = "cloudy";
         }
       });
     },
@@ -620,7 +1064,7 @@ export default {
         teleID: "",
       };
     },
-    createEvent() {
+    createMarker() {
       this.isCreateErrors = false;
       if (this.createForm.pCode == "") {
         this.isCreateErrors = true;
@@ -667,7 +1111,7 @@ export default {
         let key = "AIzaSyBum4Aau6RFj_MyiKFERdj5xKq812WJfVU";
         let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${this.createForm["pCode"]}&key=${key}`;
         axios.get(url).then((response) => {
-         console.log(response);
+          console.log(response);
           if (response["status"] == 200) {
             if (response.data.results.length != 0) {
               data = response.data.results[0];
@@ -680,9 +1124,9 @@ export default {
                 lng: parseFloat(data.geometry.location.lng),
               };
               if (this.createForm["eType"] == "Buffet") {
-                url = `./database/buffetmarker.php?email=${this.email}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
+                url = `./database/buffetmarker.php?email=${this.email}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&cuisineType=${this.createForm["cType"]}&halal=${this.createForm["isHalal"]}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}&pcode=${this.createForm["pCode"]}`;
               } else {
-                url = `./database/giveawaymarker.php?giveawayname=${this.createForm["giveAwayName"]}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&itemdesc=${this.createForm["giveAwayDescription"]}&email=${this.email}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}`;
+                url = `./database/giveawaymarker.php?giveawayname=${this.createForm["giveAwayName"]}&locDesc=${this.createForm["description"]}&endDatetime=${this.createForm["eDateTime"]}&itemdesc=${this.createForm["giveAwayDescription"]}&email=${this.email}&latitude=${this.createForm["lat"]}&longitude=${this.createForm["lng"]}&telegramid=${this.createForm["teleID"]}&pcode=${this.createForm["pCode"]}`;
               }
               axios.post(url).then(() => {
                 setTimeout(() => {
@@ -693,10 +1137,9 @@ export default {
                   this.getMarkers();
                 }, 2000);
               });
-            }
-            else{
+            } else {
               this.toggleLoading();
-              alert('Marker could not be created');
+              alert("Marker could not be created");
             }
           }
         });
@@ -708,21 +1151,23 @@ export default {
     setMarker(data) {
       console.log(data);
       let latLng = data.latLng.toJSON();
+
       let newMarker = {
-        type: "food",
-        icon: "mapPin.svg",
-        lat: latLng["lat"],
-        lng: latLng["lng"],
+        type: "marker",
+        mimage: "mapPin.svg",
+        latitude: latLng["lat"],
+        longitude: latLng["lng"],
         clickable: true,
         draggable: false,
       };
       this.isSelectedMarker = true;
       this.createForm["lat"] = latLng["lat"];
       this.createForm["lng"] = latLng["lng"];
+      console.log(this.createForm);
 
       if (
         this.markers.length > 0 &&
-        this.markers[this.markers.length - 1]["icon"] == "mapPin.svg"
+        this.markers[this.markers.length - 1]["mimage"] == "mapPin.svg"
       ) {
         this.markers.splice(-1, 1);
       }
@@ -750,22 +1195,22 @@ export default {
     },
     updateFilter(type) {
       if (type == "giveAway") {
-        this.filter.giveAway = !this.filter.giveAway;
+        this.filter["Give Away"] = !this.filter["Give Away"];
       } else if (type == "refill") {
         this.filter.refill = !this.filter.refill;
       } else {
-        this.filter.food = !this.filter.food;
+        this.filter["Buffet"] = !this.filter["Buffet"];
       }
       this.updateMarkers();
     },
     updateMarkers() {
       var output = [];
       for (var type in this.filter) {
-        if (this.filter[type] && type == "giveAway") {
+        if (this.filter[type] && type == "Give Away") {
           output = output.concat(this.allLocations.giveAway);
         } else if (this.filter[type] && type == "refill") {
           output = output.concat(this.allLocations.refill);
-        } else if (this.filter[type] && type == "food") {
+        } else if (this.filter[type] && type == "Buffet") {
           output = output.concat(this.allLocations.food);
         }
       }
@@ -782,6 +1227,22 @@ export default {
   },
 
   computed: {
+    currentDateTime() {
+      let date = new Date();
+      let hours = date.getHours();
+      if (hours < 10) {
+        hours = "0" + hours;
+      }
+      let dateString = `${date.getFullYear()}-${date.getMonth() +
+        1}-${date.getDate()}T${hours}:${date.getMinutes()}`;
+      return dateString;
+    },
+    cusineRadio() {
+      return this.$store.state.cusineRadio;
+    },
+    eventTypeRadio() {
+      return this.$store.state.markerEventTypeRadio;
+    },
     isLoading() {
       return this.$store.state.isSpinner;
     },

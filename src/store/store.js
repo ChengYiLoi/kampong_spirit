@@ -8,6 +8,15 @@ export const store = new Vuex.Store({
     isButtonSpinner: false,
     isSpinner: false,
     isSignup: false,
+    itemFilter: {
+      Electronics: true,
+      Technology: true,
+      Essentials: true,
+      "Books and Stationary": true,
+      "Assistive Device": true,
+      "Beauty Accessories": true,
+      Others: true,
+    },
     userInfo: {
       isLogin: false,
       acctype: "",
@@ -18,7 +27,7 @@ export const store = new Vuex.Store({
       mobileno: "",
       password: "",
       profilepic: "NA",
-      numofevents: ""
+      numofevents: "",
     },
     loginForm: {
       form: {
@@ -112,7 +121,24 @@ export const store = new Vuex.Store({
     ],
     isDisplayMarketItems: true,
     isDisplayUserEvents: false,
-    userItems: [],
+    userItems: [
+      {
+        // category: "Electronics",
+        // createDate: "2020-11-03",
+        // deliveryType: "Postage",
+        // description: "best watch",
+        // fname: "Kampong",
+        // iID: "87",
+        // image: "Submariner-smurf-in-steel-mock-up-from-Watchvice.jpg",
+        // listedBy: "wad2project@gmail.com",
+        // lname: "Admin",
+        // location: "",
+        // name: "infinity book",
+        // profilepic: "image.png",
+        // state: "New",
+        // status: "Open",
+      },
+    ],
     userEvents: [
       // {
       //   description: "old event",
@@ -147,6 +173,21 @@ export const store = new Vuex.Store({
     ],
     userRewards: [],
     events: [
+      // {
+      //   description: "aaaabbbccc",
+      //   endDatetime: "2020-10-28 13:57:00",
+      //   eventID: "340",
+      //   image: "noimage.png",
+      //   location: "where wherre",
+      //   maxcapacity: "3",
+      //   numPart: "1",
+      //   pointsEarn: "3",
+      //   postalCode: "1111122222",
+      //   startDatetime: "2020-10-27 13:57:00",
+      //   status: "Completed",
+      //   title: "another event",
+      //   type: "Clean up",
+      // },
       // {
       //   description: "old event",
       //   endDatetime: "2020-10-26 23:04:00",
@@ -194,22 +235,42 @@ export const store = new Vuex.Store({
       // },
     ],
     markers: [
-      // {
-      //  endDatetime: "2020-12-12 02:09:09",
-      //  gaID: "123",
-      //  host: "dekubhna@gmail.com",
-      //  itemDesc: "many different model",
-      //  latitude: "1.4279",
-      //  locDesc: "outside shopping mall",
-      //  longitude: "103.8447",
-      //  mimage: "giveaway.svg",
-      //  name: "g-shock watch giveaway",
-      //  startDatetime: "2020-10-21 02:06:06",
-      //  telegramid: "0",
-      //  type: "giveAway",
-      //  clickable: true,
-      //  draggable: false
+      {
+      //   endDatetime: "2020-12-12 02:09:09",
+      //   gaID: "123",
+      //   host: "dekubhna@gmail.com",
+      //   itemDesc: "many different model",
+      //   latitude: "1.4279",
+      //   locDesc: "outside shopping mall",
+      //   longitude: "103.8447",
+      //   mimage: "giveaway.svg",
+      //   name: "g-shock watch giveaway",
+      //   startDatetime: "2020-10-21 02:06:06",
+      //   telegramid: "0",
+      //   type: "Give Away",
+      //   clickable: true,
+      //   draggable: false,
+      //   postalcode: 123456,
       // },
+      // {
+      //   endDatetime: "2020-12-12 02:09:09",
+      //   gaID: "123",
+      //   host: "dekubhna@gmail.com",
+      //   itemDesc: "many different model",
+      //   latitude: "1.275134",
+      //   locDesc: "outside shopping mall",
+      //   longitude: "103.813510",
+      //   mimage: "giveaway.svg",
+      //   name: "g-shock watch giveaway",
+      //   startDatetime: "2020-10-21 02:06:06",
+      //   telegramid: "123456",
+      //   type: "Buffet",
+      //   clickable: true,
+      //   draggable: false,
+      //   postalcode: 123456,
+      //   halal: '1',
+      //   cuisineType: "western"
+      },
       // {
       //   type: "refill",
       //   mimage: "water.svg",
@@ -274,6 +335,23 @@ export const store = new Vuex.Store({
     deliveryTypeRadio: [
       { value: "Meet Up", text: "Meet Up" },
       { value: "Postage", text: "Postage" },
+    ],
+    markerEventTypeRadio: [
+      {
+        value: "Buffet",
+        text: "Buffet",
+      },
+      {
+        value: "Give Away",
+        text: "Give Away",
+      },
+    ],
+    cusineRadio: [
+      { value: "1", text: "Halal" },
+      {
+        value: "0",
+        text: "Non-Halal",
+      },
     ],
     // eventTypeRadio: [
     //   { value: "", text: "" },

@@ -69,6 +69,7 @@
               v-model="sDateTime"
               id="sDateTime"
               type="datetime-local"
+              :min="currentDateTime"
             >
             </b-form-input>
           </b-form-group>
@@ -79,6 +80,7 @@
               v-model="eDateTime"
               id="eDateTime"
               type="datetime-local"
+              :min="currentDateTime"
             >
             </b-form-input>
           </b-form-group>
@@ -99,6 +101,11 @@
           Event start date time cannot be empty
         </li>
         <li v-if="eDateTime == ''">Event end date time cannot be empty</li>
+        <!-- <li v-if="parseEndDate < parseStartDate">End date time cannot be earlier than start date time</li>
+        <li v-if="sDateTimeObj > eDateTimeObj">Start date time cannot be later than end date time</li>
+        <li v-if="eDateTimeObj < sDateTimeObj">End date time cannot be earlier than start date time</li>
+        <li v-if="sDateTimeObj < currentDate">Start date time cannot be earlier than current date time</li>
+        <li v-if="eDateTimeObj < currentDate">End date time cannot be earlier than current date time</li> -->
       </ul>
     </b-alert>
     <template>
@@ -127,15 +134,37 @@ export default {
       eDescription: "",
       location: "",
       pCode: "",
-      mParticipants: "",
+      mParticipants: 1,
       gPoints: 0,
       eventType: "",
       sDateTime: "",
       eDateTime: "",
+     
     };
   },
   methods: {
+    resetCreateForm(){
+      this.eventPicture = null;
+      this.eventTitle = null,
+      this.eventPictureName = null;
+      this.eDescription = null;
+      this.location = "";
+      this.pCode = "";
+      this.mParticipants = "";
+      this.gPoints = 0;
+      this.eventType = "";
+      this.isCreateErrors = false;
+      this.sDateTime = "";
+      this.eDateTime = "";
+    },
     createNewEvent() {
+       this.parseStartDate = Date.parse(this.sDateTime);
+      this.parseEndDate = Date.parse(this.eDateTime);
+    //   this.sDateTimeObj = new Date(this.sDateTime);
+    // this.eDateTimeObj  = new Date(this.eDateTime);
+      
+      console.log(this.sDateTime < this.currentDate);
+      
       this.isCreateErrors = false;
       if (this.eventTitle == "") {
         this.isCreateErrors = true;
@@ -161,6 +190,26 @@ export default {
       if (this.eDateTime == "") {
         this.isCreateErrors = true;
       }
+     
+      if (this.parseEndDate < this.parseStartDate) {
+        console.log(`End date is smaller than start date ${this.parseEndDate < this.parseStartDate}`)
+        this.isCreateErrors = true;
+      }
+     
+    //   if(this.sDateTime > this.eDateTime){
+    //     console.log(`Start date time is earlier than end date time ${this.sDateTime > this.eDateTime}`)
+    //     this.isCreateErrors = true;
+    //   }
+    //   if(this.eDateTime < this.sDateTime){
+    //     console.log(`End date time is earlier than `)
+    //     this.isCreateErrors = true;
+    //   }
+    //   if(this.sDateTime < this.eDateTime){
+    //     this.isCreateErrors = true;
+    //   }
+    // if(this.eDateTime <this.currentDate){
+    //     this.isCreateErrors = true;
+    //   }
 
       if (!this.isCreateErrors) {
         var fd = new FormData();
@@ -171,43 +220,54 @@ export default {
           this.eventPictureName = "noimage.png";
         }
 
-        let parseStartDate = Date.parse(this.sDateTime);
-        let parseEndDate = Date.parse(this.eDateTime);
-        if (parseEndDate > parseStartDate) {
-          var extension = this.eventPictureName
-            .substring(this.eventPictureName.lastIndexOf(".") + 1)
-            .toLowerCase();
-          if (
-            extension == "gif" ||
-            extension == "png" ||
-            extension == "bmp" ||
-            extension == "jpeg" ||
-            extension == "jpg" ||
-            extension == "jpg" ||
-            extension == "svg"
-          ) {
-            let url = `./database/addimage.php`;
-            axios.post(url, fd).then(() => {
-              url = `./database/create_event.php?title=${this.eventTitle}&type=${this.eventType}&startDateTime=${this.sDateTime}&endDateTime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}&image=${this.eventPictureName}`;
+        
+
+        var extension = this.eventPictureName
+          .substring(this.eventPictureName.lastIndexOf(".") + 1)
+          .toLowerCase();
+        if (
+          extension == "gif" ||
+          extension == "png" ||
+          extension == "bmp" ||
+          extension == "jpeg" ||
+          extension == "jpg" ||
+          extension == "jpg" ||
+          extension == "svg"
+        ) {
+          let url = `./database/addimageevent.php`;
+          axios.post(url, fd).then(() => {
+            url = `./database/create_event.php?title=${this.eventTitle}&type=${this.eventType}&startDateTime=${this.sDateTime}&endDateTime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}&image=${this.eventPictureName}`;
+            url = encodeURI(url);
+            axios.post(url).then(() => {
+              this.$bvModal.hide("create-event-form");
+              alert("event has been created");
+              this.resetCreateForm();
+              url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
               url = encodeURI(url);
-              axios.post(url).then(() => {
-                this.$bvModal.hide("create-event-form");
-                alert("event has been created");
-                url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
-                url = encodeURI(url);
-                axios.get(url).then((response) => {
-                  this.$store.state.events = response.data;
-                });
+              axios.get(url).then((response) => {
+                this.$store.state.events = response.data;
               });
             });
-          }
-        } else {
-          alert("End date must be later than start date");
+          });
         }
       }
     },
   },
-  computed: {},
+  computed: {
+    currentDate(){
+      var date = new Date();
+      return date;
+    },
+    currentDateTime(){
+      let date = new Date();
+      let hours = date.getHours();
+      if(hours < 10){
+        hours = "0" + hours;
+      } 
+      let dateString = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T${hours}:${date.getMinutes()}`;
+      return dateString;
+    }
+  },
 };
 </script>
 <style lang="scss"></style>

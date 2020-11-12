@@ -1,7 +1,7 @@
 <template>
   <b-card
     :title="`${item.name}`"
-    class="card-info mt-4"
+    class="card-info mt-4 pt-3"
     @click="showModal(item)"
   >
     <b-row>
@@ -118,7 +118,7 @@
         </b-row>
         <b-row>
           <b-col class="pr-0"
-            ><b-button variant="danger" class="w-100">Delete</b-button></b-col
+            ><b-button variant="danger" class="w-100" @click="$bvModal.show(`item-delete-confirmation-${item['iID']}`)">Delete</b-button></b-col
           >
 
           <b-col class="pl-1"
@@ -142,10 +142,11 @@
     </b-modal>
 
     <b-modal
-      id="item-delete-confirmation"
+      :id="`item-delete-confirmation-${item['iID']}`"
       ok-title="Yes"
       ok-variant="success"
       cancel-variant="danger"
+      centered
       @ok="deleteItem(`${item['iID']}`)"
     >
       <p>Are you Sure?</p>
@@ -216,7 +217,7 @@
       <template>
         <b-row class="pb-2">
           <b-col class="pr-0"
-            ><b-button class=" w-100" variant="danger">Cancel</b-button></b-col
+            ><b-button @click="resetEditFields(`${item.iID}-edit`)" class="w-100" variant="danger">Cancel</b-button></b-col
           >
           <b-col class="pl-1"
             ><b-button
@@ -253,6 +254,15 @@ export default {
     };
   },
   methods: {
+    resetEditFields(modalName){
+      this.itemName = null;
+      this.selectedCategory = null;
+      this.selectedCondition = null;
+      this.itemDescription = null;
+      this.selectedDeliveryType =null;
+      this.location = null;
+      this.$bvModal.hide(modalName);
+    },
     displayChat(type) {
       if (!this.validateLogin()) {
         alert("user has not logged in");
@@ -394,16 +404,16 @@ export default {
       let email = this.$store.state.userInfo["email"];
       let url = `./database/deleteitem.php?iID=${iID}&email=${email}`;
       url = encodeURI(url);
-      console.log('delete url is');
-      console.log(url);
       axios.post(url).then(() => {
         if (!this.isDisplayMarketItems) {
+          
           url = `./database/getUserItems.php?useremail=${email}`;
           url = encodeURI(url);
           axios.post(url).then((result) => {
             this.$store.state.userItems = result.data;
           });
         } else {
+
           url = `./database/getItems.php`;
           axios.post(url).then((result) => {
             this.$store.state.items = result.data;

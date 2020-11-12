@@ -12,11 +12,10 @@
     <b-row>
       <b-col>
         <b-card-group columns>
-          <itemcard
-            v-for="item in userItems"
-            :key="item.iID"
-            :item="item"
-          ></itemcard>
+          <div v-for="item in userItems" :key="item.iID" :item="item">
+            <itemcard v-if="filter[item.category]" :item="item"></itemcard>
+            
+          </div>
         </b-card-group>
       </b-col>
     </b-row>
@@ -151,6 +150,9 @@ export default {
     },
   },
   computed: {
+    filter() {
+      return this.$store.state.itemFilter;
+    },
     isLoading() {
       return this.$store.state.isSpinner;
     },

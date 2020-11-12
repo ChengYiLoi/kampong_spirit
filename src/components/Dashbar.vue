@@ -18,9 +18,8 @@
         <b-row>
           <b-col>
             <router-link to="/">
-                <p id="brand" class="pt-2">Kampong Spirit</p>
+              <p id="brand" class="pt-2">Kampong Spirit</p>
             </router-link>
-          
           </b-col>
         </b-row>
 
@@ -58,19 +57,20 @@ export default {
         };
         this.$store.state["userInfo"] = {
           isLogin: false,
-          accType: "",
+          acctype: "",
           email: "",
           fname: "",
-          greenPoints: "",
+          greenpoints: "",
           lname: "",
-          mobileNo: "",
+          mobileno: "",
           password: "",
-          profilePic: "NA",
+          profilepic: "NA",
+          numofevents: "",
         };
         this.$store.state.dashOptions.profile["selected"] = false;
         this.$store.state.dashOptions.map["selected"] = false;
         this.$store.state.dashOptions.events["selected"] = false;
-        this.$store.state.dashOptions.marketplace["selected"] = false;
+        this.$store.state.dashOptions.marketplace["selected"] = true;
         this.$store.state.dashOptions.logout["selected"] = false;
 
         this.$router.push({ name: "Landing" });

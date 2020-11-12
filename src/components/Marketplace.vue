@@ -53,7 +53,7 @@
         <div>
           <b-row class="pt-2">
             <b-col></b-col>
-            <b-col cols="5">
+            <b-col lg="8" class="mx-2">
               <b-input-group>
                 <template #prepend>
                   <b-form-select
@@ -74,7 +74,11 @@
                     <div v-if="!isButtonLoading">
                       Search
                     </div>
-                    <b-spinner v-else label="spinning" style="width: 1.0rem; height: 1.0rem"></b-spinner>
+                    <b-spinner
+                      v-else
+                      label="spinning"
+                      style="width: 1.0rem; height: 1.0rem"
+                    ></b-spinner>
                   </b-button>
                 </template>
               </b-input-group>
@@ -124,12 +128,23 @@
           </b-row>
         </div>
         <b-row v-if="displayMarketItems" class="m-0 main d-inline">
-          <b-col>
+          <b-col v-if="items.length > 0">
             <b-card-group columns>
               <div v-for="item in items" :key="item.iID">
                 <itemcard v-if="filter[item.category]" :item="item"></itemcard>
               </div>
             </b-card-group>
+          </b-col>
+          <b-col v-else class="mt-5">
+            <b-row>
+              <b-col cols="12">
+                <b-img fluid :src="require('../assets/empty.svg')"></b-img>
+              </b-col>
+              <b-col cols="12">
+                The item you are looking for is not available
+              </b-col>
+            </b-row>
+            
           </b-col>
         </b-row>
         <b-row v-else>
@@ -169,15 +184,15 @@ export default {
       ],
       searchFilter: "item",
       searchInput: "",
-      filter: {
-        Electronics: true,
-        Technology: true,
-        Essentials: true,
-        "Books and Stationary": true,
-        "Assistive Device": true,
-        "Beauty Accessories": true,
-        Others: true,
-      },
+      // filter: {
+      //   Electronics: true,
+      //   Technology: true,
+      //   Essentials: true,
+      //   "Books and Stationary": true,
+      //   "Assistive Device": true,
+      //   "Beauty Accessories": true,
+      //   Others: true,
+      // },
     };
   },
   created() {
@@ -299,6 +314,9 @@ export default {
     },
   },
   computed: {
+    filter() {
+      return this.$store.state.itemFilter;
+    },
     isButtonLoading() {
       return this.$store.state.isButtonSpinner;
     },

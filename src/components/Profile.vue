@@ -36,15 +36,7 @@
               >Change Name</b-button
             >
           </b-col>
-          <b-modal
-            id="user-name"
-            centered
-            title="Change Name"
-            ok-variant="success"
-            ok-title="Update"
-            cancel-variant="danger"
-            @ok="updateInfo"
-          >
+          <b-modal id="user-name" centered title="Change Name" hide-footer>
             <b-form-group label="First Name: " label-for="fname">
               <b-form-input
                 v-model="newfname"
@@ -59,6 +51,32 @@
                 type="text"
               ></b-form-input>
             </b-form-group>
+            <b-alert show v-if="cNameError" variant="warning">
+              <ul>
+                <li v-if="newfname == ''">First name cannot be empty</li>
+                <li v-if="newlname == ''">Last name cannot be empty</li>
+              </ul>
+            </b-alert>
+            <template>
+              <b-row>
+                <b-col>
+                  <b-button
+                    class="w-100"
+                    @click="$bvModal.hide('user-name')"
+                    variant="danger"
+                    >Cancel</b-button
+                  >
+                </b-col>
+                <b-col>
+                  <b-button
+                    class="w-100"
+                    @click="validateName"
+                    variant="success"
+                    >Update</b-button
+                  >
+                </b-col>
+              </b-row>
+            </template>
             <!-- <template>
               <div class="mt-2">
                 <b-row>
@@ -115,30 +133,63 @@
             id="user-password"
             centered
             title="Change password"
-            ok-title="Update"
-            @ok="updateInfo"
+            hide-footer
           >
-            <b-form-group label="New Password: " label-for="nPassword">
-              <b-form-input
-                v-model="newpassword"
-                id="nPassword"
-                type="text"
-              ></b-form-input>
-            </b-form-group>
-            <b-form-group label="Old Password: " label-for="oPassword">
+            <b-form-group label="Current Password: " label-for="oPassword">
               <b-form-input
                 v-model="oldpassword"
                 id="oPassword"
-                type="text"
+                type="password"
               ></b-form-input>
+              <b-form-group label="New Password: " label-for="nPassword">
+                <b-form-input
+                  v-model="newpassword"
+                  id="nPassword"
+                  type="password"
+                  placeholder="At least 6 characters"
+                ></b-form-input>
+              </b-form-group>
             </b-form-group>
             <b-form-group label="Confirm Password: " label-for="cPassword">
               <b-form-input
                 v-model="confirmpassword"
                 id="cPassword"
-                type="text"
+                type="password"
               ></b-form-input>
             </b-form-group>
+            <b-alert variant="warning" show v-if="cPasswordError">
+              <ul>
+                <li v-if="getPassword != oldpassword">
+                  Current password is invalid
+                </li>
+                <li v-if="newpassword < 6">
+                  Password length must be at least 6 characters
+                </li>
+                <li v-if="newpassword != confirmpassword">
+                  New password and confirm password does not match
+                </li>
+              </ul>
+            </b-alert>
+            <template>
+              <b-row>
+                <b-col>
+                  <b-button
+                    class="w-100"
+                    @click="resetPass"
+                    variant="danger"
+                    >Cancel</b-button
+                  >
+                </b-col>
+                <b-col>
+                  <b-button
+                    class="w-100"
+                    @click="validatePassword"
+                    variant="success"
+                    >Update</b-button
+                  >
+                </b-col>
+              </b-row>
+            </template>
           </b-modal>
         </b-row>
 
@@ -163,8 +214,7 @@
             id="phonenum"
             centered
             title="Change Phone Number"
-            ok-title="Update"
-            @ok="updateInfo"
+            hide-footer
           >
             <b-form-group label="New Phone Number: " label-for="newNumber">
               <b-form-input
@@ -173,6 +223,33 @@
                 type="text"
               ></b-form-input>
             </b-form-group>
+            <b-alert variant="warning" show v-if="cNumberError">
+              <ul>
+                <li>
+                  Number cannot be empty
+                </li>
+              </ul>
+            </b-alert>
+            <template>
+              <b-row>
+                <b-col>
+                  <b-button
+                    class="w-100"
+                    @click="resetNum"
+                    variant="danger"
+                    >Cancel</b-button
+                  >
+                </b-col>
+                <b-col>
+                  <b-button
+                    class="w-100"
+                    @click="validateNumber"
+                    variant="success"
+                    >Update</b-button
+                  >
+                </b-col>
+              </b-row>
+            </template>
           </b-modal>
         </b-row>
 
@@ -199,26 +276,20 @@
           >
             <b-container>
               <b-button
-                :disabled="gPoints < 50 ? true : false"
-                class="w-100"
-                variant="primary"
-                @click="deductPoints(50, '10OFF', 'Amazon $10 off')"
-                >Amazon coupon code (50 Green Points)</b-button
+                v-for="reward in rewards"
+                :key="reward.code"
+                :disabled="gPoints < reward['cost'] ? true : false"
+                class="w-100 my-1"
+                :variant="gPoints < reward['cost'] ? 'dark' : 'success'"
+                @click="
+                  deductPoints(
+                    reward['cost'],
+                    reward['code'],
+                    reward['cDescription'],
+                  )
+                "
+                >{{ reward["bDescription"] }}</b-button
               >
-              <b-button
-                :disabled="gPoints < 10 ? true : false"
-                variant="primary"
-                @click="deductPoints(10, '2OFF', 'Grab Food $2 off')"
-              >
-                Grab coupon code (10 Green Points)
-              </b-button>
-              <b-button
-                :disabled="gPoints < 10 ? true : false"
-                variant="primary"
-                @click="deductPoints(10, '5OFF', 'Foodpanda $5 off')"
-              >
-                Foodpanda coupon code (10 Green Points)
-              </b-button>
             </b-container>
 
             <b-modal
@@ -243,9 +314,7 @@
           </b-col>
           <b-modal
             id="view-rewards"
-            ok-only
-            ok-title="Close"
-            ok-variant="danger"
+            hide-footer
           >
             <b-table
               striped
@@ -254,11 +323,34 @@
               bordered
               :items="userRewards"
               :fields="fields"
-            ></b-table>
+              selectable
+              @row-selected="onRowSelected"
+            >
+            </b-table>
             <!-- <b-row v-for="reward in userRewards" :key="reward['rewardcode']">
               <b-col>{{ reward["rewardname"] }}</b-col>
               <b-col>{{ reward["rewardcode"] }}</b-col>
             </b-row> -->
+               <template>
+              <b-row>
+                <b-col>
+                  <b-button
+                    class="w-100"
+                    @click="$bvModa.hide('view-rewards')"
+                    variant="danger"
+                    >Cancel</b-button
+                  >
+                </b-col>
+                <b-col v-if="selected > 0">
+                  <b-button
+                    class="w-100"
+                    @click="deleteRow"
+                    variant="success"
+                    >Delete</b-button
+                  >
+                </b-col>
+              </b-row>
+            </template>
           </b-modal>
         </b-row>
       </b-container>
@@ -369,6 +461,26 @@ export default {
   },
   data() {
     return {
+      rewards: [
+        {
+          cDescription: "Amazon $10 off",
+          bDescription: "Amazon coupon code (50 Green Points)",
+          cost: 50,
+          code: "10OFF",
+        },
+        {
+          cDescription: "Grab Food $2 off",
+          bDescription: "Grab coupon code (10 Green Points)",
+          cost: 10,
+          code: "2OFF",
+        },
+        {
+          cDescription: "Foodpanda $5 off",
+          bDescription: "Foodpanda coupon code (10 Green Points)",
+          cost: 10,
+          code: "5OFF",
+        },
+      ],
       fields: [
         {
           key: "rewardname",
@@ -378,6 +490,10 @@ export default {
           key: "rewardcode",
           label: "Reward Code",
         },
+        {
+          key: "checkbox",
+          label: ""
+        }
       ],
       isVisible: false,
       newfname: "",
@@ -386,37 +502,61 @@ export default {
       newpassword: "",
       confirmpassword: "",
       oldpassword: "",
-
+      cNameError: false,
+      cPasswordError: false,
+      cNumberError: false,
+      selected: [],
       chartOptions: {
         title: `Number of Events Joined for ${currentYear}`,
       },
     };
   },
   methods: {
+    deleteRow(){
+      console.log(this.selected);
+    },
+    onRowSelected(items){
+      this.selected = items;
+    },
+    resetNum(){
+      this.newmobileno = "";
+      this.$bvModal.hide('phonenum');
+    },
+    resetPass(){
+      this.newpassword = "";
+      this.confirmpassword = "";
+      this.oldpassword = "";
+      this.$bvModal.hide('user-password');
+    },
+    resetName(){
+      this.newfname = "";
+      this.newlname = "";
+      this.$bvModal.hide('user-name');
+    },
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
     },
     getUserRewards() {
       let url = `./database/userrewards.php?email=${this.email}`;
       axios.get(url).then((result) => {
-        setTimeout(() => {
-          this.toggleLoading();
-          this.$store.state.userRewards = result.data;
-          console.log("user rewards is");
-          console.log(result.data);
-        }, 1800);
+        this.$store.state.userRewards = result.data;
+        console.log("user rewards is");
+        console.log(result.data);
       });
     },
     getUserData() {
       let url = `./database/updatedprofile.php?email=${this.email}`;
       axios.get(url).then((result) => {
-        let data = result.data[0];
-        data.isLogin = true;
-        console.log("User data is");
-        console.log(result.data);
-        // sessionStorage.setItem("userSession", JSON.stringify(data));
-        this.$store.state.userInfo = data;
         this.getUserRewards();
+        setTimeout(() => {
+          this.toggleLoading();
+          let data = result.data[0];
+          data.isLogin = true;
+          console.log("User data is");
+          console.log(result.data);
+          // sessionStorage.setItem("userSession", JSON.stringify(data));
+          this.$store.state.userInfo = data;
+        }, 1800);
       });
     },
     deductPoints(points, rCode, rDescription) {
@@ -434,6 +574,54 @@ export default {
           this.getUserRewards();
         });
       });
+    },
+    validateName() {
+      this.cNameError = false;
+
+      if (this.newfname == "") {
+        this.cNameError = true;
+      }
+      if (this.newlname == "") {
+        this.cNameError = true;
+      }
+      if (!this.cNameError) {
+        this.updateInfo();
+        this.newfname = "";
+        this.newlname = "";
+      }
+    },
+    validatePassword() {
+      this.cPasswordError = false;
+
+      if (this.getPassword != this.oldpassword) {
+        this.cPasswordError = true;
+      }
+      if (this.newpassword.length < 6) {
+        this.cPasswordError = true;
+      }
+      if (this.newpassword != this.confirmpassword) {
+        this.cPasswordError = true;
+      }
+      if (!this.cPasswordError) {
+        this.updateInfo();
+        this.newpassword = "";
+        this.oldpassword = "";
+        this.confirmpassword = "";
+      } else {
+        this.$bvModal.show("user-password");
+      }
+    },
+    validateNumber() {
+      this.cNumberError = false;
+      if (this.newmobileno == "") {
+        this.cNumberError = true;
+      }
+      if (!this.cNumberError) {
+        this.updateInfo();
+        this.newmobileno == "";
+      } else {
+        this.$bvModal.show("phonenum");
+      }
     },
     updateInfo() {
       console.log(this.newpassword);
@@ -577,6 +765,9 @@ export default {
     },
     eventCount() {
       return this.$store.state.userInfo.numofevents;
+    },
+    getPassword() {
+      return this.$store.state.userInfo.password;
     },
   },
 };
