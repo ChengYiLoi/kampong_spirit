@@ -11,33 +11,33 @@
         </b-col>
       </b-row>
       <b-row class="event-card-info w-100 m-0 p-2">
-        <b-col cols="8">
+        <b-col>
           <b-row align-v="center">
-            <b-col cols="2" class="pr-0 mb-1">
+            <b-col cols="2" class="px-0 mb-1">
               <b-img :src="require('../assets/calendar.svg')"></b-img>
             </b-col>
-            <b-col class="text-left pl-0">
+            <b-col class="text-left  pl-0">
               {{ startDate }}
             </b-col>
           </b-row>
           <b-row align-v="center">
-            <b-col cols="2" class="pr-0 mb-1">
+            <b-col cols="2" class="px-0 mb-1">
               <b-img :src="require('../assets/time.svg')"></b-img>
             </b-col>
-            <b-col class="text-left pl-0">
+            <b-col class="text-left  pl-0">
               {{ startEndTime }}
             </b-col>
           </b-row>
           <b-row align-v="center">
-            <b-col cols="2" class="pr-0 mb-1">
+            <b-col cols="2" class="px-0 mb-1">
               <b-img :src="require('../assets/location.svg')"></b-img>
             </b-col>
-            <b-col class="text-left pl-0">
+            <b-col class="text-left  pl-0">
               {{ location }}
             </b-col>
           </b-row>
         </b-col>
-        <b-col></b-col>
+      
       </b-row>
     </b-card>
     <eventeditform :eventInfo="eventInfo"></eventeditform>
@@ -297,22 +297,25 @@ export default {
           sHour = sHour
         .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
         .concat([" "])
-        .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 9, 11))
+        .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 8, 11))
         .join("")
         .toString()
         .toUpperCase();
       eHour = eHour
-        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
+        .slice(0, endDateTimeObj.getHours() >= 13 ? 4 : 5)
         .concat([" "])
-        .concat(eHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 9, 11))
+        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 7 : 8, 11))
         .join("")
         .toString()
         .toUpperCase();
       
-    
+
+  
     
       var output = `${sHour} to ${eHour}`.toString();
+    
       return output;
+      
     },
     startDate() {
       var startDateTime = this.eventInfo.startDatetime;
@@ -349,6 +352,16 @@ export default {
   cursor: pointer;
   .event-card-info {
     background-color: #e7e6e6;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .event-card-info{
+    font-size: 0.7rem;
+  }
+}
+@media only screen and (max-width: 425px) {
+  .event-card-info{
+    font-size: 1.0rem;
   }
 }
 </style>

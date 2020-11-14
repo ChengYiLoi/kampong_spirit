@@ -305,7 +305,7 @@ export default {
         this.$store.state.userInfo = userSession;
       }
       console.log(this.$store.state["userInfo"]);
-      this.getItems();
+      // this.getItems();
     },
     toggleMarketPlace() {
       this.$store.state.isDisplayMarketItems = !this.$store.state

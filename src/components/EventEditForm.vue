@@ -65,18 +65,18 @@
           <b-form-file id="eventPicture" v-model="eventPicture"></b-form-file>
         </b-form-group>
         <b-form-group label="Event Name:" label-for="eTitle">
-          <b-form-input v-model="eventInfo['title']" id="eTitle" type="text">
+          <b-form-input v-model="editForm['title']" id="eTitle" type="text">
           </b-form-input>
         </b-form-group>
         <b-form-group label="Event Description:" label-for="eDescription">
-          <b-form-textarea v-model="eventInfo['description']" id="eDescription">
+          <b-form-textarea v-model="editForm['description']" id="eDescription">
           </b-form-textarea>
         </b-form-group>
         <b-row>
           <b-col>
             <b-form-group label="Location:" label-for="location">
               <b-form-input
-                v-model="eventInfo['location']"
+                v-model="editForm['location']"
                 id="location"
                 type="text"
               >
@@ -86,7 +86,7 @@
           <b-col cols="4">
             <b-form-group label="Postal Code:" label-for="pCode">
               <b-form-input
-                v-model="eventInfo['postalCode']"
+                v-model="editForm['postalCode']"
                 id="pCode"
                 type="text"
               >
@@ -101,7 +101,7 @@
               label-for="mParticipants"
             >
               <b-form-input
-                v-model="eventInfo['maxcapacity']"
+                v-model="editForm['maxcapacity']"
                 id="mParticipants"
                 type="number"
                 min="0"
@@ -112,7 +112,7 @@
           <b-col>
             <b-form-group label="Green Points Reward:" label-for="gPoints">
               <b-form-input
-                v-model="eventInfo['pointsEarn']"
+                v-model="editForm['pointsEarn']"
                 id="gPoints"
                 type="number"
                 min="0"
@@ -125,7 +125,7 @@
               <b-col>
                 <b-form-group label="Event Type:" label-for="eventType">
                   <b-form-input
-                    v-model="eventInfo['type']"
+                    v-model="editForm['type']"
                     id="eType"
                     type="text"
                   >
@@ -140,7 +140,7 @@
           <b-col>
             <b-form-group label="Start Date Time:" label-for="sDateTime">
               <b-form-input
-                v-model="eventInfo['startDatetime']"
+                v-model="editForm['startDatetime']"
                 id="sDateTime"
                 type="datetime-local"
               >
@@ -150,7 +150,7 @@
           <b-col>
             <b-form-group label="End Date Time:" label-for="eDateTime">
               <b-form-input
-                v-model="eventInfo['endDatetime']"
+                v-model="editForm['endDatetime']"
                 id="eDateTime"
                 type="datetime-local"
               >
@@ -177,7 +177,12 @@
       <template>
         <b-row class="pb-2">
           <b-col class="pr-0"
-            ><b-button class=" w-100" variant="danger">Cancel</b-button></b-col
+            ><b-button
+              class=" w-100"
+              variant="danger"
+              @click="$bvModal.hide(`${eventInfo.eventID}-admin`)"
+              >Cancel</b-button
+            ></b-col
           >
           <b-col class="pl-1"
             ><b-button class="w-100" variant="success" @click="updateEvent"
@@ -217,7 +222,9 @@
 var axios = require("axios");
 export default {
   props: ["eventInfo"],
-  mounted() {},
+  mounted() {
+    this.editFormValues();
+  },
   data() {
     return {
       isEditErrors: false,
@@ -234,9 +241,19 @@ export default {
       eDateTime: "",
       selectedParticipants: [],
       eventParticipants: [],
+      editForm: {},
     };
   },
   methods: {
+    editFormValues() {
+      var obj = {};
+
+      for (var property in this.eventInfo) {
+        obj[property] = this.eventInfo[property];
+      }
+
+      this.editForm = obj;
+    },
     distributeGreenPoints() {
       console.log(`selected partcipants are ${this.selectedParticipants}`);
       this.$bvModal.hide(`${this.eventInfo.eventID}-admin`);
@@ -250,41 +267,41 @@ export default {
           axios.get(url);
         });
       });
-      alert("Green points distributed");
+      
     },
     getAllParticipants() {
       let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
       url = encodeURI(url);
       axios.get(url).then((result) => {
-        alert("Event participants retrieved");
+       
         console.log(result.data);
         this.eventParticipants = result.data;
       });
     },
     updateEvent() {
       this.isEditErrors = false;
-      if (this.eventInfo["title"] == "") {
+      if (this.editForm["title"] == "") {
         this.isEditErrors = true;
       }
-      if (this.eventInfo["description"] == "") {
+      if (this.editForm["description"] == "") {
         this.isEditErrors = true;
       }
-      if (this.eventInfo["location"] == "") {
+      if (this.editForm["location"] == "") {
         this.isEditErrors = true;
       }
-      if (this.eventInfo["postalCode"] == "") {
+      if (this.editForm["postalCode"] == "") {
         this.isEditErrors = true;
       }
-      if (this.eventInfo["maxcapacity"] == "") {
+      if (this.editForm["maxcapacity"] == "") {
         this.isEditErrors = true;
       }
-      if (this.eventInfo["type"] == "") {
+      if (this.editForm["type"] == "") {
         this.isEditErrors = true;
       }
-      if (this.eventInfo["pointsEarn"] == "") {
+      if (this.editForm["pointsEarn"] == "") {
         this.isEditErrors = true;
       }
-      if (this.eventInfo["pointsEarn"] == "") {
+      if (this.editForm["pointsEarn"] == "") {
         this.isEditErrors = true;
       }
       if (!this.isEditErrors) {
@@ -298,7 +315,7 @@ export default {
         ) {
           let url;
           if (this.eventPicture == null) {
-            this.eventPictureName = "noimage.png";
+            this.eventPictureName = "";
           } else {
             this.eventPictureName = this.eventPicture.name;
             fd.append("eventPicture", this.eventPicture);
@@ -322,17 +339,17 @@ export default {
             }
           }
           console.log(this.eventInfo);
-          url = `./database/update_event.php?eventID=${this.eventInfo["eventID"]}&title=${this.eventInfo["title"]}&type=${this.eventInfo["type"]}&startDatetime=${this.eventInfo["startDatetime"]}&endDatetime=${this.eventInfo["endDatetime"]}&location=${this.eventInfo["location"]}&postalCode=${this.eventInfo["postalCode"]}&description=${this.eventInfo["description"]}&pointsEarn=${this.eventInfo["pointsEarn"]}&maxcapacity=${this.eventInfo["maxcapacity"]}&image=${this.eventPictureName}`;
+          url = `./database/update_event.php?eventID=${this.editForm["eventID"]}&title=${this.editForm["title"]}&type=${this.editForm["type"]}&startDatetime=${this.editForm["startDatetime"]}&endDatetime=${this.editForm["endDatetime"]}&location=${this.editForm["location"]}&postalCode=${this.editForm["postalCode"]}&description=${this.editForm["description"]}&pointsEarn=${this.editForm["pointsEarn"]}&maxcapacity=${this.editForm["maxcapacity"]}&image=${this.eventPictureName}`;
           url = encodeURI(url);
           axios.post(url).then(() => {
-            alert("event has been updated");
-            this.$bvModal.hide("edit-event-form");
+          
+            this.$bvModal.hide(`edit-event-form-${this.eventInfo.eventID}`);
             // this.getAllEvents();
 
             url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
             url = encodeURI(url);
             axios.get(url).then((response) => {
-              alert("retrieved all events");
+             
               this.$store.state.events = response.data;
             });
           });
@@ -346,7 +363,7 @@ export default {
           //     this.sDateTime = "";
           //     this.eDateTime = "";
         } else {
-          alert("end date must be later than start date");
+          
           this.$bvModal.show("edit-event-form");
         }
       }
@@ -366,21 +383,24 @@ export default {
       var endDateTimeObj = new Date(this.eventInfo.endDatetime);
       var sHour = startDateTimeObj.toLocaleTimeString("en-SG").split("");
       var eHour = endDateTimeObj.toLocaleTimeString("en-SG").split("");
+
       sHour = sHour
-        .slice(0, 5)
+        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
         .concat([" "])
-        .concat(sHour.slice(9, 11))
+        .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 8, 11))
         .join("")
         .toString()
         .toUpperCase();
       eHour = eHour
-        .slice(0, 5)
+        .slice(0, endDateTimeObj.getHours() >= 13 ? 4 : 5)
         .concat([" "])
-        .concat(eHour.slice(9, 11))
+        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 7 : 8, 11))
         .join("")
         .toString()
         .toUpperCase();
+
       var output = `${sHour} to ${eHour}`.toString();
+
       return output;
     },
     startDate() {
@@ -414,3 +434,29 @@ export default {
 };
 </script>
 <style lang="scss"></style>
+
+ startEndTime() {
+      var startDateTimeObj = new Date(this.eventInfo.startDatetime);
+      var endDateTimeObj = new Date(this.eventInfo.endDatetime);
+      var sHour = startDateTimeObj.toLocaleTimeString("en-SG").split("");
+      var eHour = endDateTimeObj.toLocaleTimeString("en-SG").split("");
+
+      sHour = sHour
+        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
+        .concat([" "])
+        .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 8, 11))
+        .join("")
+        .toString()
+        .toUpperCase();
+      eHour = eHour
+        .slice(0, endDateTimeObj.getHours() >= 13 ? 4 : 4)
+        .concat([" "])
+        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 7 : 8, 11))
+        .join("")
+        .toString()
+        .toUpperCase();
+
+      var output = `${sHour} to ${eHour}`.toString();
+
+      return output;
+    },

@@ -2,13 +2,13 @@
   <div id="full-height">
     <div id="banner">
       <b-row align-v="center" class="px-2">
-        <b-col lg="2">
+        <b-col lg="3">
           <dashbar></dashbar>
         </b-col>
         <b-col id="feature-title">
           <h1>{{ isDisplayUserEvents ? "My Events" : "Events" }}</h1>
         </b-col>
-        <b-col lg="2" class="responsive-col">
+        <b-col lg="3" class="responsive-col">
           <b-button
             @click="displayCreateEventForm"
             v-if="isAdmin"
@@ -280,7 +280,7 @@ import eventcard from "../components/eventCard";
 var axios = require("axios");
 export default {
   mounted() {
-    this.getAllEvents();
+    // this.getAllEvents();
   },
   components: {
     eventcreateform,

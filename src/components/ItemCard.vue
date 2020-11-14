@@ -35,16 +35,18 @@
       <b-col cols="12"><br /></b-col>
       <b-col cols="12" class="text-right pb-2" v-if="isDisplayMarketItems">
         <b-row>
-          <b-col>
+          <b-col class="listed-info">
             <p>
               <strong> Listed By: </strong>
               <span>
                 {{ item.fname }}{{ item.lname }}
                 <div id="profile-bg" class="d-inline">
-                  <b-img
+                  <b-avatar  :src="'./images/' + `${item.profilepic}`"></b-avatar>
+                  <!-- <b-img
                     id="item-profile"
                     :src="'./images/' + `${item.profilepic}`"
-                  ></b-img>
+                  ></b-img> -->
+
                 </div>
               </span>
             </p>
@@ -118,7 +120,12 @@
         </b-row>
         <b-row>
           <b-col class="pr-0"
-            ><b-button variant="danger" class="w-100" @click="$bvModal.show(`item-delete-confirmation-${item['iID']}`)">Delete</b-button></b-col
+            ><b-button
+              variant="danger"
+              class="w-100"
+              @click="$bvModal.show(`item-delete-confirmation-${item['iID']}`)"
+              >Delete</b-button
+            ></b-col
           >
 
           <b-col class="pl-1"
@@ -217,7 +224,12 @@
       <template>
         <b-row class="pb-2">
           <b-col class="pr-0"
-            ><b-button @click="resetEditFields(`${item.iID}-edit`)" class="w-100" variant="danger">Cancel</b-button></b-col
+            ><b-button
+              @click="resetEditFields(`${item.iID}-edit`)"
+              class="w-100"
+              variant="danger"
+              >Cancel</b-button
+            ></b-col
           >
           <b-col class="pl-1"
             ><b-button
@@ -254,12 +266,12 @@ export default {
     };
   },
   methods: {
-    resetEditFields(modalName){
+    resetEditFields(modalName) {
       this.itemName = null;
       this.selectedCategory = null;
       this.selectedCondition = null;
       this.itemDescription = null;
-      this.selectedDeliveryType =null;
+      this.selectedDeliveryType = null;
       this.location = null;
       this.$bvModal.hide(modalName);
     },
@@ -331,10 +343,10 @@ export default {
             axios.post(url, fd).then(() => {});
           }
         }
-        
+
         url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
         url = encodeURI(url);
-        console.log('edit item url is');
+        console.log("edit item url is");
         console.log(url);
         axios.post(url).then(() => {
           if (this.$store.state.isDisplayMarketItems) {
@@ -406,14 +418,12 @@ export default {
       url = encodeURI(url);
       axios.post(url).then(() => {
         if (!this.isDisplayMarketItems) {
-          
           url = `./database/getUserItems.php?useremail=${email}`;
           url = encodeURI(url);
           axios.post(url).then((result) => {
             this.$store.state.userItems = result.data;
           });
         } else {
-
           url = `./database/getItems.php`;
           axios.post(url).then((result) => {
             this.$store.state.items = result.data;
@@ -485,7 +495,7 @@ $white: rgb(245, 245, 245);
 
 #profile-bg {
   img {
-    width: 5%;
+    width: 2.5rem;
   }
 }
 .card-title {
@@ -538,9 +548,32 @@ $white: rgb(245, 245, 245);
     border-radius: 5px;
   }
 }
-@media only screen and (max-width: 769px) {
+@media only screen and (max-width: 768px) {
   .item-info-text {
     font-size: 1rem;
   }
+  .card-info {
+    cursor: pointer;
+    transition: unset;
+    &:hover {
+      transform: unset;
+      //Need to restate hover transition because if session exist,
+      //Card.vue wont be loaded which has the .card-info with transition properties stated
+    }
+    &:focus {
+      outline: none;
+    }
+    .listed-info {
+      font-size: 0.8rem;
+    }
+  }
+}
+@media only screen and (max-width: 425px){
+  .card-info{
+      .listed-info {
+      font-size: 1.3rem;
+    }
+  }
+ 
 }
 </style>

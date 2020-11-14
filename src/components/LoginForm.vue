@@ -48,14 +48,21 @@
       <b-alert show v-if="islogInvalid" variant="warning">
         Log in details is incorrect
       </b-alert>
-      <!-- <template>
-        <vue-recaptcha
-          ref="recaptcha"
-          sitekey="6LcSL-EZAAAAALTIqkRuFDRdRI9v0f27DdaSehcr"
-          :loadRecaptchaScript="true"
-          @verify="onVerify"
-        ></vue-recaptcha>
-      </template> -->
+      <b-row>
+        <b-col lg="8">
+          <template>
+            <vue-recaptcha
+              ref="recaptcha"
+              class="captcha-size"
+              sitekey="6LcSL-EZAAAAALTIqkRuFDRdRI9v0f27DdaSehcr"
+              :loadRecaptchaScript="true"
+              @verify="onVerify"
+            ></vue-recaptcha>
+          </template>
+        </b-col>
+        <b-col></b-col>
+      </b-row>
+
       <b-alert
         show
         v-if="!isReCaptcha"
@@ -73,7 +80,7 @@
       </button>
       <b-row class="mt-4">
         <b-col></b-col>
-        <b-col>
+        <b-col cols="6">
           <p class=" text-center">
             <u class="text-link" v-b-modal="'password-rest'">Forgot Password</u>
           </p>
@@ -129,7 +136,7 @@
   </div>
 </template>
 <script>
-// import VueRecaptcha from "vue-recaptcha";
+import VueRecaptcha from "vue-recaptcha";
 import { validationMixin } from "vuelidate";
 import { required, email } from "vuelidate/lib/validators";
 import getData from "../getData";
@@ -138,7 +145,7 @@ export default {
   mixins: [validationMixin],
   props: ["isSignup"],
   components: {
-    // VueRecaptcha,
+    VueRecaptcha,
   },
   data() {
     return {
@@ -146,7 +153,7 @@ export default {
       resetEmail: null,
       isEmailValid: true,
       islogInvalid: false,
-      reCaptcha: "a",
+      reCaptcha: "",
       isReCaptcha: true,
     };
   },
@@ -203,7 +210,7 @@ export default {
       this.$store.state.userInfo = userInfo;
       if (this.keepLogged) {
         localStorage.setItem("userStorage", JSON.stringify(userInfo));
-        alert("local storage created");
+       
       }
     },
     handleSignIn() {
@@ -223,10 +230,10 @@ export default {
           let url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
           url = encodeURI(url);
           axios.get(url).then((result) => {
-            alert("check with DB was done");
+           
             console.log(result.data);
             if (result.data.length == 1) {
-              alert("User is authorised");
+            
 
               data = result.data[0];
               // this.$store.state.dashOptions.marketplace.selected = true;
@@ -236,8 +243,7 @@ export default {
               this.$bvModal.show("login-error");
             }
           });
-        }
-        else{
+        } else {
           this.isReCaptcha = false;
         }
       });
@@ -379,6 +385,14 @@ $white: rgb(245, 245, 245);
     p {
       font-size: 0.6rem;
     }
+  }
+}
+@media only screen and (max-width: 320px) {
+  .captcha-size {
+    transform: scale(0.80);
+    -webkit-transform: scale(0.80);
+    transform-origin: 0 0;
+    -webkit-transform-origin: 0 0;
   }
 }
 </style>

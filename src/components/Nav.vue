@@ -2,7 +2,7 @@
   <b-navbar id="navbar" toggleable="lg" type="dark" class="nav-deco p-3">
     <router-link to="/">
       <b-navbar-brand id="brand">
-        <strong>Kampong Spirit</strong>
+        <strong>Kampung Spirit</strong>
       </b-navbar-brand>
     </router-link>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>

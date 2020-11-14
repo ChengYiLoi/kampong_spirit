@@ -116,6 +116,7 @@
                 :options="eventTypeRadio"
                 v-model="editForm['type']"
                 stacked
+                disabled
               >
               </b-form-radio-group>
             </b-form-group>
@@ -123,22 +124,24 @@
             <b-row v-if="editForm['type'] == 'Buffet'">
               <b-col>
                 <b-form-group
-                  label="Cusine Type:"
+                  label="Cuisine Type:"
                   label-for="cType"
                   label-cols="4"
                 >
                   <b-form-input
                     id="cType"
                     v-model="editForm['cuisineType']"
+                    disabled
                   ></b-form-input>
                 </b-form-group>
               </b-col>
               <b-col cols="4">
                 <b-form-group>
                   <b-form-radio-group
-                    :options="cusineRadio"
+                    :options="cuisineRadio"
                     v-model="editForm['halal']"
                     stacked
+                    disabled
                   >
                   </b-form-radio-group>
                 </b-form-group>
@@ -148,7 +151,7 @@
             <b-row v-if="editForm['type'] == 'Give Away'">
               <b-col cols="12">
                 <b-form-group label="Event Name: " label-cols="3">
-                  <b-form-input v-model="editForm['name']"></b-form-input>
+                  <b-form-input v-model="editForm['name']" disabled></b-form-input>
                 </b-form-group>
               </b-col>
               <b-col cols="12">
@@ -156,6 +159,7 @@
                   <b-form-textarea
                     v-model="editForm['itemDesc']"
                     placeholder=""
+                    disabled
                   >
                   </b-form-textarea>
                 </b-form-group>
@@ -264,7 +268,7 @@
                       editForm['cuisineType'] == null
                   "
                 >
-                  Cusine type is required
+                  Cuisine type is required
                 </li>
                 <li
                   v-if="
@@ -291,9 +295,9 @@
                 ? `delete-marker-confirm-${activeMarker['bID']}`
                 : `delete-marker-confirm-${activeMarker['gaID']}`
             "
-            cancel-variant="warning"
+            cancel-variant="danger"
             ok-title="Delete"
-            ok-variant="danger"
+            ok-variant="success"
             @ok="deleteMarker"
           >
             <h4 class="text-center">Confirm delete marker?</h4>
@@ -302,9 +306,21 @@
             <b-container fluid class="marker-info">
               <b-row>
                 <b-col class="py-2 text-left">
-                  <p v-if="activeMarker['type'] != 'refill'">
-                    <strong>Description: </strong>{{ activeMarker.locDesc }}
+                
+                  <p v-if="activeMarker['type'] == 'Buffet' || activeMarker['type'] == 'Give Away'">
+                    <strong>Location Description: </strong>{{activeMarker.locDesc}}
                   </p>
+                  <div v-if="activeMarker['type'] == 'Give Away'">
+                      <p>
+                    <strong>Event Name: </strong>{{activeMarker.name}}
+                  </p>
+                  <p>
+                    <strong>Item Description: </strong>
+                    {{activeMarker.itemDesc}}
+                  </p>
+                  </div>
+                
+                
                   <p
                     v-if="
                       activeMarker['telegramid'] != null &&
@@ -314,8 +330,8 @@
                     <strong>Organiser Telegram ID: </strong
                     >{{ activeMarker.telegramid }}
                   </p>
-                  <p v-if="activeMarker['cusineType'] != null">
-                    <strong>Cusine type: </strong>{{ activeMarker.cusineType }}
+                  <p v-if="activeMarker['cuisineType'] != null">
+                    <strong>Cuisine type: </strong>{{ activeMarker.cuisineType }}
                   </p>
                   <p v-if="activeMarker['halal'] != null">
                     <strong>Halal: </strong
@@ -589,7 +605,7 @@
                   <b-row v-if="createForm['eType'] == 'Buffet'">
                     <b-col>
                       <b-form-group
-                        label="Cusine Type:"
+                        label="Cuisine Type:"
                         label-for="cType"
                         label-cols="4"
                       >
@@ -743,7 +759,7 @@
                             createForm.cType == null
                         "
                       >
-                        Cusine type is required
+                        Cuisine type is required
                       </li>
                       <li
                         v-if="
@@ -798,7 +814,7 @@ export default {
   },
   mounted() {
     this.getCurrentLocation();
-    // this.getcurrentWeather();
+    this.getcurrentWeather();
   },
   components: {
     dashbar,
@@ -879,6 +895,7 @@ export default {
           ? `delete-marker-confirm-${this.activeMarker["bID"]}`
           : `delete-marker-confirm-${this.activeMarker["gaID"]}`,
       );
+      this.infoWindowOpened = false;
       this.getMarkers();
     },
     deletMarkerConfirm(modal) {
@@ -1237,8 +1254,8 @@ export default {
         1}-${date.getDate()}T${hours}:${date.getMinutes()}`;
       return dateString;
     },
-    cusineRadio() {
-      return this.$store.state.cusineRadio;
+    cuisineRadio() {
+      return this.$store.state.cuisineRadio;
     },
     eventTypeRadio() {
       return this.$store.state.markerEventTypeRadio;

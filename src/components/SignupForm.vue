@@ -155,9 +155,11 @@
       <b-form-group label-size="lg" label="Verification Code:" label-cols="4">
         <b-form-input size="lg" v-model="vCode"></b-form-input>
       </b-form-group>
-      <p class="text-link" @click="resendCode"><u>Resend verification code</u></p>
+      <p class="text-link" @click="resendCode">
+        <u>Resend verification code</u>
+      </p>
       <b-button id="login-button" @click="addUser">
-       <b-spinner v-if="isLoading" label="spinning"></b-spinner>
+        <b-spinner v-if="isLoading" label="spinning"></b-spinner>
         <div v-else>
           Submit
         </div>
@@ -218,8 +220,8 @@ export default {
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
     },
-    resendCode(){
-      alert('resend');
+    resendCode() {
+      alert("resend");
       let url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
       axios.post(url);
     },
@@ -279,6 +281,7 @@ export default {
             console.log(lname);
           }
         }
+        this.isTaken = false;
         let url = `./database/checkemail.php?email=${email}`;
         axios.get(url).then((response) => {
           if (response.data.length >= 1) {
@@ -324,6 +327,7 @@ export default {
       });
     },
     switchForm() {
+      this.resetFields();
       this.$store.state.isSignup = !this.$store.state.isSignup;
     },
     validateState(name) {
@@ -331,6 +335,7 @@ export default {
       return $dirty ? !$error : null;
     },
     onSubmit() {
+      this.isTaken = false;
       this.$v.form.$touch();
       if (this.$v.form.$anyError) {
         return;
@@ -338,15 +343,18 @@ export default {
         this.toggleLoading();
         let url = `./database/checkemail.php?email=${this.$v.form.email.$model}`;
         axios.get(url).then((response) => {
-          if (response.data.length >= 1) {
-            this.isTaken = true;
-          } else {
-            this.toggleLoading();
-            this.isVerification = true;
-            console.log(this.$v.form.pnumber.$model);
-            url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
-            axios.post(url);
-          }
+          setTimeout(() => {
+            if (response.data.length >= 1) {
+              this.toggleLoading();
+              this.isTaken = true;
+            } else {
+              this.toggleLoading();
+              this.isVerification = true;
+              console.log(this.$v.form.pnumber.$model);
+              url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
+              axios.post(url);
+            }
+          }, 1800);
         });
       }
     },

@@ -68,4 +68,12 @@ export default {
     transform: scale(1.05);
   }
 }
+@media only screen and (max-width: 768px){
+  .card-info{
+    transition: unset;
+    &:hover{
+      transform: unset;
+    }
+  }
+}
 </style>

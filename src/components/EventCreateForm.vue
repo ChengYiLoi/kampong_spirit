@@ -111,7 +111,7 @@
     <template>
       <b-row class="pb-2">
         <b-col class="pr-0"
-          ><b-button class=" w-100" variant="danger">Cancel</b-button></b-col
+          ><b-button class=" w-100" variant="danger" @click="$bvModal.hide('create-event-form')">Cancel</b-button></b-col
         >
         <b-col class="pl-1"
           ><b-button class="w-100" variant="success" @click="createNewEvent"

@@ -173,10 +173,7 @@
             <template>
               <b-row>
                 <b-col>
-                  <b-button
-                    class="w-100"
-                    @click="resetPass"
-                    variant="danger"
+                  <b-button class="w-100" @click="resetPass" variant="danger"
                     >Cancel</b-button
                   >
                 </b-col>
@@ -233,10 +230,7 @@
             <template>
               <b-row>
                 <b-col>
-                  <b-button
-                    class="w-100"
-                    @click="resetNum"
-                    variant="danger"
+                  <b-button class="w-100" @click="resetNum" variant="danger"
                     >Cancel</b-button
                   >
                 </b-col>
@@ -281,13 +275,7 @@
                 :disabled="gPoints < reward['cost'] ? true : false"
                 class="w-100 my-1"
                 :variant="gPoints < reward['cost'] ? 'dark' : 'success'"
-                @click="
-                  deductPoints(
-                    reward['cost'],
-                    reward['code'],
-                    reward['cDescription'],
-                  )
-                "
+                @click="deductPoints(reward['cost'], reward['cDescription'])"
                 >{{ reward["bDescription"] }}</b-button
               >
             </b-container>
@@ -297,8 +285,9 @@
               ok-only
               ok-title="close"
               ok-variant="danger"
+              centered
             >
-              <p class="w-100">
+              <p class="w-100 text-center">
                 Green points have been successfully deducted. Click
                 <strong>View Rewards</strong> to view the coupon code
               </p>
@@ -312,12 +301,8 @@
               >View Rewards</b-button
             >
           </b-col>
-          <b-modal
-            id="view-rewards"
-            hide-footer
-          >
+          <b-modal id="view-rewards" hide-footer centered>
             <b-table
-              striped
               hover
               head-variant="light"
               bordered
@@ -331,21 +316,18 @@
               <b-col>{{ reward["rewardname"] }}</b-col>
               <b-col>{{ reward["rewardcode"] }}</b-col>
             </b-row> -->
-               <template>
+            <template>
               <b-row>
                 <b-col>
                   <b-button
                     class="w-100"
-                    @click="$bvModa.hide('view-rewards')"
+                    @click="$bvModal.hide('view-rewards')"
                     variant="danger"
                     >Cancel</b-button
                   >
                 </b-col>
-                <b-col v-if="selected > 0">
-                  <b-button
-                    class="w-100"
-                    @click="deleteRow"
-                    variant="success"
+                <b-col v-if="selected.length > 0">
+                  <b-button class="w-100" @click="deleteRow" variant="success"
                     >Delete</b-button
                   >
                 </b-col>
@@ -376,13 +358,13 @@
             <b-col class="" id="tooltip-bronze">
               <b-tooltip target="tooltip-bronze" triggers="hover">
                 {{
-                  eventCount >= 20
-                    ? "Achievement for participating 20 events"
-                    : "Unlocks when you have participated 20 events"
+                  eventCount >= 5
+                    ? "Achievement for participating 5 events"
+                    : "Unlocks when you have participated 5 events"
                 }}
               </b-tooltip>
               <b-img
-                v-if="eventCount >= 20"
+                v-if="eventCount >= 5"
                 fluid
                 :src="require('../assets/bronzeMedalUnlocked.svg')"
               ></b-img>
@@ -395,13 +377,13 @@
             <b-col id="tooltip-silver">
               <b-tooltip target="tooltip-silver" triggers="hover">
                 {{
-                  eventCount >= 50
-                    ? "Achievement for participating 50 events"
-                    : "Unlocks when you have participated 50 events"
+                  eventCount >= 10
+                    ? "Achievement for participating 10 events"
+                    : "Unlocks when you have participated 10 events"
                 }}
               </b-tooltip>
               <b-img
-                v-if="eventCount >= 50"
+                v-if="eventCount >= 10"
                 fluid
                 :src="require('../assets/silverMedalUnlocked.svg')"
               ></b-img>
@@ -414,13 +396,13 @@
             <b-col id="tooltip-gold">
               <b-tooltip target="tooltip-gold" triggers="hover">
                 {{
-                  eventCount == 1000
-                    ? "Achievement for participating 1000 events"
-                    : "Unlocks when you have participated 1000 events"
+                  eventCount == 20
+                    ? "Achievement for participating 20 events"
+                    : "Unlocks when you have participated 20 events"
                 }}
               </b-tooltip>
               <b-img
-                v-if="eventCount == 1000"
+                v-if="eventCount == 20"
                 fluid
                 :src="require('../assets/goldMedalUnlocked.svg')"
               ></b-img>
@@ -490,10 +472,6 @@ export default {
           key: "rewardcode",
           label: "Reward Code",
         },
-        {
-          key: "checkbox",
-          label: ""
-        }
       ],
       isVisible: false,
       newfname: "",
@@ -512,26 +490,33 @@ export default {
     };
   },
   methods: {
-    deleteRow(){
+    deleteRow() {
+      let url;
+      this.selected.forEach((obj) => {
+        url = `./database/deletereward.php?rewardcode=${obj["rewardcode"]}&email=${this.email}`;
+        console.log(url);
+        axios.post(url);
+      });
+      this.getUserRewards();
+    },
+    onRowSelected(items) {
+      this.selected = items;
       console.log(this.selected);
     },
-    onRowSelected(items){
-      this.selected = items;
-    },
-    resetNum(){
+    resetNum() {
       this.newmobileno = "";
-      this.$bvModal.hide('phonenum');
+      this.$bvModal.hide("phonenum");
     },
-    resetPass(){
+    resetPass() {
       this.newpassword = "";
       this.confirmpassword = "";
       this.oldpassword = "";
-      this.$bvModal.hide('user-password');
+      this.$bvModal.hide("user-password");
     },
-    resetName(){
+    resetName() {
       this.newfname = "";
       this.newlname = "";
-      this.$bvModal.hide('user-name');
+      this.$bvModal.hide("user-name");
     },
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
@@ -548,6 +533,7 @@ export default {
       let url = `./database/updatedprofile.php?email=${this.email}`;
       axios.get(url).then((result) => {
         this.getUserRewards();
+        this.getUserChartData();
         setTimeout(() => {
           this.toggleLoading();
           let data = result.data[0];
@@ -559,7 +545,20 @@ export default {
         }, 1800);
       });
     },
-    deductPoints(points, rCode, rDescription) {
+    generateCode(length) {
+      var result = "";
+      var characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      var charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength),
+        );
+      }
+      return result;
+    },
+    deductPoints(points, rDescription) {
+      let rCode = this.generateCode(5);
       let url = `./database/deductpoints.php?email=${this.email}&greenpoints=${points}&rewardname=${rDescription}&rewardcode=${rCode}`;
       url = encodeURI(url);
       axios.post(url).then(() => {
@@ -669,7 +668,6 @@ export default {
       console.log(user);
       this.$store.state.userInfo = user;
       this.getUserData();
-      this.getUserChartData();
     },
     getUserChartData() {
       let monthsWithEvents = {
@@ -692,6 +690,7 @@ export default {
       url = encodeURI(url);
       axios.get(url).then((result) => {
         result.data.forEach((event) => {
+          console.log(event);
           let date = event.endDatetime;
           let dateArray = date.split(/\D+/);
           let month = dateArray[1];
@@ -773,6 +772,14 @@ export default {
 };
 </script>
 <style lang="scss">
+table {
+  tr {
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
 .user-info {
   background-color: #f1f3f6 !important;
   border-radius: 1rem;
