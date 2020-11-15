@@ -317,7 +317,8 @@ export default {
         this.$store.state.userInfo = userSession;
       }
      
-      this.getItems();
+      // this.getItems();
+      // Commented this out so that the spinner does not show for local host
     },
     toggleMarketPlace() {
       this.$store.state.isDisplayMarketItems = !this.$store.state

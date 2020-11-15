@@ -208,7 +208,7 @@ export default {
               axios.get(url).then((result) => {
                 setTimeout(() => {
                   this.toggleLoading();
-                  console.log(result);
+                
                   this.$store.state.userItems = result.data;
                 }, 1800);
               });

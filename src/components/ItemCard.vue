@@ -342,17 +342,15 @@ export default {
       if (!this.isErrors) {
         // if there are no validation errors, append the image file to the form data obj
         let url;
+        let extension = "";
         if (this.itemPicture != null) {
           picName = this.itemPicture.name;
+          let itemPictureName = this.itemPicture["name"];
           let fd = new FormData();
           fd.append("itemPicture", this.itemPicture);
-          url = `./database/addimage.php?`;
-          url = encodeURI(url);
-          let itemPictureName = this.itemPicture["name"];
-          let extension = itemPictureName
+          extension = itemPictureName
             .substring(itemPictureName.lastIndexOf(".") + 1)
             .toLowerCase();
-
           if (
             extension == "gif" ||
             extension == "png" ||
@@ -362,34 +360,36 @@ export default {
             extension == "jpg" ||
             extension == "svg"
           ) {
-            axios.post(url, fd);
-            url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
+            url = `./database/addimage.php?`;
             url = encodeURI(url);
-            this.toggleButtonLoading();
-            axios.post(url).then(() => {
-              setTimeout(() => {
-                this.toggleButtonLoading();
-                if (this.$store.state.isDisplayMarketItems) {
-                  url = `./database/getItems.php`;
-                } else {
-                  url = `./database/getUserItems.php?useremail=${email}`;
-                }
-                url = encodeURI(url);
-                axios.get(url).then((result) => {
-                  this.$bvModal.hide(`${this.item.iID}-edit`);
-                  if (this.$store.state.isDisplayMarketItems) {
-                    this.$store.state.items = result.data;
-                  } else {
-                    this.$store.state.userItems = result.data;
-                  }
-                });
-              }, 1300);
-            });
-          }
-          else{
+            axios.post(url, fd);
+          } else {
             this.$bvModal.show(`image-formats-${this.item.iID}`);
           }
         }
+
+        url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
+        url = encodeURI(url);
+        this.toggleButtonLoading();
+        axios.post(url).then(() => {
+          setTimeout(() => {
+            this.toggleButtonLoading();
+            if (this.$store.state.isDisplayMarketItems) {
+              url = `./database/getItems.php`;
+            } else {
+              url = `./database/getUserItems.php?useremail=${email}`;
+            }
+            url = encodeURI(url);
+            axios.get(url).then((result) => {
+              this.$bvModal.hide(`${this.item.iID}-edit`);
+              if (this.$store.state.isDisplayMarketItems) {
+                this.$store.state.items = result.data;
+              } else {
+                this.$store.state.userItems = result.data;
+              }
+            });
+          }, 1300);
+        });
 
         // postData(url, this.updateItemInfoCallBack);
       }
@@ -406,7 +406,6 @@ export default {
     itemStatusCallback() {
       let url;
       if (this.$store.state.isDisplayMarketItems) {
-        
         url = `./database/getItems.php`;
         axios.get(url).then((response) => {
           this.$store.state.items = response.data;
@@ -417,7 +416,6 @@ export default {
         axios.get(url).then((response) => {
           this.$store.state.userItems = response.data;
         });
-    
       }
     },
 

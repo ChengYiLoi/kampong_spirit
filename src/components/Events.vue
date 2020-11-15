@@ -155,7 +155,8 @@ import eventcard from "../components/eventCard";
 var axios = require("axios");
 export default {
   mounted() {
-    this.getAllEvents();
+    // this.getAllEvents();
+    // Commented this out so the spinner wont show for local host
   },
   components: {
     eventcreateform,
