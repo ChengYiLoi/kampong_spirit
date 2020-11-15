@@ -2,13 +2,13 @@
   <div>
     <div v-if="!isVerification" class="login-form text-left p-3">
       <h2 class="text-lg-left text-center">Sign up</h2>
-      <button
+      <!-- <button
         @click="handleSignup"
         id="google"
         class="mt-4 d-block w-100 mx-auto px-3"
       >
         <span><img src="../assets/google.svg"/></span> Sign Up with Google
-      </button>
+      </button> -->
       <b-form @submit.stop.prevent="onSubmit()">
         <b-row class="mt-4">
           <b-col>
@@ -142,9 +142,9 @@
         <p class="mt-4 text-center text-link" v-on:click="switchForm()">
           Back to Login
         </p>
-        <b-alert v-if="isTaken" show variant="warning">
+        <!-- <b-alert v-if="isTaken" show variant="warning">
           Email is already registered
-        </b-alert>
+        </b-alert> -->
       </b-form>
     </div>
     <div v-else class="login-form p-3">
@@ -218,10 +218,10 @@ export default {
   },
   methods: {
     toggleLoading() {
-      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+      this.$store.commit('toggleLoading');
     },
     resendCode() {
-      alert("resend");
+     
       let url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
       axios.post(url);
     },
@@ -229,13 +229,13 @@ export default {
       this.toggleLoading();
       let url = `./database/smsverify.php?enteredcode=${this.vCode}`;
       axios.get(url).then((response) => {
-        console.log(response);
+       
         if (response.data.length == 1) {
           let userInputs = this.$v.form.$model;
           url = `./database/registeruser.php?lname=${userInputs["lname"]}&fname=${userInputs["fname"]}&email=${userInputs["email"]}&mobileno=${userInputs["pnumber"]}&password=${userInputs["password"]}`;
           url = encodeURI(url);
           axios.post(url).then(() => {
-            alert("Form submitted");
+           
             setTimeout(() => {
               url = `./database/validate.php?email=${userInputs["email"]}&password=${userInputs["password"]}`;
               url = encodeURI(url);
@@ -243,7 +243,7 @@ export default {
                 this.resetFields();
                 if (response.data.length == 1) {
                   let data = response.data[0];
-                  console.log(data);
+                
 
                   this.$store.state.dashOptions.marketplace.selected = true;
                   this.createSession(data);
@@ -266,7 +266,7 @@ export default {
     },
     handleSignup() {
       this.$gAuth.signIn().then((user) => {
-        console.log("user", user);
+       
         let email;
         let fname;
         let lname;
@@ -276,9 +276,7 @@ export default {
             email = user[props].getEmail();
             fname = user[props].getGivenName();
             lname = user[props].getFamilyName();
-            console.log(email);
-            console.log(fname);
-            console.log(lname);
+          
           }
         }
         this.isTaken = false;
@@ -302,7 +300,7 @@ export default {
                     this.$router.push({ name: "Main" });
                   }
                 });
-              }, 5000);
+              }, 1500);
             });
           }
         });
@@ -316,7 +314,7 @@ export default {
       this.$store.state.userInfo = userInfo;
       if (this.keepLogged) {
         localStorage.setItem("userStorage", JSON.stringify(userInfo));
-        alert("local storage created");
+       
       }
     },
     getUserRewards(email) {
@@ -350,7 +348,7 @@ export default {
             } else {
               this.toggleLoading();
               this.isVerification = true;
-              console.log(this.$v.form.pnumber.$model);
+            
               url = `./database/send_sms.php?mobileno=${this.$v.form.pnumber.$model}`;
               axios.post(url);
             }

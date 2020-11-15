@@ -17,8 +17,8 @@
       <b-container>
         <b-row>
           <b-col>
-            <router-link to="/">
-              <p id="brand" class="pt-2">Kampung Spirit</p>
+            <router-link to="/" id="brand">
+              <p class="pt-2">Kampung Spirit</p>
             </router-link>
           </b-col>
         </b-row>
@@ -26,6 +26,7 @@
         <b-row>
           <b-col cols="12" v-for="option in dashOptions" :key="option.text">
             <dashOption
+            v-if="isAdmin(option)"
               class="isSelected"
               :dashProps="option"
               v-on:updateSelection="updateSelection($event)"
@@ -48,7 +49,15 @@ export default {
     };
   },
   methods: {
+    isAdmin(event){
+      if(event.text == "Profile" && this.$store.state.userInfo.acctype == "Admin"){
+        return false;
+      }
+      return true;
+    },
     updateSelection(type) {
+      // Updates the sidebar option, if user selects logout, it will redirect to the landing page. 
+      // It also removes both the session and local storage as well as the vuex store
       this.isSideBarOpen = false;
       if (type == "logout") {
         this.$store.state.loginForm.form = {
@@ -74,10 +83,10 @@ export default {
         this.$store.state.dashOptions.logout["selected"] = false;
 
         this.$router.push({ name: "Landing" });
-        alert("Log out successful");
+      
         localStorage.removeItem("userStorage");
         sessionStorage.removeItem("userSession");
-        alert("storage (if keep logged was selected) and session removed");
+        
         this.resetStore();
       } else {
         Object.keys(this.dashOptions).forEach((key) => {
@@ -91,6 +100,7 @@ export default {
       this.$store.state["isDisplayMarketItems"] = true;
     },
     resetStore() {
+      // Resets the vuex store to the original state
       this.$store.state = {
         isButtonSpinner: false,
         isSpinner: false,
@@ -280,6 +290,10 @@ export default {
 }
 #brand {
   font-size: 1.6rem;
+  &:hover{
+    color: unset;
+    text-decoration: none;
+  }
 }
 
 @media only screen and (max-width: 1025px) {

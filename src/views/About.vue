@@ -20,7 +20,7 @@
             <b-row>
               <b-col>
                 <span
-                  >Kampong Spirit is a platform for people that want to do their
+                  >Kampung Spirit is a platform for people that want to do their
                   part in fighting climate change by
                   <strong>reducing waste.</strong></span
                 >
@@ -28,7 +28,7 @@
                 <span
                   >As the yearly increase in wastage and limited wasteland size
                   in <strong>Semakau island</strong> is projected to be
-                  <strong>full by 2035</strong>, Kampong Spirit aims to reduce
+                  <strong>full by 2035</strong>, Kampung Spirit aims to reduce
                   wastage in terms of providing users a platform to donate
                   unwanted items for others to reuse / recycle, minimze food
                   wastage by allowing others to consume the excess food (such as

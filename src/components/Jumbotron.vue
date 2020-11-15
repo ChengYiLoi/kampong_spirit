@@ -22,6 +22,8 @@
         </b-col>
       </b-row>
     </b-jumbotron>
+    <!-- Image reference:
+    https://lottiefiles.com/13893-eco-living -->
   </div>
 </template>
 <script>

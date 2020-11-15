@@ -36,8 +36,15 @@
               {{ location }}
             </b-col>
           </b-row>
+          <b-row v-if="isAdmin">
+            <b-col>
+              <p class="text-right">
+                <strong>Status: </strong>
+                {{eventInfo.status}}
+              </p>
+            </b-col>
+          </b-row>
         </b-col>
-      
       </b-row>
     </b-card>
     <eventeditform :eventInfo="eventInfo"></eventeditform>
@@ -55,8 +62,8 @@
         <p><strong>Description:</strong> {{ eventInfo.description }}</p>
         <p><strong>Location:</strong> {{ eventInfo.location }}</p>
         <p><strong>Postal Code:</strong> {{ eventInfo.postalCode }}</p>
-        <p><strong>Date:</strong> {{ startDate }}</p>
-        <p><strong>Time:</strong> {{ startEndTime }}</p>
+        <p><strong>Date:</strong> {{ startDateTime }}</p>
+        <p><strong>Time:</strong> {{ endDateTime }}</p>
         <p><strong>Green Points Reward:</strong> {{ eventInfo.pointsEarn }}</p>
         <p>
           <strong>Current Number of Participants Joined:</strong>
@@ -92,7 +99,11 @@
                 <div v-if="!isButtonLoading">
                   Join
                 </div>
-                <b-spinner style="width: 1.0rem; height: 1.0rem" v-else label="spinning"></b-spinner> </b-button
+                <b-spinner
+                  style="width: 1.0rem; height: 1.0rem"
+                  v-else
+                  label="spinning"
+                ></b-spinner> </b-button
             ></b-col>
           </b-row>
         </template>
@@ -112,8 +123,8 @@
         <p><strong>Description:</strong> {{ eventInfo.description }}</p>
         <p><strong>Location:</strong> {{ eventInfo.location }}</p>
         <p><strong>Postal Code:</strong> {{ eventInfo.postalCode }}</p>
-        <p><strong>Start Date Time:</strong> {{ eventInfo.startDatetime }}</p>
-        <p><strong>End Date Time:</strong> {{ eventInfo.endDatetime }}</p>
+        <p><strong>Start Date Time:</strong> {{ startDateTime }}</p>
+        <p><strong>End Date Time:</strong> {{ endDateTime }}</p>
         <p><strong>Green Points Reward:</strong> {{ eventInfo.pointsEarn }}</p>
 
         <p>
@@ -130,14 +141,18 @@
               ><b-button
                 class=" w-100"
                 variant="danger"
-                @click="$bvModal.hide('event-modal-user')"
+                @click="$bvModal.hide(`event-modal-info-${eventInfo.eventID}`)"
                 >Close</b-button
               ></b-col
             >
             <b-col class="pl-1"
               ><b-button class="w-100" variant="success" @click="withdrawEvent">
                 <div v-if="!isButtonLoading">Withdraw</div>
-                <b-spinner v-else label="spinner" style="width: 1.0rem; height: 1.0rem"></b-spinner> </b-button
+                <b-spinner
+                  v-else
+                  label="spinner"
+                  style="width: 1.0rem; height: 1.0rem"
+                ></b-spinner> </b-button
             ></b-col>
           </b-row>
         </template>
@@ -170,23 +185,24 @@ export default {
     return {
       // selectedParticipants: [],
       // eventParticipants: [],
-      
     };
   },
   methods: {
     toggleButtonLoading() {
-       this.$store.state.isButtonSpinner = !this.$store.state.isButtonSpinner;
+      // render the spinner in the button
+      this.$store.commit('toggleButtonLoading');
     },
     toggleLoading() {
-      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+      // renders the spinner
+      this.$store.commit('toggleLoading');
     },
 
     withdrawEvent() {
+      
       this.toggleButtonLoading();
       let eventID = this.eventInfo["eventID"];
       let email = this.getUserEmail;
-      console.log(eventID);
-      console.log(email);
+
       let url = `./database/withdraw.php?eventID=${eventID}&email=${email}`;
       url = encodeURI(url);
       axios.post(url).then(() => {
@@ -206,6 +222,7 @@ export default {
       });
     },
     displayModal() {
+      // displays modals with different options based on whether the user is an admin or not
       if (!this.isAdmin) {
         if (this.isDisplayUserEvents) {
           this.$bvModal.show(`event-modal-info-${this.eventInfo.eventID}`);
@@ -217,40 +234,73 @@ export default {
       }
     },
     emailConfirmation() {
-      this.toggleButtonLoading();
-      let email = this.getUserEmail;
-      let eventID = this.eventInfo["eventID"];
-      let title = this.eventInfo["title"];
-      let type = this.eventInfo["type"];
-      let startDateTime = this.eventInfo["startDatetime"];
-      let endDateTime = this.eventInfo["endDatetime"];
-      let location = this.eventInfo["location"];
-      let postalCode = this.eventInfo["postalCode"];
-      let pointsEarn = this.eventInfo["pointsEarn"];
-      let url = `./database/send_email.php?email=${email}&eventID=${eventID}&title=${title}&type=${type}&startDatetime=${startDateTime}&endDatetime=${endDateTime}&location=${location}&postalCode=${postalCode}&pointsEarn=${pointsEarn}`;
-      url = encodeURI(url);
-      axios.get(url).then(() => {
-        setTimeout(() => {
-          this.toggleButtonLoading();
-          this.$bvModal.hide(`${this.eventInfo.eventID}`);
-          this.$bvModal.show(
-            `event-join-confirmation-${this.eventInfo.eventID}`,
-          );
-          url = `./database/insert_join.php?eventID=${eventID}&email=${email}`;
-          url = encodeURI(url);
-          axios.get(url);
-        }, 1200);
-      });
+      //Sends a email to the user has decided to join the event, if the user is not logged in, will redirect to login page
+      if (!this.$store.state.userInfo.isLogin) {
+        this.$router.push({ name: "Login" });
+      } else {
+        this.toggleButtonLoading();
+        let email = this.getUserEmail;
+        let eventID = this.eventInfo["eventID"];
+        let title = this.eventInfo["title"];
+        let type = this.eventInfo["type"];
+        let startDateTime = this.eventInfo["startDatetime"];
+        let endDateTime = this.eventInfo["endDatetime"];
+        let location = this.eventInfo["location"];
+        let postalCode = this.eventInfo["postalCode"];
+        let pointsEarn = this.eventInfo["pointsEarn"];
+        let url = `./database/send_email.php?email=${email}&eventID=${eventID}&title=${title}&type=${type}&startDatetime=${startDateTime}&endDatetime=${endDateTime}&location=${location}&postalCode=${postalCode}&pointsEarn=${pointsEarn}`;
+        url = encodeURI(url);
+        axios.get(url).then(() => {
+          setTimeout(() => {
+            this.toggleButtonLoading();
+            this.$bvModal.hide(`${this.eventInfo.eventID}`);
+            this.$bvModal.show(
+              `event-join-confirmation-${this.eventInfo.eventID}`,
+            );
+            url = `./database/insert_join.php?eventID=${eventID}&email=${email}`;
+            url = encodeURI(url);
+            axios.get(url);
+          }, 1200);
+        });
+      }
     },
   },
   computed: {
-     isButtonLoading() {
+    startDateTime() {
+      // returns the event start date time
+      var options = {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      };
+      let output = new Date(this.eventInfo["startDatetime"]);
+      output = output.toLocaleTimeString("en-SG", options);
+      
+      return output;
+    },
+    endDateTime() {
+      // returns the event end date time
+      var options = {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      };
+      let output = new Date(this.eventInfo["endDatetime"]);
+      output = output.toLocaleTimeString("en-SG", options);
+      return output;
+    },
+    isButtonLoading() {
+      // toggle the boolean to display the button spinner
       return this.$store.state.isButtonSpinner;
     },
     isLoading() {
+      // toggle the boolena to display the spinner
       return this.$store.state.isSpinner;
     },
     isDisplayUserEvents() {
+      
       return this.$store.state.isDisplayUserEvents;
     },
     isAdmin() {
@@ -277,7 +327,7 @@ export default {
       let isJoined = false;
       userEvents = this.$store.state.userEvents;
       userEvents.forEach((event) => {
-        console.log(event["eventID"]);
+       
         if (eventID === event["eventID"]) {
           isJoined = true;
         }
@@ -292,30 +342,27 @@ export default {
       var endDateTimeObj = new Date(this.eventInfo.endDatetime);
       var sHour = startDateTimeObj.toLocaleTimeString("en-SG").split("");
       var eHour = endDateTimeObj.toLocaleTimeString("en-SG").split("");
-      
-      
-          sHour = sHour
-        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
-        .concat([" "])
-        .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 8, 11))
-        .join("")
-        .toString()
-        .toUpperCase();
-      eHour = eHour
-        .slice(0, endDateTimeObj.getHours() >= 13 ? 4 : 5)
-        .concat([" "])
-        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 7 : 8, 11))
-        .join("")
-        .toString()
-        .toUpperCase();
-      
 
-  
-    
+      sHour = sHour
+        .slice(0, sHour[0] == 1 ? 5 : 4)
+        .concat([" "])
+        .concat(sHour.slice(sHour[0] == 1 ? 8 : 7, 11))
+        .join("")
+        .toString()
+        .toUpperCase();
+
+      // if(endDateTimeObj.getHours() )
+      eHour = eHour
+        .slice(0, eHour[0] == 1 && eHour[1] != ":" ? 5 : 4)
+        .concat([" "])
+        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 8 : 8))
+        .join("")
+        .toString()
+        .toUpperCase();
+
       var output = `${sHour} to ${eHour}`.toString();
-    
+
       return output;
-      
     },
     startDate() {
       var startDateTime = this.eventInfo.startDatetime;
@@ -355,13 +402,13 @@ export default {
   }
 }
 @media only screen and (max-width: 768px) {
-  .event-card-info{
+  .event-card-info {
     font-size: 0.7rem;
   }
 }
 @media only screen and (max-width: 425px) {
-  .event-card-info{
-    font-size: 1.0rem;
+  .event-card-info {
+    font-size: 1rem;
   }
 }
 </style>

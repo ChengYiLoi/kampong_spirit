@@ -34,16 +34,29 @@
           <b-carousel-slide>
             <template #img>
               <b-img fluid :src="require('../assets/carousel-1.png')"></b-img>
+              <!-- Image references:
+              https://www.cgs.gov.sg/how-can-we-act/volunteer
+              http://www.globalstewards.org/environmental-calendar.htm -->
             </template>
           </b-carousel-slide>
           <b-carousel-slide>
             <template #img>
               <b-img fluid :src="require('../assets/carousel-2.png')"></b-img>
+              <!-- Image references:
+              https://www.facebook.com/CGSingapore/photos/10158455180911855
+              https://www.facebook.com/CGSingapore/photos/10158374626811855
+              https://www.nea.gov.sg/programmes-grants/events-calendar/past-events/index/clean-green-singapore-launch-ceremony-and-main-carnival-2019
+              https://greennudge.sg/green-event/ -->
             </template>
           </b-carousel-slide>
           <b-carousel-slide>
             <template #img>
               <b-img fluid :src="require('../assets/carousel-3.png')"></b-img>
+              <!-- Image references:
+              https://www.facebook.com/CGSingapore/photos/a.10157489007181855/10157489007701855
+              https://www.facebook.com/CGSingapore/photos/a.10157489007181855/10157489007521855
+              https://www.facebook.com/CGSingapore/photos/a.390989376854/10158250237241855
+              https://www.facebook.com/CGSingapore/photos/a.10157489007181855/10157489007521855 -->
             </template>
           </b-carousel-slide>
         </b-carousel>
@@ -96,171 +109,33 @@
       </b-row>
       <userevents v-if="isDisplayUserEvents"></userevents>
       <div class="p-0" v-else>
-        <!-- <b-table
-        v-if="isAdmin"
-        table-variant="light"
-        head-variant="dark"
-        hover
-        striped
-        selectable
-        select-mode="single"
-        stacked="md"
-        :items="events"
-        @row-selected="updateSelectedEvent"
-      >
-      </b-table> -->
         <b-row class="p-2">
           <b-col>
             <b-card-group columns>
               <div v-for="event in events" :key="event.eventID">
-                <eventcard
-                  v-if="filter[getMonth(event)]"
-                  :eventInfo="event"
-                ></eventcard>
+                <div v-if="!isAdmin">
+                  <eventcard
+                    v-if="
+                      filter[getMonth(event)] && checkEventAvail(event)
+                    "
+                    :eventInfo="event"
+                  ></eventcard>
+                </div>
+                <div v-else>
+                  <eventcard
+                    v-if="filter[getMonth(event)]"
+                    :eventInfo="event"
+                  ></eventcard>
+                </div>
               </div>
+              <!-- Image references:
+              https://www.science.edu.sg/whats-on/workshops-activities/international-days-at-scs/earth-day-at-scs
+              https://www.cgs.gov.sg/how-can-we-act/events/events-details/2017/11/11/default-calendar/clean-green-singapore-(north-west) -->
+
             </b-card-group>
           </b-col>
         </b-row>
-
-        <b-modal
-          id="confirm-cancel"
-          size="sm"
-          ok-title="Confirm"
-          ok-variant="success"
-          cancel-variant="danger"
-          hide-header
-          centered
-          @ok="cancelEvent"
-        >
-          <p class="text-center">
-            <strong>Confirm cancel {{ eventInfo["title"] }}?</strong>
-          </p>
-        </b-modal>
-
         <eventcreateform></eventcreateform>
-
-        <!-- <b-modal
-        id="create-event-form"
-        size="lg"
-        title="Create New Event"
-        hide-footer
-        button-size="lg"
-      >
-        <b-form class="modal-info p-3">
-          <b-form-group label="Event Name:" label-for="eTitle">
-            <b-form-input v-model="eventTitle" id="eTitle" type="text">
-            </b-form-input>
-          </b-form-group>
-          <b-form-group label="Event Description:" label-for="eDescription">
-            <b-form-textarea v-model="eDescription" id="eDescription">
-            </b-form-textarea>
-          </b-form-group>
-          <b-row>
-            <b-col>
-              <b-form-group label="Location:" label-for="location">
-                <b-form-input v-model="location" id="location" type="text">
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col cols="4">
-              <b-form-group label="Postal Code:" label-for="pCode">
-                <b-form-input v-model="pCode" id="pCode" type="text">
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col>
-              <b-form-group
-                label="Maximum Participants:"
-                label-for="mParticipants"
-              >
-                <b-form-input
-                  v-model="mParticipants"
-                  id="mParticipants"
-                  type="number"
-                  min="0"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col>
-              <b-form-group label="Green Points Reward:" label-for="gPoints">
-                <b-form-input
-                  v-model="gPoints"
-                  id="gPoints"
-                  type="number"
-                  min="0"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col>
-              <b-row>
-                <b-col>
-                  <b-form-group label="Event Type:" label-for="eventType">
-                    <b-form-input v-model="eventType" id="eType" type="text">
-                    </b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </b-col>
-          </b-row>
-
-          <b-row>
-            <b-col>
-              <b-form-group label="Start Date Time:" label-for="sDateTime">
-                <b-form-input
-                  v-model="sDateTime"
-                  id="sDateTime"
-                  type="datetime-local"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col>
-              <b-form-group label="End Date Time:" label-for="eDateTime">
-                <b-form-input
-                  v-model="eDateTime"
-                  id="eDateTime"
-                  type="datetime-local"
-                >
-                </b-form-input>
-              </b-form-group>
-            </b-col>
-          </b-row>
-        </b-form>
-        <b-alert :show="isCreateErrors" class="w-100" variant="warning">
-          <ul>
-            <li v-if="eventTitle == ''">Event name cannot be empty</li>
-            <li v-if="eDescription == ''">Event description cannot be empty</li>
-            <li v-if="location == ''">Event location cannot be empty</li>
-            <li v-if="pCode == ''">Event postal code cannot be empty</li>
-            <li v-if="mParticipants == ''">
-              Maximum event participants code cannot be empty
-            </li>
-            <li v-if="eventType == ''">Event type cannot be empty</li>
-            <li v-if="sDateTime == ''">
-              Event start date time cannot be empty
-            </li>
-            <li v-if="eDateTime == ''">Event end date time cannot be empty</li>
-          </ul>
-        </b-alert>
-        <template>
-          <b-row class="pb-2">
-            <b-col class="pr-0"
-              ><b-button class=" w-100" variant="danger"
-                >Cancel</b-button
-              ></b-col
-            >
-            <b-col class="pl-1"
-              ><b-button class="w-100" variant="success" @click="createNewEvent"
-                >Create</b-button
-              ></b-col
-            >
-          </b-row>
-        </template>
-      </b-modal> -->
       </div>
     </div>
     <b-spinner
@@ -280,7 +155,7 @@ import eventcard from "../components/eventCard";
 var axios = require("axios");
 export default {
   mounted() {
-    // this.getAllEvents();
+    this.getAllEvents();
   },
   components: {
     eventcreateform,
@@ -343,10 +218,24 @@ export default {
     };
   },
   methods: {
+    checkEventAvail(event) {
+      // check the event start date with the current date. 
+      //If the current date is later than the start date, the event card will not render
+      let currentDate = new Date();
+      let eventStartDate = new Date(event["startDatetime"]);
+      let max = event['maxcapacity'];
+      let current = event['numPart'];
+   
+      if(eventStartDate > currentDate &&  parseInt(current) < parseInt(max)){
+        return true;
+      }
+      return false;
+    },
     toggleLoading() {
-      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+      this.$store.commit('toggleLoading');
     },
     displayCreateEventForm() {
+      // resets the form inputs and display the create event form modal
       this.eventTitle = "";
       this.eDescription = "";
       this.location = "";
@@ -357,44 +246,8 @@ export default {
       this.sDateTime = "";
       this.eDateTime = "";
       this.$bvModal.show("create-event-form");
+      
     },
-
-    cancelEvent() {
-      let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
-      url = encodeURI(url);
-      axios.get(url).then((result) => {
-        alert("Event participants retrieved");
-        console.log(result.data);
-        this.eventParticipants = result.data;
-        url = `./database/cancelled_event.php?eventID=${this.eventInfo["eventID"]}`;
-        url = encodeURI(url);
-        axios.post(url).then(() => {
-          console.log(this.eventParticipants);
-          let participants = this.eventParticipants;
-          for (var participant in participants) {
-            console.log(`email is ${participant["email"]}`);
-            let email = participants[participant]["email"];
-            url = `./database/update_cancel.php?email=${email}&eventID=${this.eventInfo["eventID"]}`;
-            url = encodeURI(url);
-            axios.get(url);
-            url = `./database/cancelled_emailsend.php?email=${email}&title=${this.eventTitle}`;
-            url = encodeURI(url);
-            axios.get(url);
-          }
-
-          //  url = `cancelled_emailsend.php?email=${email}&title=${this.eventTitle}`;
-          //  url = `update_cancel.php?email=${email}&eventID=${this.eventInfo['eventID']}`;
-          //  axios.get(url).then(()=>{
-          //  url = `update_cancel.php?email=${email}&eventID=${this.eventInfo['eventID']}`;
-          //  axios.get(url);
-        });
-      });
-
-      alert("Event has been cancelled");
-      this.$bvModal.hide("edit-event-form");
-      this.getAllEvents();
-    },
-
     getAllEvents() {
       this.toggleLoading();
       let url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
@@ -403,7 +256,7 @@ export default {
         setTimeout(() => {
           this.toggleLoading();
           this.$store.state.events = result.data;
-          console.log(result.data);
+        
         }, 1800);
 
         url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
@@ -416,7 +269,8 @@ export default {
 
     updateSelectedEvent(selectedEventInfo) {
       // this.selectedEvent = selectedEventInfo[0];
-      alert("update fired");
+    
+    
       this.selectedEvent = {
         description: selectedEventInfo[0].description,
         endDatetime: selectedEventInfo[0].endDatetime,
@@ -431,7 +285,7 @@ export default {
         startDatetime: selectedEventInfo[0].startDatetime,
         type: selectedEventInfo[0].type,
       };
-      console.log(this.selectedEvent);
+    
       // this.eventInfo = selectedEventInfo[0];
       // this.eventTitle = selectedEventInfo[0].title;
       // this.eDescription = selectedEventInfo[0].description;
@@ -446,7 +300,10 @@ export default {
         : this.$bvModal.show("event-modal-user");
     },
     displayUserEvents() {
-      if (!this.isDisplayUserEvents) {
+      if(!this.$store.state.userInfo.isLogin){
+        this.$router.push({name: "Login"})
+      }else{
+         if (!this.isDisplayUserEvents) {
         this.toggleLoading();
         let url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
         url = encodeURI(url);
@@ -462,6 +319,8 @@ export default {
       }
       this.$store.state.isDisplayUserEvents = !this.$store.state
         .isDisplayUserEvents;
+      }
+     
     },
     getMonth(event) {
       var months = [
@@ -507,7 +366,7 @@ export default {
       // let output = [];
       let events = [];
       events = this.$store.state.events;
-      console.log(events);
+     
 
       return events;
     },

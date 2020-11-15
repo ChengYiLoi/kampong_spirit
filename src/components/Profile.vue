@@ -323,7 +323,7 @@
                     class="w-100"
                     @click="$bvModal.hide('view-rewards')"
                     variant="danger"
-                    >Cancel</b-button
+                    >Close</b-button
                   >
                 </b-col>
                 <b-col v-if="selected.length > 0">
@@ -412,6 +412,8 @@
                 :src="require('../assets/goldMedalLocked.svg')"
               ></b-img>
             </b-col>
+            <!-- Image references:
+            https://www.flaticon.com/free-icon/medal_3428106?term=badges%20eco&page=1&position=1 -->
           </b-row>
         </div>
       </div>
@@ -494,14 +496,14 @@ export default {
       let url;
       this.selected.forEach((obj) => {
         url = `./database/deletereward.php?rewardcode=${obj["rewardcode"]}&email=${this.email}`;
-        console.log(url);
+       
         axios.post(url);
       });
       this.getUserRewards();
     },
     onRowSelected(items) {
       this.selected = items;
-      console.log(this.selected);
+    
     },
     resetNum() {
       this.newmobileno = "";
@@ -519,14 +521,13 @@ export default {
       this.$bvModal.hide("user-name");
     },
     toggleLoading() {
-      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+      this.$store.commit('toggleLoading');
     },
     getUserRewards() {
       let url = `./database/userrewards.php?email=${this.email}`;
       axios.get(url).then((result) => {
         this.$store.state.userRewards = result.data;
-        console.log("user rewards is");
-        console.log(result.data);
+      
       });
     },
     getUserData() {
@@ -538,8 +539,7 @@ export default {
           this.toggleLoading();
           let data = result.data[0];
           data.isLogin = true;
-          console.log("User data is");
-          console.log(result.data);
+         
           // sessionStorage.setItem("userSession", JSON.stringify(data));
           this.$store.state.userInfo = data;
         }, 1800);
@@ -623,7 +623,7 @@ export default {
       }
     },
     updateInfo() {
-      console.log(this.newpassword);
+     
       let url = `./database/editprofile.php?fname=${this.newfname}&lname=${this.newlname}&email=${this.email}&mobileno=${this.newmobileno}&password=${this.newpassword}`;
       url = encodeURI(url);
       postData(url, this.updateUsernameCallBack);
@@ -645,7 +645,7 @@ export default {
         if (data[0] != null) {
           data = data[0];
           data.isLogin = true;
-          console.log(data);
+        
           this.updateSession(data);
           this.toggleLoading();
           // sessionStorage.setItem("userSession", JSON.stringify(data));
@@ -657,7 +657,7 @@ export default {
       this.isVisible = !this.isVisible;
     },
     checkSession() {
-      alert("checking profile session");
+     
       let user;
       if (sessionStorage.getItem("userSession")) {
         user = JSON.parse(sessionStorage.getItem("userSession"));
@@ -665,7 +665,7 @@ export default {
         user = JSON.parse(localStorage.getItem("userStorage"));
       }
 
-      console.log(user);
+     
       this.$store.state.userInfo = user;
       this.getUserData();
     },
@@ -690,12 +690,12 @@ export default {
       url = encodeURI(url);
       axios.get(url).then((result) => {
         result.data.forEach((event) => {
-          console.log(event);
+         
           let date = event.endDatetime;
           let dateArray = date.split(/\D+/);
           let month = dateArray[1];
           month = this.$store.state.monthNames[--month];
-          console.log(month);
+         
 
           if (monthsWithEvents[month] === "") {
             // alert("found matching month");
@@ -703,14 +703,14 @@ export default {
           } else {
             monthsWithEvents[month] = [month, monthsWithEvents[month][1] + 1];
           }
-          console.log(Array.isArray(monthsWithEvents[month]));
+         
         });
         for (var month in monthsWithEvents) {
           if (Array.isArray(monthsWithEvents[month])) {
             chartData.push(monthsWithEvents[month]);
           }
         }
-        console.log(chartData);
+       
         this.$store.state.chartData = chartData;
       });
     },
@@ -729,7 +729,7 @@ export default {
       let pass;
       if (!this.isVisible) {
         pass = this.$store.state.userInfo.password;
-        console.log(pass);
+       
         let hiddenPass = "";
         for (let x = 0; x < pass.length; x++) {
           hiddenPass += "*";
@@ -740,7 +740,7 @@ export default {
     },
     userInfo() {
       let userInfo = sessionStorage.getItem("userSession");
-      console.log(userInfo);
+     
       return userInfo;
     },
 
@@ -789,7 +789,7 @@ table {
 #tooltip-gold {
   transition: transform 0.3s linear;
   &:hover {
-    transform: scale(1.2);
+    transform: scale(1.07);
   }
 }
 @media only screen and (max-width: 426px) {

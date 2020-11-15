@@ -144,6 +144,7 @@ export default {
   },
   methods: {
     resetCreateForm(){
+      // resets the form after submission or cancel
       this.eventPicture = null;
       this.eventTitle = null,
       this.eventPictureName = null;
@@ -162,9 +163,6 @@ export default {
       this.parseEndDate = Date.parse(this.eDateTime);
     //   this.sDateTimeObj = new Date(this.sDateTime);
     // this.eDateTimeObj  = new Date(this.eDateTime);
-      
-      console.log(this.sDateTime < this.currentDate);
-      
       this.isCreateErrors = false;
       if (this.eventTitle == "") {
         this.isCreateErrors = true;
@@ -192,7 +190,7 @@ export default {
       }
      
       if (this.parseEndDate < this.parseStartDate) {
-        console.log(`End date is smaller than start date ${this.parseEndDate < this.parseStartDate}`)
+       
         this.isCreateErrors = true;
       }
      
@@ -219,6 +217,7 @@ export default {
         } else {
           this.eventPictureName = "noimage.png";
         }
+        
 
         
 
@@ -234,13 +233,14 @@ export default {
           extension == "jpg" ||
           extension == "svg"
         ) {
+     
           let url = `./database/addimageevent.php`;
           axios.post(url, fd).then(() => {
             url = `./database/create_event.php?title=${this.eventTitle}&type=${this.eventType}&startDateTime=${this.sDateTime}&endDateTime=${this.eDateTime}&location=${this.location}&postalCode=${this.pCode}&description=${this.eDescription}&pointsEarn=${this.gPoints}&maxcapacity=${this.mParticipants}&image=${this.eventPictureName}`;
             url = encodeURI(url);
             axios.post(url).then(() => {
               this.$bvModal.hide("create-event-form");
-              alert("event has been created");
+            
               this.resetCreateForm();
               url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
               url = encodeURI(url);

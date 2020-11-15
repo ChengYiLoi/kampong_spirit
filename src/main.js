@@ -32,7 +32,7 @@ Vue.use(VueGoogleCharts);
 
 Vue.use(VueGoogleMaps,{
   load:{
-    key: "",
+    key: "AIzaSyA_X2QcQ2oiNONAXrSFCMwvlL6bFQNzjJs",
   },
   
 });
@@ -45,4 +45,4 @@ new Vue({
   render: h => h(App)
 }).$mount("#app");
 
-// AIzaSyA_X2QcQ2oiNONAXrSFCMwvlL6bFQNzjJs
+

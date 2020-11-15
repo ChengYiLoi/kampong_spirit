@@ -43,7 +43,7 @@ export default {
         user = JSON.parse(localStorage.getItem("userStorage"));
         this.$store.state.userInfo = user;
       } else if (sessionStorage.getItem("userStorage") != null) {
-        alert("session found");
+        
         user = JSON.parse(sessionStorage.getItem("userSession"));
         this.$store.state.userInfo = user;
       }

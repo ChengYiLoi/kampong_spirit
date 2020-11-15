@@ -39,7 +39,7 @@ export default {
       }
 
       if (userSession != null) {
-        alert("user did not log out");
+       
         this.$router.push({ name: "Main" });
       } else {
         this.$router.push({ name: "Login" });

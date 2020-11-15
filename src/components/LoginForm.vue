@@ -6,9 +6,16 @@
       @click="handleSignIn"
       id="google"
       class="mt-4 d-block w-100 mx-auto"
+      :disabled="isLoading"
     >
-      <span><img src="../assets/google.svg"/></span> Sign in with Google
+      <b-spinner v-if="isGoogleLoading" label="spinning"></b-spinner>
+      <div v-else>
+        <span><img src="../assets/google.svg"/></span> Sign in with Google
+      </div>
     </button>
+    <b-alert v-if="isTaken" show variant="warning">
+      Email is already registered
+    </b-alert>
     <b-form @submit.stop.prevent="onSubmit()" class="text-left">
       <b-form-group label="Email Address:" label-for="email" class="my-4">
         <b-form-input
@@ -126,9 +133,6 @@
         </b-row>
       </template>
     </b-modal>
-    <b-modal id="login-error" ok-only>
-      Google account not signed up. Please sign up before trying again.
-    </b-modal>
     <b-modal id="reset-confirmation" ok-only class="text-center" centered>
       An email will be sent to your email. Please follow the instruction in the
       email to reset your password.
@@ -155,6 +159,8 @@ export default {
       islogInvalid: false,
       reCaptcha: "",
       isReCaptcha: true,
+      isTaken: false,
+      isGoogleLoading: false,
     };
   },
   validations: {
@@ -171,17 +177,20 @@ export default {
   },
   methods: {
     onVerify(response) {
-      console.log(response);
+      // stores the recaptch response
+      // When a user logs in, the login function will check if the reCaptcha variable is empty. If it is, the user will prompt to do the reCaptcha validation
       this.reCaptcha = response;
     },
     toggleLoading() {
-      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+      this.$store.commit('toggleLoading');
+    },
+    toggleGoogleLoading() {
+      this.isGoogleLoading = !this.isGoogleLoading;
     },
     resetPass() {
       this.toggleLoading();
       let url = `./database/checkemail.php?email=${this.resetEmail}`;
       axios.get(url).then((response) => {
-        console.log(response);
         if (response.data.length == 1) {
           this.toggleLoading();
           url = `./database/forgetpassword.php?email=${this.resetEmail}`;
@@ -203,44 +212,75 @@ export default {
       });
     },
     createSession(userInfo) {
-      console.log(userInfo);
+     
       this.getUserRewards(userInfo["email"]);
       userInfo.isLogin = true;
       sessionStorage.setItem("userSession", JSON.stringify(userInfo));
       this.$store.state.userInfo = userInfo;
       if (this.keepLogged) {
         localStorage.setItem("userStorage", JSON.stringify(userInfo));
-       
       }
     },
     handleSignIn() {
+      // Log in function for the traditional way
+      this.isReCaptcha = true;
       this.$gAuth.signIn().then((user) => {
-        console.log("user", user);
+      
         let email;
+        let fname;
+        let lname;
+        this.isTaken = false;
 
         for (var props in user) {
           let substring = props.substring(1);
           if (substring == "t") {
             email = user[props].getEmail();
+            fname = user[props].getGivenName();
+            lname = user[props].getFamilyName();
+           
           }
         }
         if (this.reCaptcha != "") {
-          let data;
-          let idtoken = user.wc["login_hint"];
-          let url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
-          url = encodeURI(url);
-          axios.get(url).then((result) => {
-           
-            console.log(result.data);
-            if (result.data.length == 1) {
-            
+          this.toggleGoogleLoading();
+          let url = `./database/checkemail.php?email=${email}`;
+          axios.get(url).then((response) => {
+            if (response.data.length >= 1) {
+              let data;
+              let idtoken = user.wc["login_hint"];
+              url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+              url = encodeURI(url);
+              axios.get(url).then((result) => {
+                setTimeout(() => {
+                 
+                  if (result.data.length == 1) {
+                    this.toggleGoogleLoading();
 
-              data = result.data[0];
-              // this.$store.state.dashOptions.marketplace.selected = true;
-              this.createSession(data);
-              this.$router.push({ name: "Main" });
+                    data = result.data[0];
+                    // this.$store.state.dashOptions.marketplace.selected = true;
+                    this.createSession(data);
+                    this.$router.push({ name: "Main" });
+                  }
+                }, 1800);
+              });
             } else {
-              this.$bvModal.show("login-error");
+              let idtoken = user.wc["login_hint"];
+              url = `./database/signupgmail.php?lname=${lname}&fname=${fname}&email=${email}&idtoken=${idtoken}`;
+              url = encodeURI(url);
+              axios.post(url).then(() => {
+                setTimeout(() => {
+                  url = `./database/validateGoogleAuth.php?useremail=${email}&googleidtoken=${idtoken}`;
+                  url = encodeURI(url);
+                  axios.get(url).then((response) => {
+                    if (response.data.length == 1) {
+                      this.toggleGoogleLoading();
+                      let data = response.data[0];
+                      this.$store.state.dashOptions.marketplace.selected = true;
+                      this.createSession(data);
+                      this.$router.push({ name: "Main" });
+                    }
+                  });
+                }, 1800);
+              });
             }
           });
         } else {
@@ -276,7 +316,6 @@ export default {
     authLogin(dataObj) {
       this.toggleLoading();
       let data = JSON.parse(dataObj);
-      console.log(data);
       if (data[0] != null) {
         setTimeout(() => {
           data = data[0];
@@ -389,8 +428,8 @@ $white: rgb(245, 245, 245);
 }
 @media only screen and (max-width: 320px) {
   .captcha-size {
-    transform: scale(0.80);
-    -webkit-transform: scale(0.80);
+    transform: scale(0.8);
+    -webkit-transform: scale(0.8);
     transform-origin: 0 0;
     -webkit-transform-origin: 0 0;
   }

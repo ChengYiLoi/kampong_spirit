@@ -3,7 +3,7 @@
     <b-row class="pt-2">
       <b-col></b-col>
       <b-col cols="2">
-        <b-button class="w-100 d-block mx-auto" v-b-modal="'addNewItemForm'"
+        <b-button class="w-100 d-block mx-auto" @click="toggleAddItemForm"
           >Add new Item</b-button
         >
       </b-col>
@@ -14,18 +14,11 @@
         <b-card-group columns>
           <div v-for="item in userItems" :key="item.iID" :item="item">
             <itemcard v-if="filter[item.category]" :item="item"></itemcard>
-            
           </div>
         </b-card-group>
       </b-col>
     </b-row>
-    <b-modal
-      id="addNewItemForm"
-      centered
-      title="New Item"
-      ok-title="Add"
-      @ok="onSubmit"
-    >
+    <b-modal id="addNewItemForm" centered title="New Item" hide-footer>
       <b-form class="modal-info p-3">
         <b-form-group label="Item Picture:" label-for="itemPicture">
           <b-form-file id="itemPicture" v-model="itemPicture"></b-form-file>
@@ -78,7 +71,58 @@
           <b-form-input v-model="location" id="location" type="text" required>
           </b-form-input>
         </b-form-group>
+        <b-alert variant="warning" v-if="isCreateErrors" show>
+          <ul>
+            <li v-if="itemName == null">
+              Item name cannot be empty
+            </li>
+            <li v-if="selectedCategory == null">
+              Please select a category
+            </li>
+            <li v-if="selectedCondition == null">
+              Please indicate the item condition
+            </li>
+            <li v-if="itemDescription == null">
+              Item description cannot be empty
+            </li>
+            <li v-if="selectedDeliveryType == null">
+              Please indicate the delivery type
+            </li>
+          </ul>
+        </b-alert>
+        <template>
+          <div class="mt-2">
+            <b-row>
+              <b-col class=""
+                ><b-button
+                  class="w-100"
+                  variant="danger"
+                  @click="$bvModal.hide('addNewItemForm')"
+                  >Cancel</b-button
+                ></b-col
+              >
+              <b-col class=""
+                ><b-button @click="addItem" class="w-100" variant="success"
+                  >Add</b-button
+                ></b-col
+              >
+            </b-row>
+          </div>
+        </template>
       </b-form>
+    </b-modal>
+    <b-modal
+      id="image-formats"
+      ok-only
+      ok-title="Close"
+      ok-variant="danger"
+      hide-header
+      centered
+    >
+      <p class="text-center">
+        Image upload only allows file types of
+        <strong>GIF, PNG, JPG, JPEG and BMP</strong>
+      </p>
     </b-modal>
   </b-container>
 </template>
@@ -93,6 +137,7 @@ export default {
 
   data() {
     return {
+      isCreateErrors: false,
       itemPicture: null,
       itemName: null,
       selectedCategory: null,
@@ -103,49 +148,79 @@ export default {
     };
   },
   methods: {
+    toggleAddItemForm(){
+      this.itemPicture = null;
+      this.itemName = null;
+      this.selectedCategory = null;
+      this.selectedCondition = null;
+      this.itemDescription = null;
+      this.selectedDeliveryType = null;
+      this.location = null;
+      this.$bvModal.show('addNewItemForm');
+    },
     toggleLoading() {
       this.$store.state.isSpinner = !this.$store.state.isSpinner;
     },
-    onSubmit() {
-      var fd = new FormData();
-
-      fd.append("itemPicture", this.itemPicture);
-      if (this.itemPicture == null) {
-        this.itemPicture = { name: "noimage.png" };
+    addItem() {
+      this.isCreateErrors = false;
+      if (this.itemName == "") {
+        this.isCreateErrors = true;
       }
-      let itemPictureName = this.itemPicture["name"];
-      var extension = itemPictureName
-        .substring(itemPictureName.lastIndexOf(".") + 1)
-        .toLowerCase();
+      if (this.selectedCategory == null) {
+        this.isCreateErrors = true;
+      }
+      if (this.selectedCondition == null) {
+        this.isCreateErrors = true;
+      }
+      if (this.itemDescription == null) {
+        this.isCreateErrors = true;
+      }
+      if (this.selectedDeliveryType == null) {
+        this.isCreateErrors = true;
+      }
+      if (!this.isCreateErrors) {
+        var fd = new FormData();
+        fd.append("itemPicture", this.itemPicture);
+        if (this.itemPicture == null) {
+          this.itemPicture = { name: "noimage.png" };
+        }
+        let itemPictureName = this.itemPicture["name"];
+        var extension = itemPictureName
+          .substring(itemPictureName.lastIndexOf(".") + 1)
+          .toLowerCase();
 
-      if (
-        extension == "gif" ||
-        extension == "png" ||
-        extension == "bmp" ||
-        extension == "jpeg" ||
-        extension == "jpg" ||
-        extension == "jpg" ||
-        extension == "svg"
-      ) {
-        this.toggleLoading();
-        let url = `./database/addItems.php?pictureName=${itemPictureName}&itemName=${this.itemName}&selectedCategory=${this.selectedCategory}&selectedCondition=${this.selectedCondition}&itemDescription=${this.itemDescription}&selectedDeliveryType=${this.selectedDeliveryType}&location=${this.location}&userEmail=${this.userEmail}`;
-        url = encodeURI(url);
-        axios.post(url).then(() => {
-          url = `./database/addimage.php?`;
-          axios.post(url, fd).then(() => {
-            url = `./database/getUserItems.php?useremail=${this.userEmail}`;
-            axios.get(url).then((result) => {
-              setTimeout(() => {
-                this.toggleLoading();
-                console.log(result);
-                this.$store.state.userItems = result.data;
-              }, 1800);
+        if (
+          extension == "gif" ||
+          extension == "png" ||
+          extension == "bmp" ||
+          extension == "jpeg" ||
+          extension == "jpg" ||
+          extension == "jpg" ||
+          extension == "svg"
+        ) {
+          this.toggleLoading();
+          let url = `./database/addItems.php?pictureName=${itemPictureName}&itemName=${this.itemName}&selectedCategory=${this.selectedCategory}&selectedCondition=${this.selectedCondition}&itemDescription=${this.itemDescription}&selectedDeliveryType=${this.selectedDeliveryType}&location=${this.location}&userEmail=${this.userEmail}`;
+          url = encodeURI(url);
+          axios.post(url).then(() => {
+            url = `./database/addimage.php?`;
+            axios.post(url, fd).then(() => {
+              url = `./database/getUserItems.php?useremail=${this.userEmail}`;
+              axios.get(url).then((result) => {
+                setTimeout(() => {
+                  this.toggleLoading();
+                  console.log(result);
+                  this.$store.state.userItems = result.data;
+                }, 1800);
+              });
             });
           });
-        });
+        } else {
+          this.$bvModal.show("image-formats");
+        }
       } else {
-        alert("Photo only allows file types of GIF, PNG, JPG, JPEG and BMP.");
+        this.$bvModal.show("addNewItemForm");
       }
+
       // getData(url, this.itemAdded);
     },
   },

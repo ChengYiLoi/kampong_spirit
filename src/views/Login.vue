@@ -16,6 +16,8 @@
       </b-col>
       <b-col class="text-right d-none d-lg-block">
         <b-img fluid :src="require('../assets/earth.svg')"></b-img>
+        <!-- Image reference:
+        https://undraw.co/search -->
       </b-col>
     </b-row>
   </div>

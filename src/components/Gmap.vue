@@ -12,7 +12,7 @@
       </b-row>
     </div>
     <div class="main">
-      <gmap-map :center="currentPos" :zoom="16" id="map" class="mx-1">
+      <gmap-map :center="currentPos" :zoom="16" id="map">
         <!-- @click='setMarker' for gmap-map if want to allow user to place marker on map -->
         <gmap-info-window
           :options="infoWindowOptions"
@@ -30,6 +30,7 @@
             hide-footer
             centered
           >
+          <!-- terneray expression to return the values if the active marker ID is undefined -->
             <b-row>
               <b-col>
                 <b-form-group
@@ -71,7 +72,7 @@
             >
               <b-form-input
                 v-model="editForm['postalcode']"
-                placeholder="#######"
+                placeholder=""
                 id="pCode"
               ></b-form-input>
             </b-form-group>
@@ -83,21 +84,11 @@
               <b-form-textarea
                 v-model="editForm['locDesc']"
                 id="descriptionInput"
-                placeholder="Briefly describe your event"
+                placeholder="E.g Void Deck, Residence Corner, Level 5 Lift Lobby"
               >
               </b-form-textarea>
             </b-form-group>
-            <!-- <b-form-group
-                    label="Start Time: "
-                    label-for="sDateTime"
-                    label-cols="3"
-                  >
-                    <b-form-input
-                      v-model="createForm['sDateTime']"
-                      type="datetime-local"
-                      id="sDateTime"
-                    ></b-form-input>
-                  </b-form-group> -->
+         
             <b-form-group
               label="End Time: "
               label-for="eDateTime"
@@ -151,7 +142,10 @@
             <b-row v-if="editForm['type'] == 'Give Away'">
               <b-col cols="12">
                 <b-form-group label="Event Name: " label-cols="3">
-                  <b-form-input v-model="editForm['name']" disabled></b-form-input>
+                  <b-form-input
+                    v-model="editForm['name']"
+                    disabled
+                  ></b-form-input>
                 </b-form-group>
               </b-col>
               <b-col cols="12">
@@ -240,12 +234,13 @@
             </template>
             <b-alert :show="isCreateErrors" class="w-100" variant="warning">
               <ul>
+                 <li v-if="editForm['postalcode'] == ''">
+                        Postal code cannot be empty
+                      </li>
                 <li v-if="editForm['locDesc'] == ''">
                   Event description cannot be empty
                 </li>
-                <!-- <li v-if="createForm['sDateTime'] == null">
-                        Start date time cannot be empty
-                      </li> -->
+                
                 <li v-if="editForm['endDatetime'] == null">
                   End date time cannot be empty
                 </li>
@@ -306,21 +301,23 @@
             <b-container fluid class="marker-info">
               <b-row>
                 <b-col class="py-2 text-left">
-                
-                  <p v-if="activeMarker['type'] == 'Buffet' || activeMarker['type'] == 'Give Away'">
-                    <strong>Location Description: </strong>{{activeMarker.locDesc}}
+                  <p
+                    v-if="
+                      activeMarker['type'] == 'Buffet' ||
+                        activeMarker['type'] == 'Give Away'
+                    "
+                  >
+                    <strong>Location Description: </strong
+                    >{{ activeMarker.locDesc }}
                   </p>
                   <div v-if="activeMarker['type'] == 'Give Away'">
-                      <p>
-                    <strong>Event Name: </strong>{{activeMarker.name}}
-                  </p>
-                  <p>
-                    <strong>Item Description: </strong>
-                    {{activeMarker.itemDesc}}
-                  </p>
+                    <p><strong>Event Name: </strong>{{ activeMarker.name }}</p>
+                    <p>
+                      <strong>Item Description: </strong>
+                      {{ activeMarker.itemDesc }}
+                    </p>
                   </div>
-                
-                
+
                   <p
                     v-if="
                       activeMarker['telegramid'] != null &&
@@ -331,7 +328,8 @@
                     >{{ activeMarker.telegramid }}
                   </p>
                   <p v-if="activeMarker['cuisineType'] != null">
-                    <strong>Cuisine type: </strong>{{ activeMarker.cuisineType }}
+                    <strong>Cuisine type: </strong
+                    >{{ activeMarker.cuisineType }}
                   </p>
                   <p v-if="activeMarker['halal'] != null">
                     <strong>Halal: </strong
@@ -401,27 +399,32 @@
             </b-row>
           </div>
         </gmap-info-window>
-        <gmap-marker
-          v-for="marker in markers"
-          :key="marker.latitude"
-          :position="
-            filter[marker['type']]
-              ? {
-                  lat: parseFloat(marker.latitude),
-                  lng: parseFloat(marker.longitude),
-                }
-              : null
-          "
-          :clickable="true"
-          :draggable="false"
-          @click="setActiveMarker(marker)"
-          :icon="{
-            url: require(`../assets/${marker.mimage}`),
+        <div v-for="marker in markers" :key="marker.latitude">
+          <gmap-marker
+            v-if="checkDateTime(marker)"
+            :position="
+              filter[marker['type']]
+                ? {
+                    lat: parseFloat(marker.latitude),
+                    lng: parseFloat(marker.longitude),
+                  }
+                : null
+            "
+            :clickable="true"
+            :draggable="false"
+            @click="setActiveMarker(marker)"
+            :icon="{
+              url: require(`../assets/${marker.mimage}`),
 
-            scaledSize: iconScaleSize,
-          }"
-        >
-        </gmap-marker>
+              scaledSize: iconScaleSize,
+            }"
+          >
+          </gmap-marker>
+          <!-- Image references:
+          https://www.flaticon.com/free-icon/chicken_933245?term=fried%20chicken&page=1&position=22
+          https://www.flaticon.com/free-icon/picnic_3380781?term=bread%20basket&page=1&position=80
+          https://www.flaticon.com/free-icon/water_1582023?term=water%20droplet&page=1&position=21 -->
+        </div>
       </gmap-map>
 
       <b-row class="m-2">
@@ -436,6 +439,8 @@
                 fluid
                 :src="require(`../assets/${weather.img}.svg`)"
               ></b-img>
+              <!-- Image reference:
+              https://www.amcharts.com/free-animated-svg-weather-icons/ -->
               <p class="weather-description">
                 <strong>{{ weather.description }}</strong>
               </p>
@@ -552,7 +557,7 @@
                   >
                     <b-form-input
                       v-model="createForm['pCode']"
-                      placeholder="#######"
+                      placeholder=""
                       id="pCode"
                     ></b-form-input>
                   </b-form-group>
@@ -696,10 +701,6 @@
                     </b-col>
                   </b-row>
 
-                  <!-- <b-tooltip target="tooltip-tele">
-                    Click this to get your Telegram user ID
-                  </b-tooltip> -->
-
                   <template>
                     <b-row class="pb-2">
                       <b-col class="pr-0"
@@ -730,12 +731,13 @@
                     variant="warning"
                   >
                     <ul>
+                      <li v-if="createForm['pCode'] == null">
+                        Postal code cannot be empty
+                      </li>
                       <li v-if="createForm['description'] == ''">
                         Event description cannot be empty
                       </li>
-                      <!-- <li v-if="createForm['sDateTime'] == null">
-                        Start date time cannot be empty
-                      </li> -->
+                 
                       <li v-if="createForm['eDateTime'] == null">
                         End date time cannot be empty
                       </li>
@@ -883,12 +885,20 @@ export default {
     };
   },
   methods: {
+    checkDateTime(marker) {
+      if (marker.type == "refill") {
+        return true;
+      }
+      let currentDate = new Date();
+      let eventDateTime = new Date(marker["endDatetime"]);
+      return eventDateTime > currentDate;
+    },
     deleteMarker() {
       let url = `./database/deletebuffet.php?email=${this.activeMarker["host"]}&bid=${this.activeMarker["bID"]}`;
       if (this.activeMarker["type"] == "Give Away") {
         url = `./database/deletegiveaway.php?email=${this.activeMarker["host"]}&gaid=${this.activeMarker["gaID"]}`;
       }
-      console.log(url);
+     
       axios.post(url);
       this.$bvModal.hide(
         this.activeMarker["gaID"] == undefined
@@ -940,11 +950,11 @@ export default {
         this.isCreateErrors = true;
       }
       if (!this.isEditErrors) {
-        console.log(this.editForm["postalcode"]);
+      
         var data;
         let key = "AIzaSyBum4Aau6RFj_MyiKFERdj5xKq812WJfVU";
         let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${this.editForm["postalcode"]}&key=${key}`;
-        console.log(url);
+      
         axios.get(url).then((response) => {
           if (response.data.results.length != 0) {
             data = response.data.results[0];
@@ -958,7 +968,7 @@ export default {
             if (this.editForm["type"] == "Give Away") {
               url = `./database/editgiveaway.php?email=${this.editForm["host"]}&gaid=${this.editForm["gaID"]}&locdescription=${this.editForm["locDesc"]}&latitude=${this.editForm["latitude"]}&longitude=${this.editForm["longitude"]}&endtime=${this.editForm["endDatetime"]}&eventname=${this.editForm["name"]}&itemdesc=${this.editForm["itemDesc"]}&pcode=${this.editForm["postalcode"]}`;
             }
-            console.log(url);
+           
             url = encodeURI(url);
             axios.post(url).then(() => {
               this.$bvModal.hide(
@@ -989,7 +999,7 @@ export default {
       this.$bvModal.show(modal);
     },
     toggleLoading() {
-      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+      this.$store.commit('toggleLoading');
     },
     telegram() {
       let url = `https://t.me/kampung_spirit_bot`;
@@ -1006,7 +1016,7 @@ export default {
       let url = `https://api.openweathermap.org/data/2.5/weather?q=Singapore&appid=59c4666c81f49ccae94014d00279149e&units=metric`;
       axios.get(url).then((response) => {
         let data = response.data;
-        console.log(response.data);
+       
         this.weather["description"] = data.weather[0]["description"];
 
         this.weather["temperature"] = data.main["temp"].toFixed(1);
@@ -1015,7 +1025,7 @@ export default {
           this.weather.img = "rainy";
         } else if (data.weather[0]["main"] == "Clouds") {
           let currentTime = new Date().getHours();
-          console.log(currentTime);
+        
           if (currentTime > 19 || currentTime < 7) {
             this.weather.img = "cloudy-moon";
           } // if the weather is cloudy and is already past sunset
@@ -1049,7 +1059,7 @@ export default {
             //   marker.draggable = false;
             // })
             this.$store.state.markers = allMarkers;
-            console.log(this.$store.state.markers);
+        
           });
         });
       });
@@ -1128,12 +1138,11 @@ export default {
         let key = "AIzaSyBum4Aau6RFj_MyiKFERdj5xKq812WJfVU";
         let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${this.createForm["pCode"]}&key=${key}`;
         axios.get(url).then((response) => {
-          console.log(response);
+        
           if (response["status"] == 200) {
             if (response.data.results.length != 0) {
               data = response.data.results[0];
-              console.log("data is");
-              console.log(data);
+            
               this.createForm["lat"] = data.geometry.location.lat;
               this.createForm["lng"] = data.geometry.location.lng;
               this.currentPos = {
@@ -1149,14 +1158,13 @@ export default {
                 setTimeout(() => {
                   this.toggleLoading();
                   this.resetFields();
-                  console.log(url);
+                
                   this.$bvModal.hide("create-event-form");
                   this.getMarkers();
                 }, 2000);
               });
             } else {
               this.toggleLoading();
-              alert("Marker could not be created");
             }
           }
         });
@@ -1166,7 +1174,7 @@ export default {
       // }
     },
     setMarker(data) {
-      console.log(data);
+     
       let latLng = data.latLng.toJSON();
 
       let newMarker = {
@@ -1180,7 +1188,7 @@ export default {
       this.isSelectedMarker = true;
       this.createForm["lat"] = latLng["lat"];
       this.createForm["lng"] = latLng["lng"];
-      console.log(this.createForm);
+     
 
       if (
         this.markers.length > 0 &&
@@ -1204,7 +1212,7 @@ export default {
       place.minutes = minutes;
       this.activeMarker = place;
       this.infoWindowOpened = true;
-      console.log(place);
+     
     },
     closeWindowMarker() {
       this.activeMarker = {};

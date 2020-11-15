@@ -51,7 +51,7 @@
     <div>
       <div v-if="!isLoading">
         <div>
-          <b-row class="pt-2">
+          <b-row class="pt-2" v-if="displayMarketItems">
             <b-col></b-col>
             <b-col lg="8" class="mx-2">
               <b-input-group>
@@ -132,6 +132,17 @@
             <b-card-group columns>
               <div v-for="item in items" :key="item.iID">
                 <itemcard v-if="filter[item.category]" :item="item"></itemcard>
+                <!-- Image references:
+                https://www.businessinsider.com/hydro-flask-oasis-jug-review
+                https://www.pinterest.com/pin/259801472238548631/
+                https://www.narcecases.com/products/real-pressed-dried-flowers-transparent-silicone-phone-case
+                https://www.2knowandvote.com/how-to-wear-a-herschel-little-america-backpack/
+                https://www.msn.com/en-sg/lifestyle/lifestyle/malaysian-comedian-behind-viral-uncle-roger-video-on-youtube-super-grateful-people-love-his-work/ar-BB18kGPv?li=BBr8Cnr
+                https://www.universalstudentliving.com/graduate-linkedin-profile-top-tips/
+                https://www.gentlemanstationer.com/blog/2019/7/5/top-five-mechanical-pencils-for-when-you-really-want-to-write-small
+                https://bleacherreport.com/articles/2904832-khabib-says-conor-mcgregor-is-a-better-striker-than-ufc-champ-justin-gaethje 
+                https://www.etsy.com/sg-en/listing/627437476/mens-leather-wallet-mens-wallet-slim
+                -->
               </div>
             </b-card-group>
           </b-col>
@@ -139,6 +150,8 @@
             <b-row>
               <b-col cols="12">
                 <b-img fluid :src="require('../assets/empty.svg')"></b-img>
+                <!-- Image reference:
+                https://undraw.co/search -->
               </b-col>
               <b-col cols="12">
                 The item you are looking for is not available
@@ -210,8 +223,7 @@ export default {
         axios.get(url).then((response) => {
           setTimeout(() => {
             this.toggleButtonLoading();
-            console.log(response);
-            console.log(response.data);
+          
             this.searchInput = "";
             this.$store.state.items = response.data;
           }, 1500);
@@ -222,10 +234,10 @@ export default {
       }
     },
     toggleButtonLoading() {
-      this.$store.state.isButtonSpinner = !this.$store.state.isButtonSpinner;
+       this.$store.commit('toggleButtonLoading');
     },
     toggleLoading() {
-      this.$store.state.isSpinner = !this.$store.state.isSpinner;
+      this.$store.commit('toggleLoading');
     },
     getItems() {
       this.toggleLoading();
@@ -251,7 +263,7 @@ export default {
 
     renderUserItems(data) {
       setTimeout(() => {
-        console.log(JSON.parse(data));
+       
         this.toggleLoading();
         this.$store.state.userItems = JSON.parse(data);
       }, 1800);
@@ -260,7 +272,7 @@ export default {
     renderItems(data) {
       setTimeout(() => {
         this.toggleLoading();
-        console.log(JSON.parse(data));
+       
         this.$store.state.items = JSON.parse(data);
       }, 1800);
     },
@@ -275,7 +287,7 @@ export default {
     },
     displayUserChat() {
       if (!this.validateLogin()) {
-        alert("user has not logged in");
+        
         this.$router.push({ name: "Login" });
       } else {
         window.location.replace(
@@ -297,15 +309,15 @@ export default {
       let userSession;
       if (sessionStorage.getItem("userSession") != null) {
         userSession = JSON.parse(sessionStorage.getItem("userSession"));
-        console.log("user session is");
+       
         this.$store.state.userInfo = userSession;
       }
       if (localStorage.getItem("userStorage") != null) {
         userSession = JSON.parse(localStorage.getItem("userStorage"));
         this.$store.state.userInfo = userSession;
       }
-      console.log(this.$store.state["userInfo"]);
-      // this.getItems();
+     
+      this.getItems();
     },
     toggleMarketPlace() {
       this.$store.state.isDisplayMarketItems = !this.$store.state

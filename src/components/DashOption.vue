@@ -42,6 +42,7 @@ export default {
   },
   computed:{
     isLogin(){
+      // Checks if the user has logged in
       return this.$store.state.userInfo.isLogin;
     }
   }

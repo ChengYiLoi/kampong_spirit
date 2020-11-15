@@ -7,7 +7,11 @@
     <b-row class="p-2">
       <b-col cols="">
         <b-img fluid :src="require(`../assets/${cardObject.img}`)"
-      /></b-col>
+      
+      />
+      Image reference:
+      <!-- https://undraw.co/search -->
+      </b-col>
       <hr class="w-100" />
       <b-col cols="12">
         <b-card-text
@@ -32,13 +36,10 @@ export default {
   methods: {
     renderFeature() {
       let selectedName = this.cardObject.dashOption;
-     
-
       this.$store.state.dashOptions.profile.selected = false;
       this.$store.state.dashOptions.map.selected = false;
       this.$store.state.dashOptions.events.selected = false;
       this.$store.state.dashOptions.marketplace.selected = false;
-
       this.$store.state.dashOptions[selectedName].selected = true;
       // if (selectedName == "marketplace") {
       //   this.getItems();

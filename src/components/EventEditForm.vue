@@ -28,7 +28,7 @@
           {{ eventInfo.status }}
         </p>
 
-        <template>
+        <template v-if="checkStatus(this.eventInfo)">
           <b-row class="pb-2">
             <b-col
               ><b-button
@@ -158,20 +158,29 @@
             </b-form-group>
           </b-col>
         </b-row>
-        <b-button variant="warning" v-b-modal="'confirm-cancel'" class="w-100"
+        <b-button
+          variant="warning"
+          v-b-modal="`confirm-cancel-${eventInfo.eventID}`"
+          class="w-100"
           >Cancel Event</b-button
         >
       </b-form>
       <b-alert :show="isEditErrors" class="w-100" variant="warning">
         <ul>
-          <li v-if="eventTitle == ''">Event name cannot be empty</li>
-          <li v-if="eDescription == ''">Event description cannot be empty</li>
-          <li v-if="location == ''">Event location cannot be empty</li>
-          <li v-if="pCode == ''">Event postal code cannot be empty</li>
-          <li v-if="mParticipants == ''">
+          <li v-if="editForm['title'] == ''">Event name cannot be empty</li>
+          <li v-if="editForm['description'] == ''">
+            Event description cannot be empty
+          </li>
+          <li v-if="editForm['location'] == ''">
+            Event location cannot be empty
+          </li>
+          <li v-if="editForm['postalCode'] == ''">
+            Event postal code cannot be empty
+          </li>
+          <li v-if="editForm['maxcapacity'] == ''">
             Maximum event participants code cannot be empty
           </li>
-          <li v-if="eventType == ''">Event type cannot be empty</li>
+          <li v-if="editForm['type'] == ''">Event type cannot be empty</li>
         </ul>
       </b-alert>
       <template>
@@ -180,15 +189,17 @@
             ><b-button
               class=" w-100"
               variant="danger"
-              @click="$bvModal.hide(`${eventInfo.eventID}-admin`)"
+              @click="$bvModal.hide(`edit-event-form-${eventInfo.eventID}`)"
               >Cancel</b-button
             ></b-col
           >
           <b-col class="pl-1"
-            ><b-button class="w-100" variant="success" @click="updateEvent"
-              >Save</b-button
-            ></b-col
-          >
+            ><b-button class="w-100" variant="success" @click="updateEvent">
+              <div v-if="!isButtonLoading">
+                Update
+              </div>
+              <b-spinner label="spinning" v-else></b-spinner> </b-button
+          ></b-col>
         </b-row>
       </template>
     </b-modal>
@@ -216,27 +227,52 @@
         </div>
       </template>
     </b-modal>
+
+    <b-modal
+      :id="`confirm-cancel-${eventInfo.eventID}`"
+      size="sm"
+      ok-title="Confirm"
+      ok-variant="success"
+      cancel-variant="danger"
+      hide-header
+      centered
+      @ok="cancelEvent"
+    >
+      <p class="text-center">
+        <strong>Confirm cancel {{ eventInfo["title"] }}?</strong>
+      </p>
+    </b-modal>
+    <b-modal
+      :id="`image-formats-${this.eventInfo.eventID}`"
+      ok-only
+      ok-title="Close"
+      ok-variant="danger"
+      hide-header
+      centered
+    >
+      <p class="text-center">
+        Image upload only allows file types of
+        <strong>GIF, PNG, JPG, JPEG and BMP</strong>
+      </p>
+    </b-modal>
   </div>
 </template>
 <script>
 var axios = require("axios");
 export default {
   props: ["eventInfo"],
-  mounted() {
+  created() {
     this.editFormValues();
+  },
+
+  mounted() {
+    // this.editFormValues();
   },
   data() {
     return {
       isEditErrors: false,
       eventPicture: null,
       eventPictureName: null,
-      //   eventTitle: "",
-      //   eDescription: "",
-      //   location: "",
-      //   pCode: "",
-      //   mParticipants: "",
-      //   gPoints: 0,
-      //   eventType: "",
       sDateTime: "",
       eDateTime: "",
       selectedParticipants: [],
@@ -245,6 +281,71 @@ export default {
     };
   },
   methods: {
+    checkStatus(eventInfo) {
+      // Buttons for event will display if it is not completed
+      if (
+        eventInfo["status"] == "Completed" ||
+        eventInfo["status"] == "Cancelled"
+      ) {
+        return false;
+      }
+      return true;
+    },
+    toggleLoading() {
+      this.$store.commit("toggleLoading");
+    },
+    toggleButtonLoading() {
+      this.$store.commit("toggleButtonLoading");
+    },
+    cancelEvent() {
+      let url = `./database/geteventparticipants.php?eventid=${this.eventInfo["eventID"]}`;
+      url = encodeURI(url);
+      axios.get(url).then((result) => {
+        this.eventParticipants = result.data;
+        url = `./database/cancelled_event.php?eventID=${this.eventInfo["eventID"]}`;
+        url = encodeURI(url);
+        axios.post(url).then(() => {
+          this.$bvModal.hide(`edit-event-form-${this.eventInfo.eventID}`);
+          this.$bvModal.hide(`${this.eventInfo.eventID}-admin`);
+          this.getAllEvents();
+
+          let participants = this.eventParticipants;
+
+          for (var participant in participants) {
+            // loop to send the email to all users that have joined / not confirmed notifying the event has been cancelled
+            let email = participants[participant]["email"];
+            url = `./database/update_cancel.php?email=${email}&eventID=${this.eventInfo["eventID"]}`;
+            url = encodeURI(url);
+
+            axios.get(url);
+            url = `./database/cancelled_emailsend.php?email=${email}&title=${this.eventInfo["title"]}`;
+
+            url = encodeURI(url);
+            axios.get(url);
+          }
+
+          //  url = `cancelled_emailsend.php?email=${email}&title=${this.eventTitle}`;
+          //  url = `update_cancel.php?email=${email}&eventID=${this.eventInfo['eventID']}`;
+          //  axios.get(url).then(()=>{
+          //  url = `update_cancel.php?email=${email}&eventID=${this.eventInfo['eventID']}`;
+          //  axios.get(url);
+        });
+      });
+    },
+    getAllEvents() {
+      // retrieve all events
+      let url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
+      url = encodeURI(url);
+      axios.get(url).then((result) => {
+        this.$store.state.events = result.data;
+
+        url = `./database/getUserEvents.php?email=${this.getUserEmail}`;
+        url = encodeURI(url);
+        axios.get(url).then((result) => {
+          this.$store.state.userEvents = result.data;
+        }); // need to get events that the user has joined so cards will display "Already Joined Event"
+      });
+    },
     editFormValues() {
       var obj = {};
 
@@ -255,7 +356,6 @@ export default {
       this.editForm = obj;
     },
     distributeGreenPoints() {
-      console.log(`selected partcipants are ${this.selectedParticipants}`);
       this.$bvModal.hide(`${this.eventInfo.eventID}-admin`);
       this.selectedParticipants.forEach((participantEmail) => {
         let url = `./database/update_greenpoints.php?eventID=${this.eventInfo["eventID"]}&email=${participantEmail}`;
@@ -264,22 +364,22 @@ export default {
         axios.post(url).then(() => {
           url = `./database/mark_completed.php?eventID=${this.eventInfo["eventID"]}`;
           url = encodeURI(url);
-          axios.get(url);
+          axios.get(url).then(() => {
+            this.getAllEvents();
+          });
         });
       });
-      
     },
     getAllParticipants() {
       let url = `./database/join.php?eventID=${this.eventInfo["eventID"]}`;
       url = encodeURI(url);
       axios.get(url).then((result) => {
-       
-        console.log(result.data);
         this.eventParticipants = result.data;
       });
     },
     updateEvent() {
       this.isEditErrors = false;
+      // validations
       if (this.editForm["title"] == "") {
         this.isEditErrors = true;
       }
@@ -305,6 +405,7 @@ export default {
         this.isEditErrors = true;
       }
       if (!this.isEditErrors) {
+        // if there are not errors, update event via axios
         let parseStartDate = Date.parse(this.sDateTime);
         let parseEndDate = Date.parse(this.eDateTime);
         var fd = new FormData();
@@ -334,25 +435,24 @@ export default {
             ) {
               url = `./database/addImage.php`;
               axios.post(url, fd);
+
+              url = `./database/update_event.php?eventID=${this.editForm["eventID"]}&title=${this.editForm["title"]}&type=${this.editForm["type"]}&startDatetime=${this.editForm["startDatetime"]}&endDatetime=${this.editForm["endDatetime"]}&location=${this.editForm["location"]}&postalCode=${this.editForm["postalCode"]}&description=${this.editForm["description"]}&pointsEarn=${this.editForm["pointsEarn"]}&maxcapacity=${this.editForm["maxcapacity"]}&image=${this.eventPictureName}`;
+              url = encodeURI(url);
+              axios.post(url).then(() => {
+                this.$bvModal.hide(`edit-event-form-${this.eventInfo.eventID}`);
+                // this.getAllEvents();
+
+                url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
+                url = encodeURI(url);
+                axios.get(url).then((response) => {
+                  this.$store.state.events = response.data;
+                });
+              });
             } else {
-              alert("User has entered invalid image file type");
+              this.$bvModal.show(`image-formats-${this.eventInfo.eventID}`);
             }
           }
-          console.log(this.eventInfo);
-          url = `./database/update_event.php?eventID=${this.editForm["eventID"]}&title=${this.editForm["title"]}&type=${this.editForm["type"]}&startDatetime=${this.editForm["startDatetime"]}&endDatetime=${this.editForm["endDatetime"]}&location=${this.editForm["location"]}&postalCode=${this.editForm["postalCode"]}&description=${this.editForm["description"]}&pointsEarn=${this.editForm["pointsEarn"]}&maxcapacity=${this.editForm["maxcapacity"]}&image=${this.eventPictureName}`;
-          url = encodeURI(url);
-          axios.post(url).then(() => {
-          
-            this.$bvModal.hide(`edit-event-form-${this.eventInfo.eventID}`);
-            // this.getAllEvents();
 
-            url = `./database/getAllEvents.php?email=${this.getUserEmail}`;
-            url = encodeURI(url);
-            axios.get(url).then((response) => {
-             
-              this.$store.state.events = response.data;
-            });
-          });
           //     this.eventTitle = "";
           //     this.eDescription = "";
           //     this.location = "";
@@ -363,13 +463,15 @@ export default {
           //     this.sDateTime = "";
           //     this.eDateTime = "";
         } else {
-          
           this.$bvModal.show("edit-event-form");
         }
       }
     },
   },
   computed: {
+    isButtonLoading() {
+      return this.$store.state.isButtonSpinner;
+    },
     getUserEmail() {
       let email = "";
       if (sessionStorage.getItem("userSession") != null) {
@@ -385,16 +487,26 @@ export default {
       var eHour = endDateTimeObj.toLocaleTimeString("en-SG").split("");
 
       sHour = sHour
-        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
+        .slice(
+          0,
+          endDateTimeObj.getHours() >= 22 || endDateTimeObj.getHours() < 13
+            ? 4
+            : 5,
+        )
         .concat([" "])
         .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 8, 11))
         .join("")
         .toString()
         .toUpperCase();
       eHour = eHour
-        .slice(0, endDateTimeObj.getHours() >= 13 ? 4 : 5)
+        .slice(
+          0,
+          endDateTimeObj.getHours() >= 22 || endDateTimeObj.getHours() < 13
+            ? 5
+            : 4,
+        )
         .concat([" "])
-        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 7 : 8, 11))
+        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 8 : 8))
         .join("")
         .toString()
         .toUpperCase();
@@ -434,29 +546,3 @@ export default {
 };
 </script>
 <style lang="scss"></style>
-
- startEndTime() {
-      var startDateTimeObj = new Date(this.eventInfo.startDatetime);
-      var endDateTimeObj = new Date(this.eventInfo.endDatetime);
-      var sHour = startDateTimeObj.toLocaleTimeString("en-SG").split("");
-      var eHour = endDateTimeObj.toLocaleTimeString("en-SG").split("");
-
-      sHour = sHour
-        .slice(0, startDateTimeObj.getHours() >= 13 ? 4 : 5)
-        .concat([" "])
-        .concat(sHour.slice(startDateTimeObj.getHours() >= 13 ? 8 : 8, 11))
-        .join("")
-        .toString()
-        .toUpperCase();
-      eHour = eHour
-        .slice(0, endDateTimeObj.getHours() >= 13 ? 4 : 4)
-        .concat([" "])
-        .concat(eHour.slice(endDateTimeObj.getHours() >= 13 ? 7 : 8, 11))
-        .join("")
-        .toString()
-        .toUpperCase();
-
-      var output = `${sHour} to ${eHour}`.toString();
-
-      return output;
-    },

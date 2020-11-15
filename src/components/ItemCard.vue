@@ -41,12 +41,13 @@
               <span>
                 {{ item.fname }}{{ item.lname }}
                 <div id="profile-bg" class="d-inline">
-                  <b-avatar  :src="'./images/' + `${item.profilepic}`"></b-avatar>
+                  <b-avatar
+                    :src="'./images/' + `${item.profilepic}`"
+                  ></b-avatar>
                   <!-- <b-img
                     id="item-profile"
                     :src="'./images/' + `${item.profilepic}`"
                   ></b-img> -->
-
                 </div>
               </span>
             </p>
@@ -154,9 +155,11 @@
       ok-variant="success"
       cancel-variant="danger"
       centered
+      hide-header
+      size="small"
       @ok="deleteItem(`${item['iID']}`)"
     >
-      <p>Are you Sure?</p>
+      <p class="text-center">Remove {{ item.name }}?</p>
     </b-modal>
 
     <b-modal :id="`${item.iID}-edit`" centered title="Edit Item" hide-footer>
@@ -236,11 +239,25 @@
               class="w-100"
               variant="success"
               @click="updateItemInfo(`${item['iID']}`)"
-              >Save</b-button
-            ></b-col
-          >
+            >
+              <div v-if="!isButtonLoading">Save</div>
+              <b-spinner label="spinning" v-else></b-spinner> </b-button
+          ></b-col>
         </b-row>
       </template>
+    </b-modal>
+    <b-modal
+      :id="`image-formats-${item.iID}`"
+      ok-only
+      ok-title="Close"
+      ok-variant="danger"
+      hide-header
+      centered
+    >
+      <p class="text-center">
+        Image upload only allows file types of
+        <strong>GIF, PNG, JPG, JPEG and BMP</strong>
+      </p>
     </b-modal>
   </b-card>
 </template>
@@ -266,7 +283,11 @@ export default {
     };
   },
   methods: {
+    toggleButtonLoading() {
+      this.$store.commit("toggleButtonLoading");
+    },
     resetEditFields(modalName) {
+      // reset the edit form fields and displaying the modal
       this.itemName = null;
       this.selectedCategory = null;
       this.selectedCondition = null;
@@ -276,8 +297,8 @@ export default {
       this.$bvModal.hide(modalName);
     },
     displayChat(type) {
+      // redirects to the chat function
       if (!this.validateLogin()) {
-        alert("user has not logged in");
         this.$router.push({ name: "Login" });
       } else {
         if (type == "CWD") {
@@ -319,6 +340,7 @@ export default {
       }
 
       if (!this.isErrors) {
+        // if there are no validation errors, append the image file to the form data obj
         let url;
         if (this.itemPicture != null) {
           picName = this.itemPicture.name;
@@ -340,46 +362,51 @@ export default {
             extension == "jpg" ||
             extension == "svg"
           ) {
-            axios.post(url, fd).then(() => {});
+            axios.post(url, fd);
+            url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
+            url = encodeURI(url);
+            this.toggleButtonLoading();
+            axios.post(url).then(() => {
+              setTimeout(() => {
+                this.toggleButtonLoading();
+                if (this.$store.state.isDisplayMarketItems) {
+                  url = `./database/getItems.php`;
+                } else {
+                  url = `./database/getUserItems.php?useremail=${email}`;
+                }
+                url = encodeURI(url);
+                axios.get(url).then((result) => {
+                  this.$bvModal.hide(`${this.item.iID}-edit`);
+                  if (this.$store.state.isDisplayMarketItems) {
+                    this.$store.state.items = result.data;
+                  } else {
+                    this.$store.state.userItems = result.data;
+                  }
+                });
+              }, 1300);
+            });
+          }
+          else{
+            this.$bvModal.show(`image-formats-${this.item.iID}`);
           }
         }
 
-        url = `./database/processedit.php?image=${picName}&itemName=${this.itemName}&itemCat=${this.selectedCategory}&condition=${this.selectedCondition}&description=${this.itemDescription}&DeliveryType=${this.selectedDeliveryType}&iID=${iID}&location=${this.location}`;
-        url = encodeURI(url);
-        console.log("edit item url is");
-        console.log(url);
-        axios.post(url).then(() => {
-          if (this.$store.state.isDisplayMarketItems) {
-            url = `./database/getItems.php`;
-          } else {
-            url = `./database/getUserItems.php?useremail=${email}`;
-          }
-          url = encodeURI(url);
-          axios.get(url).then((result) => {
-            this.$bvModal.hide(`${this.item.iID}-edit`);
-            if (this.$store.state.isDisplayMarketItems) {
-              this.$store.state.items = result.data;
-            } else {
-              this.$store.state.userItems = result.data;
-            }
-          });
-        });
         // postData(url, this.updateItemInfoCallBack);
       }
     },
 
     updateItemStatus(type, iID) {
       //updates whether it is reserved or open
+      this.$bvModal.hide(`${this.item.iID}`);
       let email = this.$store.state.userInfo["email"];
       let url = `./database/updatechatitemstatus.php?newstatus=${type}&email=${email}&iID=${iID}`;
       url = encodeURI(url);
       postData(url, this.itemStatusCallback);
-      this.$bvModal.hide(`${this.item.name}`);
     },
     itemStatusCallback() {
       let url;
       if (this.$store.state.isDisplayMarketItems) {
-        // this.getItems();
+        
         url = `./database/getItems.php`;
         axios.get(url).then((response) => {
           this.$store.state.items = response.data;
@@ -390,7 +417,7 @@ export default {
         axios.get(url).then((response) => {
           this.$store.state.userItems = response.data;
         });
-        // this.getUserItems();
+    
       }
     },
 
@@ -436,6 +463,9 @@ export default {
   },
 
   computed: {
+    isButtonLoading() {
+      return this.$store.state.isButtonSpinner;
+    },
     checkItemStatus() {
       var result = "Mark as Reserved";
       if (this.item.status == "Reserved") {
@@ -568,12 +598,11 @@ $white: rgb(245, 245, 245);
     }
   }
 }
-@media only screen and (max-width: 425px){
-  .card-info{
-      .listed-info {
+@media only screen and (max-width: 425px) {
+  .card-info {
+    .listed-info {
       font-size: 1.3rem;
     }
   }
- 
 }
 </style>
